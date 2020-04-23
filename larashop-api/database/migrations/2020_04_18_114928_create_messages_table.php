@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateMessengerTable extends Migration
+class CreateMessagesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateMessengerTable extends Migration
      */
     public function up()
     {
-        Schema::create('messenger', function (Blueprint $table) {
+        Schema::create('message', function (Blueprint $table) {
             $table->increments('id');
 			$table->integer('user_id')->unsigned();
 			$table->integer('store_id')->unsigned();
@@ -33,11 +33,11 @@ class CreateMessengerTable extends Migration
      */
     public function down()
     {
-		Schema::table('messenger', function(Blueprint $table){
-            $table->dropForeign('messenger_sender_id_foreign');
-			$table->dropForeign('messenger_receiver_id_foreign');
+		Schema::table('message', function(Blueprint $table){
+            $table->dropForeign('message_sender_id_foreign');
+			$table->dropForeign('message_receiver_id_foreign');
         });	
 		
-        Schema::dropIfExists('messenger');
+        Schema::dropIfExists('message');
     }
 }

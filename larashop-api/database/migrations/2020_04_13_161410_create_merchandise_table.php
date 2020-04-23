@@ -22,9 +22,7 @@ class CreateMerchandiseTable extends Migration
 			$table->text("description")->nullable();
 			$table->double("stock")->nullable();
 			$table->double("price")->nullable();
-			$table->double("buy_count")->nullable();
 			$table->double("view_count")->nullable();
-			$table->double("wishlist_count")->nullable();
             $table->timestamps();
 			
 			$table->foreign('store_id')->references('id')->on('stores');

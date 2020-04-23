@@ -21,7 +21,7 @@ class CreateOrderMerchandiseTable extends Migration
 			$table->string("note")->nullable();
 			$table->timestamps();
 			
-			$table->foreign('order_id')->references('id')->on('users');
+			$table->foreign('order_id')->references('id')->on('orders');
 			$table->foreign('merchandise_id')->references('id')->on('merchandise');
         });
     }
