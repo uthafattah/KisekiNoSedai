@@ -20,6 +20,7 @@ class CreateOrderMerchandiseTable extends Migration
 			$table->double("quantity")->default('1');
 			$table->string("note")->nullable();
 			$table->timestamps();
+			$table->softDeletes();
 			
 			$table->foreign('order_id')->references('id')->on('orders');
 			$table->foreign('merchandise_id')->references('id')->on('merchandise');

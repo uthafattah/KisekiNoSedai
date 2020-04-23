@@ -24,6 +24,7 @@ class CreateMerchandiseTable extends Migration
 			$table->double("price")->nullable();
 			$table->double("view_count")->nullable();
             $table->timestamps();
+			$table->softDeletes();
 			
 			$table->foreign('store_id')->references('id')->on('stores');
         });

@@ -18,6 +18,7 @@ class CreateWishlistsTable extends Migration
 			$table->integer('user_id')->unsigned();
 			$table->integer('merchandise_id')->unsigned();
 			$table->timestamps();
+			$table->softDeletes();
 			
 			$table->foreign('user_id')->references('id')->on('users');
 			$table->foreign('merchandise_id')->references('id')->on('merchandise');

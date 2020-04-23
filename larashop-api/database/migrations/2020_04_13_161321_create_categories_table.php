@@ -19,6 +19,7 @@ class CreateCategoriesTable extends Migration
             $table->string('slug')->unique();
 			$table->string("photo")->default('photos/no_categories.png');
 			$table->timestamps(); 
+			$table->softDeletes();
         });
     }
 

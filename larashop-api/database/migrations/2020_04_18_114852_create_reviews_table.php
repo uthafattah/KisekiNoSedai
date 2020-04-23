@@ -19,6 +19,7 @@ class CreateReviewsTable extends Migration
 			$table->decimal("rating")->unique();
 			$table->string('comment')->nullable();
 			$table->timestamps();
+			$table->softDeletes();
 			
 			$table->foreign('order_id')->references('id')->on('orders');
         });

@@ -25,6 +25,7 @@ class CreateStoresTable extends Migration
 			$table->decimal("ratings")->nullable();
             $table->integer('status_store_id')->unsigned();
             $table->timestamps();
+			$table->softDeletes();
 			
 			$table->foreign('user_id')->references('id')->on('users');
 			$table->foreign('status_store_id')->references('id')->on('status_store');

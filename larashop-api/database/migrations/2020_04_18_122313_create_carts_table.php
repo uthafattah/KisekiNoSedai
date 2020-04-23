@@ -19,6 +19,7 @@ class CreateCartsTable extends Migration
 			$table->integer('merchandise_id')->unsigned();
 			$table->double("quantity")->default('1');
 			$table->timestamps();
+			$table->softDeletes();
 			
 			$table->foreign('user_id')->references('id')->on('users');
 			$table->foreign('merchandise_id')->references('id')->on('merchandise');

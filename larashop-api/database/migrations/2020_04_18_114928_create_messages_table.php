@@ -13,13 +13,14 @@ class CreateMessagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('message', function (Blueprint $table) {
+        Schema::create('messages', function (Blueprint $table) {
             $table->increments('id');
 			$table->integer('user_id')->unsigned();
 			$table->integer('store_id')->unsigned();
             $table->enum("sender", ["User", "Store"]);
-			$table->string('message');
+			$table->string('messages');
 			$table->timestamps();
+			$table->softDeletes();
 			
 			$table->foreign('user_id')->references('id')->on('users');
 			$table->foreign('store_id')->references('id')->on('stores');	
@@ -33,11 +34,11 @@ class CreateMessagesTable extends Migration
      */
     public function down()
     {
-		Schema::table('message', function(Blueprint $table){
-            $table->dropForeign('message_sender_id_foreign');
-			$table->dropForeign('message_receiver_id_foreign');
+		Schema::table('messages', function(Blueprint $table){
+            $table->dropForeign('messages_sender_id_foreign');
+			$table->dropForeign('messages_receiver_id_foreign');
         });	
 		
-        Schema::dropIfExists('message');
+        Schema::dropIfExists('messages');
     }
 }

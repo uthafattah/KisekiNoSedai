@@ -18,6 +18,7 @@ class CreateMerchandiseCategoryTable extends Migration
 			$table->integer('merchandise_id')->unsigned();
 			$table->integer('category_id')->unsigned();
 			$table->timestamps();
+			$table->softDeletes();
 			
 			$table->foreign('merchandise_id')->references('id')->on('merchandise');
 			$table->foreign('category_id')->references('id')->on('categories');

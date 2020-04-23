@@ -21,6 +21,7 @@ class CreateOrdersTable extends Migration
             $table->integer('status_order_id')->unsigned();
             $table->integer('payment_id')->unsigned();
 			$table->timestamps();
+			$table->softDeletes();
 			
 			$table->foreign('user_id')->references('id')->on('users');
             $table->foreign('status_order_id')->references('id')->on('status_order');
