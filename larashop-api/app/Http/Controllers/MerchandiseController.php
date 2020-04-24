@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Merchandise;
 use Illuminate\Http\Request;
+use App\Http\Resources\Merchandise as MerchandiseResource;
+use App\Http\Resources\MerchandiseCollection as MerchandiseResourceCollection;
 
 class MerchandiseController extends Controller
 {
@@ -12,19 +14,20 @@ class MerchandiseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function all()
     {
-        //
+        return response()->json(['merchandise' => Merchandise::all()], 200);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function index()
     {
-        //
+        //return response()->json(['merchandise' => Merchandise::all()], 200);
+        return new MerchandiseResourceCollection(Merchandise::paginate(5));
     }
 
     /**
@@ -45,17 +48,6 @@ class MerchandiseController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Merchandise $merchandise)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Merchandise  $merchandise
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Merchandise $merchandise)
     {
         //
     }

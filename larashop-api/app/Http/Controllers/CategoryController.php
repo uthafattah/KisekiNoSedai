@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use Illuminate\Http\Request;
+use App\Http\Resources\Category as CategoryResource;
+use App\Http\Resources\CategoryCollection as CategoryResourceCollection;
 
 class CategoryController extends Controller
 {
@@ -12,19 +14,20 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function all()
     {
-        //
+        return response()->json(['category' => Category::all()], 200);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function index()
     {
-        //
+        //return response()->json(['category' => Category::all()], 200);
+        return new CategoryResourceCollection(Category::paginate(10));
     }
 
     /**
@@ -44,20 +47,10 @@ class CategoryController extends Controller
      * @param  \App\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function show(Category $category)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Category $category)
-    {
-        //
+        $category = Category::where('name', 'LIKE', "%$id%")->paginate();
+        return response()->json(['category' => $category], 200);
     }
 
     /**

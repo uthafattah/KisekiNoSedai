@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use App\Http\Resources\User as UserResource;
+use App\Http\Resources\UserCollection as UserResourceCollection;
 
 class UserController extends Controller
 {
@@ -14,17 +16,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        //return response()->json(['user' => User::all()], 200);
+        return new UserResourceCollection(User::paginate(10));
     }
 
     /**
@@ -44,20 +37,10 @@ class UserController extends Controller
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(User $user)
-    {
-        //
+        $user = User::where('name', 'LIKE', "%$id%")->paginate();
+        return response()->json(['user' => $user], 200);
     }
 
     /**
