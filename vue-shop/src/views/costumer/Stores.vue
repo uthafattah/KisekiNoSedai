@@ -49,7 +49,7 @@
 							<div class="grey--text ml-4">x.x (xxx)</div>
 						</v-row>
 						<v-row>
-							<v-col><b>Rp. {{merchandise.price}}</b></v-col>
+							<v-col><b>{{merchandise.price | currency}}</b></v-col>
 							<v-col class="text-right">xxx Terjual</v-col>
 						</v-row>
 					</v-card-text>
@@ -111,9 +111,9 @@
 			},
 		},
         created(){
-            this.axios.get('http://localhost:8000/api/merchandise/all')
+            this.axios.get('http://localhost:8000/api/merchandise')
             .then((response) => {
-                  this.merchandises = response.data.merchandise
+                  this.merchandises = response.data.data
                   console.log(this.merchandises)
             })
             .catch((error) => {

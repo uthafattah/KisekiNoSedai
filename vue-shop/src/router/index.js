@@ -129,6 +129,16 @@ Vue.use(VueRouter)
 				component: () => import( /*webpackChunkName: "about"*/ '../views/admin/Stores.vue')
 			},
 			{
+				path: 'status-store',
+				name: 'Status Store',
+				component: () => import( /*webpackChunkName: "about"*/ '../views/admin/StatusStore.vue')
+			},
+			{
+				path: 'status-order',
+				name: 'Status Order',
+				component: () => import( /*webpackChunkName: "about"*/ '../views/admin/StatusOrder.vue')
+			},
+			{
 				path: 'users',
 				name: 'Users',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/admin/Users.vue')

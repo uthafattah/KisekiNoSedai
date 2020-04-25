@@ -53,7 +53,7 @@
 								<div class="grey--text ml-4">x.x (xxx)</div>
 							</v-row>
 							<v-row>
-								<v-col><b>Rp. {{merchandise.price}}</b></v-col>
+								<v-col><b>{{merchandise.price | currency}}</b></v-col>
 								<v-col class="text-right">xxx Terjual</v-col>
 							</v-row>
 						</v-card-text>
@@ -73,11 +73,11 @@
 		},
 		data: () => ({
 			drawer: null,
-            loading: false,
-            toggle_exclusive: 2,
-            text: 'center',
-            snackbar: false,
-            toggle_none: null,
+			loading: false,
+			toggle_exclusive: 2,
+			text: 'center',
+			snackbar: false,
+			toggle_none: null,
 			colors: [
 				'indigo',
 				'warning',
@@ -92,40 +92,42 @@
 				'Fourth',
 				'Fifth',
 			],
-            categories: [],
-            merchandises: [],
+			categories: [],
+			merchandises: [],
 			wishlist_color: 'pink lighten-5',
 		}),
-        created(){
-            this.axios.get('http://localhost:8000/api/category/all')
-            .then((response) => {
-                  this.categories = response.data.category
-                  console.log(this.categories)
-            })
-            .catch((error) => {
-                  let { responses } = error
-                  console.log(responses)
-            })
+		created(){
+			if(this.$route.path == '/') {
+				this.axios.get('http://localhost:8000/api/category/all')
+				.then((response) => {
+					this.categories = response.data.category
+					console.log(this.categories)
+				})
+				.catch((error) => {
+					let { responses } = error
+					console.log(responses)
+				})
 
-            this.axios.get('http://localhost:8000/api/merchandise/all')
-            .then((response) => {
-                  this.merchandises = response.data.merchandise
-                  console.log(this.merchandises)
-            })
-            .catch((error) => {
-                  let { responses } = error
-                  console.log(responses)
-            })
-        },
-        computed: {
-            isHome () {
-                return (this.$route.path == '/')
-            }
-        },
-        methods : {
-            getImage(image) {
-                return "http://localhost:8000/storage/" + image;
-            },
+				this.axios.get('http://localhost:8000/api/merchandise/all')
+				.then((response) => {
+					this.merchandises = response.data.merchandise
+					console.log(this.merchandises)
+				})
+				.catch((error) => {
+					let { responses } = error
+					console.log(responses)
+				})
+			}
+		},
+		computed: {
+			isHome () {
+				return (this.$route.path == '/')
+			}
+		},
+		methods : {
+			getImage(image) {
+				return "http://localhost:8000/storage/" + image;
+			},
 			wishlist() {
 				if(this.wishlist_color === 'pink lighten-5') {
 					this.wishlist_color = 'pink'
@@ -133,6 +135,6 @@
 					this.wishlist_color = 'pink lighten-5'
 				}
 			},
-        }
+		}
 	}
 </script>

@@ -139,6 +139,11 @@
 					action: '/settings'
 				},
 				{
+					icon: 'mdi-heart',
+					text: 'Wishlists',
+					action: 'wishlists'
+				},
+				{
 					icon: 'mdi-package',
 					text: 'My Order',
 					action: '/orders'
@@ -169,10 +174,6 @@
 				{
 					text: 'Reports',
 					action: '/reports'
-				},
-				{
-					text: 'Wishlists',
-					action: 'wishlists'
 				},
 			],
 			admin_menu: [
@@ -205,6 +206,16 @@
 					icon: 'mdi-ticket-percent',
 					text: 'Promos',
 					action: '/admin/promos'
+				}, 
+				{
+					icon: 'mdi-sticker-check',
+					text: 'Status Store',
+					action: '/admin/status-store'
+				}, 
+				{
+					icon: 'mdi-truck-check',
+					text: 'Status Order',
+					action: '/admin/status-order'
 				}, 
 				{
 					icon: 'mdi-email',
@@ -272,6 +283,8 @@
 					this.$route.path == '/admin/payments' ||
 					this.$route.path == '/admin/promos' ||
 					this.$route.path == '/admin/roles' ||
+					this.$route.path == '/admin/status-store' ||
+					this.$route.path == '/admin/status-order' ||
 					this.$route.path == '/admin/stores' ||
 					this.$route.path == '/admin/users'
 				)

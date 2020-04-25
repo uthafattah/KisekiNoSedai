@@ -1,57 +1,53 @@
 <template>
-	<v-app id="inspire">
-		<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" 
-		:headers="headers" :options.sync="options" :server-items-length="roles.total" :items="roles.data" show-select @input="selectAll" :footer-props="footerProps">
-			<template v-slot:top>
-				<v-toolbar flat>
-					<v-toolbar-title >Role Management System</v-toolbar-title>
-					<v-divider class="mx-4" inset vertical></v-divider>
-					<v-spacer></v-spacer>
-					<v-dialog v-model="dialog" max-width="500px">
-						<template v-slot:activator="{ on }">
-							<v-btn color="primary" dark class="mb-2" v-on="on">Add New Role</v-btn>
-							<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
-						</template>
-						<v-card>
-							<v-card-title>
-								<span class="headline">{{ formTitle }}</span>
-							</v-card-title>
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="roles.total" :items="roles.data" show-select @input="selectAll" :footer-props="footerProps">
+		<template v-slot:top>
+			<v-toolbar flat>
+				<v-toolbar-title>Role Management System</v-toolbar-title>
+				<v-divider class="mx-4" inset vertical></v-divider>
+				<v-spacer></v-spacer>
+				<v-dialog v-model="dialog" max-width="500px">
+					<template v-slot:activator="{ on }">
+						<v-btn color="primary" dark class="mb-2" v-on="on">Add New Role</v-btn>
+						<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
+					</template>
+					<v-card>
+						<v-card-title>
+							<span class="headline">{{ formTitle }}</span>
+						</v-card-title>
 
-							<v-card-text>
-								<v-container>
-									<v-row>
-										<v-col cols="12" sm="12">
-											<!--v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" :blur="checkRole" label="Role Name"></v-text-field-->
-											<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Role Name"></v-text-field>
-										</v-col>
-									</v-row>
-								</v-container>
-							</v-card-text>
-							<v-card-actions>
-								<v-spacer></v-spacer>
-								<!--v-btn color="blue darken-1" text @click="close">Cancel</v-btn-->
-								<v-btn color="blue darken-1" text>Cancel</v-btn>
-								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
-							</v-card-actions>
-						</v-card>
-					</v-dialog>
-				</v-toolbar>
-				<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
-			</template>
-			<template v-slot:item.actions="{ item }">
-				<v-icon small class="mr-2" @click="editItem(item)">
-					mdi-pencil
-				</v-icon>
-				<v-icon small @click="deleteItem(item)">
-					mdi-delete
-				</v-icon>
-			</template>
-			<template v-slot:no-data>
-				<v-btn color="primary" @click="initialize">Reset</v-btn>
-				<v-btn color="primary">Reset</v-btn>
-			</template>
-		</v-data-table>
-	</v-app>
+						<v-card-text>
+							<v-container>
+								<v-row>
+									<v-col cols="12" sm="12">
+										<!--v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" :blur="checkRole" label="Role Name"></v-text-field-->
+										<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Role Name"></v-text-field>
+									</v-col>
+								</v-row>
+							</v-container>
+						</v-card-text>
+						<v-card-actions>
+							<v-spacer></v-spacer>
+							<!--v-btn color="blue darken-1" text @click="close">Cancel</v-btn-->
+							<v-btn color="blue darken-1" text>Cancel</v-btn>
+							<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
+						</v-card-actions>
+					</v-card>
+				</v-dialog>
+			</v-toolbar>
+			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
+		</template>
+		<template v-slot:item.actions="{ item }">
+			<v-icon small class="mr-2" @click="editItem(item)">
+				mdi-pencil
+			</v-icon>
+			<v-icon small @click="deleteItem(item)">
+				mdi-delete
+			</v-icon>
+		</template>
+		<template v-slot:no-data>
+			<v-btn color="primary" @click="initialize">Reset</v-btn>
+		</template>
+	</v-data-table>
 </template>
 <script>
 	export default {

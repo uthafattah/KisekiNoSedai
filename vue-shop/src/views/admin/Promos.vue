@@ -1,61 +1,58 @@
 <template>
-	<v-app id="inspire">
-		<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" 
-		:headers="headers" :options.sync="options" :server-items-length="promos.total" :items="promos.data" show-select @input="selectAll" :footer-props="footerProps">
-			<template v-slot:top>
-				<v-toolbar flat>
-					<v-toolbar-title >Promo Management System</v-toolbar-title>
-					<v-divider class="mx-4" inset vertical></v-divider>
-					<v-spacer></v-spacer>
-					<v-dialog v-model="dialog" max-width="800px">
-						<template v-slot:activator="{ on }">
-							<v-btn color="primary" dark class="mb-2" v-on="on">Add New Promo</v-btn>
-							<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
-						</template>
-						<v-card>
-							<v-card-title>
-								<span class="headline">{{ formTitle }}</span>
-							</v-card-title>
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="promos.total" :items="promos.data" show-select @input="selectAll" :footer-props="footerProps">
+		<template v-slot:top>
+			<v-toolbar flat>
+				<v-toolbar-title>Promo Management System</v-toolbar-title>
+				<v-divider class="mx-4" inset vertical></v-divider>
+				<v-spacer></v-spacer>
+				<v-dialog v-model="dialog" max-width="800px">
+					<template v-slot:activator="{ on }">
+						<v-btn color="primary" dark class="mb-2" v-on="on">Add New Promo</v-btn>
+						<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
+					</template>
+					<v-card>
+						<v-card-title>
+							<span class="headline">{{ formTitle }}</span>
+						</v-card-title>
 
-							<v-card-text>
-								<v-container>
-									<v-row>
-										<v-col cols="12" sm="6">
-											<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Promo Name"></v-text-field>
-										</v-col>
-										<v-col cols="12" sm="6">
-											<!--v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" :blur="checkCode" label="Promo Code"></v-text-field-->
-											<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Promo Code"></v-text-field>
-										</v-col>
-										<v-col cols="12" md="12">
-											<v-textarea type="text" :rules="[rules.required]" v-model="editedItem.description" label="Description"></v-textarea>
-										</v-col>
-									</v-row>
-								</v-container>
-							</v-card-text>
-							<v-card-actions>
-								<v-spacer></v-spacer>
-								<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
-							</v-card-actions>
-						</v-card>
-					</v-dialog>
-				</v-toolbar>
-				<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
-			</template>
-			<template v-slot:item.actions="{ item }">
-				<v-icon small class="mr-2" @click="editItem(item)">
-					mdi-pencil
-				</v-icon>
-				<v-icon small @click="deleteItem(item)">
-					mdi-delete
-				</v-icon>
-			</template>
-			<template v-slot:no-data>
-				<v-btn color="primary" @click="initialize">Reset</v-btn>
-			</template>
-		</v-data-table>
-	</v-app>
+						<v-card-text>
+							<v-container>
+								<v-row>
+									<v-col cols="12" sm="6">
+										<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Promo Name"></v-text-field>
+									</v-col>
+									<v-col cols="12" sm="6">
+										<!--v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" :blur="checkCode" label="Promo Code"></v-text-field-->
+										<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Promo Code"></v-text-field>
+									</v-col>
+									<v-col cols="12" md="12">
+										<v-textarea type="text" :rules="[rules.required]" v-model="editedItem.description" label="Description"></v-textarea>
+									</v-col>
+								</v-row>
+							</v-container>
+						</v-card-text>
+						<v-card-actions>
+							<v-spacer></v-spacer>
+							<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+							<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
+						</v-card-actions>
+					</v-card>
+				</v-dialog>
+			</v-toolbar>
+			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
+		</template>
+		<template v-slot:item.actions="{ item }">
+			<v-icon small class="mr-2" @click="editItem(item)">
+				mdi-pencil
+			</v-icon>
+			<v-icon small @click="deleteItem(item)">
+				mdi-delete
+			</v-icon>
+		</template>
+		<template v-slot:no-data>
+			<v-btn color="primary" @click="initialize">Reset</v-btn>
+		</template>
+	</v-data-table>
 </template>
 <script>
 	export default {

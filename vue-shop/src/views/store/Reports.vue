@@ -1,16 +1,14 @@
 <template>
-	<v-app id="inspire">
-		<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" 
-		:headers="headers" :options.sync="options" :server-items-length="reports.total" :items="reports.data" show-select @input="selectAll" :footer-props="footerProps">
-			<template v-slot:top>
-				<v-toolbar flat>
-					<v-toolbar-title >Report Management System</v-toolbar-title>
-					<v-divider class="mx-4" inset vertical></v-divider>
-					<v-spacer></v-spacer>
-					<v-dialog v-model="dialog" max-width="500px">
-						<template v-slot:activator="{ on }">
-							<v-btn color="primary" dark class="mb-2" v-on="on">Order By</v-btn>
-							<!--v-list dense>
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="reports.total" :items="reports.data" show-select @input="selectAll" :footer-props="footerProps">
+		<template v-slot:top>
+			<v-toolbar flat>
+				<v-toolbar-title>Report Management System</v-toolbar-title>
+				<v-divider class="mx-4" inset vertical></v-divider>
+				<v-spacer></v-spacer>
+				<v-dialog v-model="dialog" max-width="500px">
+					<template v-slot:activator="{ on }">
+						<v-btn color="primary" dark class="mb-2" v-on="on">Order By</v-btn>
+						<!--v-list dense>
 								<v-list-item v-for="(item, index) in order_report" :key="index" link :to="item.action">
 									<v-list-item-content>
 										<v-list-item-title>
@@ -19,39 +17,38 @@
 									</v-list-item-content>
 								</v-list-item>
 							</v-list-->
-						</template>
-						<v-card>
-							<v-card-title>
-								<span class="headline">{{ formTitle }}</span>
-							</v-card-title>
+					</template>
+					<v-card>
+						<v-card-title>
+							<span class="headline">{{ formTitle }}</span>
+						</v-card-title>
 
-							<v-card-text>
-								<v-container>
-									<v-row>
-										<v-col cols="12" sm="6">
-											<v-text-field v-model="editedItem.name" :rules="[rules.required]" :blur="checkRole" label="From Date"></v-text-field>
-										</v-col>
-										<v-col cols="12" sm="6">
-											<v-text-field v-model="editedItem.name" :rules="[rules.required]" :blur="checkRole" label="To Date"></v-text-field>
-										</v-col>
-									</v-row>
-								</v-container>
-							</v-card-text>
-							<v-card-actions>
-								<v-spacer></v-spacer>
-								<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="order">Order</v-btn>
-							</v-card-actions>
-						</v-card>
-					</v-dialog>
-				</v-toolbar>
-				<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
-			</template>
-			<template v-slot:no-data>
-				<v-btn color="primary" @click="initialize">Reset</v-btn>
-			</template>
-		</v-data-table>
-	</v-app>
+						<v-card-text>
+							<v-container>
+								<v-row>
+									<v-col cols="12" sm="6">
+										<v-text-field v-model="editedItem.name" :rules="[rules.required]" :blur="checkRole" label="From Date"></v-text-field>
+									</v-col>
+									<v-col cols="12" sm="6">
+										<v-text-field v-model="editedItem.name" :rules="[rules.required]" :blur="checkRole" label="To Date"></v-text-field>
+									</v-col>
+								</v-row>
+							</v-container>
+						</v-card-text>
+						<v-card-actions>
+							<v-spacer></v-spacer>
+							<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+							<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="order">Order</v-btn>
+						</v-card-actions>
+					</v-card>
+				</v-dialog>
+			</v-toolbar>
+			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
+		</template>
+		<template v-slot:no-data>
+			<v-btn color="primary" @click="initialize">Reset</v-btn>
+		</template>
+	</v-data-table>
 </template>
 <script>
 	export default {

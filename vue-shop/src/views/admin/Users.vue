@@ -1,96 +1,93 @@
 <template>
-	<v-app id="inspire">
-		<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait"
-		:headers="headers" :options.sync="options" :server-items-length="users.total" :items="users.data" show-select @input="selectAll" :footer-props="footerProps">
-			<template v-slot:top>
-				<v-toolbar flat>
-					<v-toolbar-title >User Management System</v-toolbar-title>
-					<v-divider class="mx-4" inset vertical></v-divider>
-					<v-spacer></v-spacer>
-					<v-dialog v-model="dialog" max-width="800px">
-						<template v-slot:activator="{ on }">
-							<v-btn color="primary" dark class="mb-2" v-on="on">Add New User</v-btn>
-							<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
-						</template>
-						<v-card>
-							<v-card-title>
-								<span class="headline">{{ formTitle }}</span>
-							</v-card-title>
-							<!--v-form v-model="valid" v-on:submit.stop.preverent="save"-->
-							<v-form v-model="valid">
-								<v-card-text>
-									<v-container>
-										<v-row>
-											<v-col cols="12" sm="6">
-												<v-text-field :rules="[rules.required, rules.min]" v-model="editedItem.name" label="Name"></v-text-field>
-											</v-col>
-											<v-col cols="12" sm="6">
-												<v-select :items="roles"  :rules="[rules.required]" v-model="editedItem.role" label="Select Role"></v-select>
-											</v-col>
-										</v-row>
-										<v-row v-if="editedIndex == -1">
-											<v-col cols="12" sm="6">
-												<!--v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail ]" :blur="checkEmail" v-model="editedItem.email" label="Email"></v-text-field-->
-												<v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail ]" v-model="editedItem.email" label="Email"></v-text-field>
-											</v-col>
-											<v-col cols="12" sm="6">
-												<v-text-field type="text" :rules="[rules.required]" v-model="editedItem.phone" label="Phone"></v-text-field>
-											</v-col>
-											<v-col cols="12" sm="6">
-												<v-text-field type="password" :rules="[rules.required]" v-model="editedItem.password" label="Type Password"></v-text-field>
-											</v-col>
-											<v-col cols="12" sm="6">
-												<v-text-field type="password" :rules="[rules.required, passwordMatch]" v-model="editedItem.rpassword" label="Retype Password"></v-text-field>
-											</v-col>
-											<v-col cols="12" md="12">
-												<v-textarea type="text" :rules="[rules.required]" v-model="editedItem.address" label="Address"></v-textarea>
-											</v-col>
-										</v-row>
-									</v-container>
-								</v-card-text>
-								<v-card-actions>
-									<v-spacer></v-spacer>
-									<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-									<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @clic.prevent="save">Save</v-btn>
-								</v-card-actions>
-							</v-form>
-						</v-card>
-					</v-dialog>
-				</v-toolbar>
-				<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
-			</template>  
-			<template v-slot:item.role="{ item }">
-				<v-edit-dialog large block persistent :return-value.sync="item.role"  @save="updateRole(item)" >
-					{{item.role}}
-					<template v-slot:input>
-						<h4>Change Role</h4>
-						<v-select :rules="[rules.required]" :items="roles" v-model="item.role" color="error" label="Select Role" ></v-select>
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="users.total" :items="users.data" show-select @input="selectAll" :footer-props="footerProps">
+		<template v-slot:top>
+			<v-toolbar flat>
+				<v-toolbar-title>User Management System</v-toolbar-title>
+				<v-divider class="mx-4" inset vertical></v-divider>
+				<v-spacer></v-spacer>
+				<v-dialog v-model="dialog" max-width="800px">
+					<template v-slot:activator="{ on }">
+						<v-btn color="primary" dark class="mb-2" v-on="on">Add New User</v-btn>
+						<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
 					</template>
-				</v-edit-dialog>
-			</template>
-			<template v-slot:item.avatar="{ item }">
-				<v-edit-dialog>
-					<v-list-item-avatar>
-						<v-img :src="getImage(item.avatar)" aspect-ratio="1" class="grey lighten-2"></v-img>
-					</v-list-item-avatar>
-					<template v-slot:input>
-						<v-file-input v-model="editedItem.avatar" label="Select File" placeholder="Upload Avatar" accept="image/jpg, image/png, image/bmp, image/jpeg" @change="uploadAvatar(item)" />
-					</template>
-				</v-edit-dialog>
-			</template>
-			<template v-slot:item.actions="{ item }">
-				<v-icon small class="mr-2" @click="editItem(item)">
-					mdi-pencil
-				</v-icon>
-				<v-icon small @click="deleteItem(item)">
-					mdi-delete
-				</v-icon>
-			</template>
-			<template v-slot:no-data>
-				<v-btn color="primary" @click="initialize">Reset</v-btn>
-			</template>
-		</v-data-table>
-	</v-app>
+					<v-card>
+						<v-card-title>
+							<span class="headline">{{ formTitle }}</span>
+						</v-card-title>
+						<!--v-form v-model="valid" v-on:submit.stop.preverent="save"-->
+						<v-form v-model="valid">
+							<v-card-text>
+								<v-container>
+									<v-row>
+										<v-col cols="12" sm="6">
+											<v-text-field :rules="[rules.required, rules.min]" v-model="editedItem.name" label="Name"></v-text-field>
+										</v-col>
+										<v-col cols="12" sm="6">
+											<v-select :items="roles" :rules="[rules.required]" v-model="editedItem.role" label="Select Role"></v-select>
+										</v-col>
+									</v-row>
+									<v-row v-if="editedIndex == -1">
+										<v-col cols="12" sm="6">
+											<!--v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail ]" :blur="checkEmail" v-model="editedItem.email" label="Email"></v-text-field-->
+											<v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail ]" v-model="editedItem.email" label="Email"></v-text-field>
+										</v-col>
+										<v-col cols="12" sm="6">
+											<v-text-field type="text" :rules="[rules.required]" v-model="editedItem.phone" label="Phone"></v-text-field>
+										</v-col>
+										<v-col cols="12" sm="6">
+											<v-text-field :append-icon="add_password ? 'mdi-eye' : 'mdi-eye-off'" :type="add_password ? 'text' : 'password'" @click:append="add_password = !add_password" :rules="[rules.required, rules.min]" v-model="editedItem.password" label="Type Password"></v-text-field>
+										</v-col>
+										<v-col cols="12" sm="6">
+											<v-text-field :append-icon="add_rpassword ? 'mdi-eye' : 'mdi-eye-off'" :type="add_rpassword ? 'text' : 'password'" @click:append="add_rpassword = !add_rpassword" :rules="[rules.required, passwordMatch]" v-model="editedItem.rpassword" label="Retype Password"></v-text-field>
+										</v-col>
+										<v-col cols="12" md="12">
+											<v-textarea type="text" :rules="[rules.required]" v-model="editedItem.address" label="Address"></v-textarea>
+										</v-col>
+									</v-row>
+								</v-container>
+							</v-card-text>
+							<v-card-actions>
+								<v-spacer></v-spacer>
+								<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @clic.prevent="save">Save</v-btn>
+							</v-card-actions>
+						</v-form>
+					</v-card>
+				</v-dialog>
+			</v-toolbar>
+			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
+		</template>
+		<template v-slot:item.role="{ item }">
+			<v-edit-dialog large block persistent :return-value.sync="item.role" @save="updateRole(item)">
+				{{item.role}}
+				<template v-slot:input>
+					<h4>Change Role</h4>
+					<v-select :rules="[rules.required]" :items="roles" v-model="item.role" color="error" label="Select Role"></v-select>
+				</template>
+			</v-edit-dialog>
+		</template>
+		<template v-slot:item.avatar="{ item }">
+			<v-edit-dialog>
+				<v-list-item-avatar>
+					<v-img :src="getImage(item.avatar)" aspect-ratio="1" class="grey lighten-2"></v-img>
+				</v-list-item-avatar>
+				<template v-slot:input>
+					<v-file-input v-model="editedItem.avatar" label="Select File" placeholder="Upload Avatar" accept="image/jpg, image/png, image/bmp, image/jpeg" @change="uploadAvatar(item)" />
+				</template>
+			</v-edit-dialog>
+		</template>
+		<template v-slot:item.actions="{ item }">
+			<v-icon small class="mr-2" @click="editItem(item)">
+				mdi-pencil
+			</v-icon>
+			<v-icon small @click="deleteItem(item)">
+				mdi-delete
+			</v-icon>
+		</template>
+		<template v-slot:no-data>
+			<v-btn color="primary" @click="initialize">Reset</v-btn>
+		</template>
+	</v-data-table>
 </template>
 <script>
 	export default {
@@ -99,6 +96,8 @@
 			dialog: false,
 			loading: false,
 			snackbar: false,
+			add_password: false,
+			add_rpassword: false,
 			selected: [],
 			text: '',
 			roles: [],
@@ -204,8 +203,8 @@
 		},
 		methods: {
 			getImage(image) {
-                return "http://localhost:8000/storage/" + image;
-            },
+				return "http://localhost:8000/storage/" + image;
+			},
 			uploadAvatar(item) {
 				if (this.editedItem.avatar != null) {
 					const index = this.users.data.indexOf(item);
@@ -263,7 +262,7 @@
 			},
 			searchIt(e) {
 				if(e.length > 2) {
-					this.axios.get(`http://localhost:8000/api/user/${e}`)
+					this.axios.get(`http://localhost:8000/api/user/search/${e}`)
 					.then(res => this.users = res.data.user)
 					.catch(err => console.dir(err.response))
 				}

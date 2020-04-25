@@ -21,8 +21,8 @@
 					<v-card flat>
 						<v-card-text>
 							<v-form ref="form" v-model="valid_login">
-								<v-text-field color="light-blue darken-1" label="Email" v-model="loginField.Email" :rules="[rules.required, rules.validEmail]" name="email" prepend-icon="mdi-email" type="email" autocomplete="off" />
-								<v-text-field color="light-blue darken-1" label="Password" v-model="loginField.password" :rules="[rules.required, rules.min]" name="password" prepend-icon="mdi-lock" type="password" autocomplete="off" />
+								<v-text-field color="light-blue darken-1" label="Email" v-model="loginField.email" :rules="[rules.required, rules.validEmail]" name="email" prepend-icon="mdi-email" type="email" autocomplete="off" />
+								<v-text-field color="light-blue darken-1" label="Password" v-model="loginField.password" :rules="[rules.required, rules.min]" name="password" prepend-icon="mdi-lock" :append-icon="login_password ? 'mdi-eye' : 'mdi-eye-off'" :type="login_password ? 'text' : 'password'" @click:append="login_password = !login_password" autocomplete="off" />
 							</v-form>
 						</v-card-text>
 						<v-card-actions>
@@ -37,8 +37,8 @@
 								<v-text-field :rules="[rules.required, rules.min]" label="Name" prepend-icon="mdi-account" autocomplete="off" />
 								<v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail]" label="Email" prepend-icon="mdi-email" autocomplete="off" />
 								<!--v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail]" :blur="checkEmail" label="Email" prepend-icon="mdi-email" autocomplete="off" /-->
-								<v-text-field type="password" :rules="[rules.required, rules.min]" v-model="registerField.password" label="Type Password" autocomplete="off" prepend-icon="mdi-lock" />
-								<v-text-field type="password" :rules="[rules.required, passwordMatch]" v-model="registerField.rpassword" label="Retype Password" prepend-icon="mdi-lock-check" autocomplete="off" />
+								<v-text-field :append-icon="register_password ? 'mdi-eye' : 'mdi-eye-off'" :type="register_password ? 'text' : 'password'" @click:append="register_password = !register_password" :rules="[rules.required, rules.min]" v-model="registerField.password" label="Type Password" autocomplete="off" prepend-icon="mdi-lock" />
+								<v-text-field :append-icon="register_rpassword ? 'mdi-eye' : 'mdi-eye-off'" :type="register_rpassword ? 'text' : 'password'" @click:append="register_rpassword = !register_rpassword" :rules="[rules.required, passwordMatch]" v-model="registerField.rpassword" label="Retype Password" prepend-icon="mdi-lock-check" autocomplete="off" />
 							</v-form>
 						</v-card-text>
 						<v-card-actions>
@@ -60,6 +60,9 @@
 			valid_register: false,
 			success: '',
 			error: '',
+			login_password: false,
+			register_password: false,
+			register_rpassword: false,
 			rules: {
 				required: v => !!v || "This Field Required",
 				min: v => v.length >= 5 || "Minimum 5 Characters Required",

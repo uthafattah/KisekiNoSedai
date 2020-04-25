@@ -1,49 +1,46 @@
 <template>
-	<v-app id="inspire">
-		<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait"
-		:headers="headers" :options.sync="options" :server-items-length="stores.total" :items="stores.data" show-select @input="selectAll" :footer-props="footerProps">
-			<template v-slot:top>
-				<v-toolbar flat>
-					<v-toolbar-title >Store Management System</v-toolbar-title>
-					<v-divider class="mx-4" inset vertical></v-divider>
-					<v-spacer></v-spacer>
-					<v-dialog v-model="dialog" max-width="500px">
-						<!--template v-slot:activator="{ on }"-->
-						<template>
-							<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
-						</template>
-					</v-dialog>
-				</v-toolbar>
-				<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
-			</template>  
-			<template v-slot:item.category="{ item }">
-				<v-edit-dialog large block persistent :return-value.sync="item.category"  @save="updateCategory(item)" >
-					{{item.category}}
-					<template v-slot:input>
-						<h4>Change Category</h4>
-						<v-select :rules="[rules.required]" :items="categories" v-model="item.category" color="error" label="Select Category"></v-select>
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="stores.total" :items="stores.data" show-select @input="selectAll" :footer-props="footerProps">
+		<template v-slot:top>
+			<v-toolbar flat>
+				<v-toolbar-title>Store Management System</v-toolbar-title>
+				<v-divider class="mx-4" inset vertical></v-divider>
+				<v-spacer></v-spacer>
+				<v-dialog v-model="dialog" max-width="500px">
+					<!--template v-slot:activator="{ on }"-->
+					<template>
+						<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
 					</template>
-				</v-edit-dialog>
-			</template>
-			<template v-slot:item.status_store="{ item }">
-				<v-edit-dialog large block persistent :return-value.sync="item.status_store"  @save="updateStatus(item)" >
-					{{item.category}}
-					<template v-slot:input>
-						<h4>Change Status</h4>
-						<v-select :rules="[rules.required]" :items="status_store" v-model="item.status_store" color="error" label="Select Status"></v-select>
-					</template>
-				</v-edit-dialog>
-			</template>
-			<template v-slot:item.actions="{ item }">
-				<v-icon small @click="deleteItem(item)">
-					mdi-delete
-				</v-icon>
-			</template>
-			<template v-slot:no-data>
-				<v-btn color="primary" @click="initialize">Reset</v-btn>
-			</template>
-		</v-data-table>
-	</v-app>
+				</v-dialog>
+			</v-toolbar>
+			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
+		</template>
+		<template v-slot:item.category="{ item }">
+			<v-edit-dialog large block persistent :return-value.sync="item.category" @save="updateCategory(item)">
+				{{item.category}}
+				<template v-slot:input>
+					<h4>Change Category</h4>
+					<v-select :rules="[rules.required]" :items="categories" v-model="item.category" color="error" label="Select Category"></v-select>
+				</template>
+			</v-edit-dialog>
+		</template>
+		<template v-slot:item.status_store="{ item }">
+			<v-edit-dialog large block persistent :return-value.sync="item.status_store" @save="updateStatus(item)">
+				{{item.category}}
+				<template v-slot:input>
+					<h4>Change Status</h4>
+					<v-select :rules="[rules.required]" :items="status_store" v-model="item.status_store" color="error" label="Select Status"></v-select>
+				</template>
+			</v-edit-dialog>
+		</template>
+		<template v-slot:item.actions="{ item }">
+			<v-icon small @click="deleteItem(item)">
+				mdi-delete
+			</v-icon>
+		</template>
+		<template v-slot:no-data>
+			<v-btn color="primary" @click="initialize">Reset</v-btn>
+		</template>
+	</v-data-table>
 </template>
 <script>
 	export default {

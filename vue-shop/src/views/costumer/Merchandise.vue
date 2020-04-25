@@ -17,7 +17,7 @@
 					<v-card :loading="loading">
 						<v-img width="300px" :src="getImage(merchandise.photo)">
 							<v-btn icon large color="pink lighten-5">
-								<v-icon>mdi-heart</v-icon>
+								<v-btn icon large :color="wishlist_color" @click="wishlist"><v-icon>mdi-heart</v-icon></v-btn>
 							</v-btn>
 						</v-img>
 						<v-card-title>{{merchandise.name}}</v-card-title>
@@ -27,7 +27,7 @@
 								<div class="grey--text ml-4">x.x (xxx)</div>
 							</v-row>
 							<v-row>
-								<v-col><b>Rp. {{merchandise.price}}</b></v-col>
+								<v-col><b>{{merchandise.price | currency}}</b></v-col>
 								<v-col class="text-right">xxx Terjual</v-col>
 							</v-row>
 						</v-card-text>
@@ -43,6 +43,7 @@
 			drawer: null,
 			loading: false,
             merchandises: [],
+			wishlist_color: 'pink lighten-5',
 		}),
         created(){
             this.axios.get('http://localhost:8000/api/merchandise/all')
@@ -58,7 +59,14 @@
         methods : {
             getImage(image) {
                 return "http://localhost:8000/storage/" + image;
-            }
+            },
+			wishlist() {
+				if(this.wishlist_color === 'pink lighten-5') {
+					this.wishlist_color = 'pink'
+				} else if (this.wishlist_color === 'pink') {
+					this.wishlist_color = 'pink lighten-5'
+				}
+			},
         }
 	}
 </script>

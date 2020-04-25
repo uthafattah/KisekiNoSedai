@@ -1,13 +1,13 @@
 <template>
-	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="categories.total" :items="categories.data" show-select @input="selectAll" :footer-props="footerProps">
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="status_store.total" :items="status_store.data" show-select @input="selectAll" :footer-props="footerProps">
 		<template v-slot:top>
 			<v-toolbar flat>
-				<v-toolbar-title>Category Management System</v-toolbar-title>
+				<v-toolbar-title>Status Store Management System</v-toolbar-title>
 				<v-divider class="mx-4" inset vertical></v-divider>
 				<v-spacer></v-spacer>
-				<v-dialog v-model="dialog" max-width="800px">
+				<v-dialog v-model="dialog" max-width="500px">
 					<template v-slot:activator="{ on }">
-						<v-btn color="primary" dark class="mb-2" v-on="on">Add New Category</v-btn>
+						<v-btn color="primary" dark class="mb-2" v-on="on">Add New Status Store</v-btn>
 						<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
 					</template>
 					<v-card>
@@ -18,12 +18,9 @@
 						<v-card-text>
 							<v-container>
 								<v-row>
-									<v-col cols="12" sm="6">
-										<!--v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" :blur="checkCategory" label="Category Name"></v-text-field-->
-										<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Category Name"></v-text-field>
-									</v-col>
-									<v-col cols="12" sm="6">
-										<v-file-input v-model="editedItem.photo" :rules="[rules.required]" label="Select File" placeholder="Upload Photo" accept="image/jpg, image/png, image/bmp, image/jpeg" />
+									<v-col cols="12" sm="12">
+										<!--v-text-field autofocus v-model="editedItem.name" :rules="[rules.required, rules.min]" :blur="checkPayment" label="Status Store Name"></v-text-field-->
+										<v-text-field autofocus v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Status Store Name"></v-text-field>
 									</v-col>
 								</v-row>
 							</v-container>
@@ -37,16 +34,6 @@
 				</v-dialog>
 			</v-toolbar>
 			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
-		</template>
-		<template v-slot:item.photo="{ item }">
-			<v-edit-dialog>
-				<v-list-item-avatar tile>
-					<v-img :src="getImage(item.photo)" aspect-ratio="1" class="grey lighten-2"></v-img>
-				</v-list-item-avatar>
-				<template v-slot:input>
-					<v-file-input v-model="editedItem.photo" label="Select File" placeholder="Upload Photo" accept="image/jpg, image/png, image/bmp, image/jpeg" @change="uploadAvatar(item)" />
-				</template>
-			</v-edit-dialog>
 		</template>
 		<template v-slot:item.actions="{ item }">
 			<v-icon small class="mr-2" @click="editItem(item)">
@@ -73,7 +60,7 @@
 			success: '',
 			error: '',
 			options: {
-				itemsPerPage: 10,
+				itemsPerPage: 5,
 				sortBy: ['id'],
 				sortDesc: [false]
 			},
@@ -82,8 +69,8 @@
 				min: v => v.length >= 5 || "Minimum 5 Characters Required",
 			},
 			footerProps: {
-				itemsPerPageOptions: [10, 20, 30],
-				itemsPerPageText: 'Categories Per Page',
+				itemsPerPageOptions: [5, 10, 15],
+				itemsPerPageText: 'Status Store Per Page',
 				'show-current-page': true,
 				'show-first-last-page': true
 			},
@@ -91,39 +78,36 @@
 				{ text: '#', align: 'left', sortable: false, value: 'id'},
 				{ text: 'Name', value: 'name' },
 				{ text: 'Slug', value: 'slug' },
-				{ text: 'Photo', sortable: false, value: 'photo' },
 				{ text: 'Actions', sortable: false, value: 'actions'},
 			],
-			categories: [],
+			status_store: [],
 			editedIndex: -1,
 			editedItem: {
 				id: '',
 				name: '',
-				photo: null,
 			},
 			defaultItem: {
 				id: '',
 				name: '',
 				slug: '',
-				photo: '',
 				created_at: '',
 				updated_at: '',
 			},
 		}),
 		computed: {
 			formTitle () {
-				return this.editedIndex === -1 ? 'New Category' : 'Edit Category'
+				return this.editedIndex === -1 ? 'New Status Store' : 'Edit Status Store'
 			},
-			/*checkCategory() {
+			/*checkPayment() {
 				if (this.editedItem.name.length >= 5) {
-					this.axios.post("/api/category/verify", { email: this.editedItem.name })
+					this.axios.post("/api/status_store/verify", { email: this.editedItem.name })
 					.then(res => {
 						this.success = res.data.message;
 						this.error = "";
 					})
 					.catch(err => {
 						this.success = "";
-						this.error = "Category Already Exists";
+						this.error = "Status Store Already Exists";
 					});
 				} else {
 					this.success = "";
@@ -139,9 +123,9 @@
 				handler(e) {
 					const sortBy = e.sortBy.length > 0 ? e.sortBy[0].trim() : 'id';
 					const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
-					this.axios.get(`http://localhost:8000/api/category`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
+					this.axios.get(`http://localhost:8000/api/status_store`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
 					.then(res => {
-						this.categories = res.data
+						this.status_store = res.data
 					})
 					.catch(err => {
 						if(err.response.status == 401) {
@@ -157,23 +141,6 @@
 			this.initialize()
 		},
 		methods: {
-			getImage(image) {
-				return "http://localhost:8000/storage/" + image;
-			},
-			uploadAvatar(item) {
-				if (this.editedItem.photo != null) {
-					const index = this.users.data.indexOf(item);
-					let formData = new FormData();
-					formData.append( "photo", this.editedItem.photo, this.editedItem.photo.name );
-					formData.append("user", item.id);
-					this.axios.post("/api/user/photo", formData)
-					.then(res => {
-						this.users.data[index].photo = res.data.user.photo;
-						this.editedItem.photo = null;
-					})
-					.catch(err => console.log(err.response));
-				}
-			},
 			selectAll(e) {
 				this.selected = []
 				if(e.length > 0) {
@@ -185,13 +152,13 @@
 				let decide = confirm('Are you sure you want to delete these items?')
 				if(decide) {
 					const selected_id = this.selected.map(val => val.id)
-					//this.axios.post('http://localhost:8000/api/category/delete', {'categories': this.selected})
-					this.axios.post('http://localhost:8000/api/category/delete', {'categories': selected_id})
+					//this.axios.post('http://localhost:8000/api/status_store/delete', {'status_store': this.selected})
+					this.axios.post('http://localhost:8000/api/status_store/delete', {'status_store': selected_id})
 					.then(res => {
 						this.text = "Records Deleted Successfully!";
 						this.selected.map(val => {
-							const index = this.categories.data.indexOf(val)
-							this.categories.data.splice(index, 1)
+							const index = this.status_store.data.indexOf(val)
+							this.status_store.data.splice(index, 1)
 						})
 						console.log(res)
 						this.snackbar = true;
@@ -204,22 +171,22 @@
 			},
 			searchIt(e) {
 				if(e.length > 2) {
-					this.axios.get(`http://localhost:8000/api/category/${e}`)
-					.then(res => this.categories = res.data.category)
+					this.axios.get(`http://localhost:8000/api/status_store/${e}`)
+					.then(res => this.status_store = res.data.status_store)
 					.catch(err => console.dir(err.response))
 				}
 				if(e.length<=0){
-					this.axios.get(`http://localhost:8000/api/category`)
-					.then(res => this.categories = res.data)
+					this.axios.get(`http://localhost:8000/api/status_store`)
+					.then(res => this.status_store = res.data)
 					.catch(err => console.dir(err.response))
 				}
 			},
 			paginate(e) {
 				const sortBy = e.sortBy.length > 0 ? e.sortBy[0].trim() : 'name';
 				const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
-				this.axios.get(`http://localhost:8000/api/category`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
+				this.axios.get(`http://localhost:8000/api/status_store`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
 				.then(res => {
-					this.categories = res.data.categories
+					this.status_store = res.data.status_store
 				})
 				.catch(err => {
 					if(err.response.status == 401) {
@@ -246,19 +213,19 @@
 				});
 			},
 			editItem (item) {
-				this.editedIndex = this.categories.data.indexOf(item)
+				this.editedIndex = this.status_store.data.indexOf(item)
 				this.editedItem = Object.assign({}, item)
 				this.dialog = true
 			},
 			deleteItem (item) {
-				const index = this.categories.data.indexOf(item)
+				const index = this.status_store.data.indexOf(item)
 				let decide = confirm('Are you sure you want to delete this item?')
 				if(decide) {
-					this.axios.delete('http://localhost:8000/api/category/' + item.id)
+					this.axios.delete('http://localhost:8000/api/status_store/' + item.id)
 					.then(res => {
 						this.text = "Record Deleted Successfully!";
 						this.snackbar = true;
-						this.categories.data.splice(index, 1)
+						this.status_store.data.splice(index, 1)
 						console.log(res)
 					}).catch(err => {
 						console.log(err.response)
@@ -277,11 +244,11 @@
 			save () {
 				if (this.editedIndex > -1) {
 					const index = this.editedIndex
-					this.axios.put('http://localhost:8000/api/category/' + this.editedItem.id, {'name': this.editedItem.name })
+					this.axios.put('http://localhost:8000/api/status_store/' + this.editedItem.id, {'name': this.editedItem.name })
 					.then(res => {
 						this.text = "Record Updated Successfully!";
 						this.snackbar = true;
-						Object.assign(this.categories.data[index], res.data.category)
+						Object.assign(this.status_store.data[index], res.data.status_store)
 					})
 					.catch(err => {
 						console.log(err.response)
@@ -289,11 +256,11 @@
 						this.snackbar = true;
 					})
 				} else {
-					this.axios.post('http://localhost:8000/api/category', {'name': this.editedItem.name })
+					this.axios.post('http://localhost:8000/api/status_store', {'name': this.editedItem.name })
 					.then(res => {
 						this.text = "Record Added Successfully!";
 						this.snackbar = true;
-						this.categories.data.push(res.data.category)
+						this.status_store.data.push(res.data.status_store)
 					})
 					.catch(err => {
 						console.log(err.response)
