@@ -14,6 +14,19 @@ class Store extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'user_id' => $this->user_id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'logo' => $this->logo,
+            'address' => $this->address,
+            'description' => $this->description,
+            'followers' => $this->followers,
+            'ratings' => $this->ratings,
+            'status_store_id' => $this->status_store_id,
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+        ];
     }
 }

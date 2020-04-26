@@ -19,7 +19,7 @@ class Merchandise extends JsonResource
             'store_id' => $this->store_id,
             'name' => $this->name,
             'slug' => $this->slug,
-            'photo' => 'storage/' . $this->photo,
+            'photo' => $this->photo,
             'description' => $this->description,
             'stock' => $this->stock,
             'price' => $this->price,
