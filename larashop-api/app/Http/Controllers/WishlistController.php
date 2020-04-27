@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Wishlist;
 use Illuminate\Http\Request;
+use App\Http\Resources\Wishlist as WishlistResource;
+use App\Http\Resources\WishlistCollection as WishlistResourceCollection;
 
 class WishlistController extends Controller
 {
@@ -12,9 +14,19 @@ class WishlistController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['wishlist' => Wishlist::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new WishlistResourceCollection(Wishlist::paginate(10));
     }
 
     /**
@@ -22,10 +34,7 @@ class WishlistController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +53,10 @@ class WishlistController extends Controller
      * @param  \App\Wishlist  $wishlist
      * @return \Illuminate\Http\Response
      */
-    public function show(Wishlist $wishlist)
+    public function show($param)
     {
-        //
+        $wishlist = Wishlist::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['wishlist' => $wishlist], 200);
     }
 
     /**
@@ -55,10 +65,7 @@ class WishlistController extends Controller
      * @param  \App\Wishlist  $wishlist
      * @return \Illuminate\Http\Response
      */
-    public function edit(Wishlist $wishlist)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\OrderMerchandise;
 use Illuminate\Http\Request;
+use App\Http\Resources\OrderMerchandise as OrderMerchandiseResource;
+use App\Http\Resources\OrderMerchandiseCollection as OrderMerchandiseResourceCollection;
 
 class OrderMerchandiseController extends Controller
 {
@@ -12,9 +14,19 @@ class OrderMerchandiseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['orderMerchandise' => OrderMerchandise::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new OrderMerchandiseResourceCollection(OrderMerchandise::paginate(10));
     }
 
     /**
@@ -22,10 +34,7 @@ class OrderMerchandiseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,21 +53,18 @@ class OrderMerchandiseController extends Controller
      * @param  \App\OrderMerchandise  $orderMerchandise
      * @return \Illuminate\Http\Response
      */
-    public function show(OrderMerchandise $orderMerchandise)
+    public function show($param)
     {
-        //
+        $orderMerchandise = OrderMerchandise::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['orderMerchandise' => $orderMerchandise], 200);
     }
-
     /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\OrderMerchandise  $orderMerchandise
      * @return \Illuminate\Http\Response
      */
-    public function edit(OrderMerchandise $orderMerchandise)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.

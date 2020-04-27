@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\MerchandiseCategory;
 use Illuminate\Http\Request;
+use App\Http\Resources\MerchandiseCategory as MerchandiseCategoryResource;
+use App\Http\Resources\MerchandiseCategoryCollection as MerchandiseCategoryResourceCollection;
 
 class MerchandiseCategoryController extends Controller
 {
@@ -12,9 +14,19 @@ class MerchandiseCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['merchandiseCategory' => MerchandiseCategory::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new MerchandiseCategoryResourceCollection(MerchandiseCategory::paginate(10));
     }
 
     /**
@@ -22,10 +34,7 @@ class MerchandiseCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +53,10 @@ class MerchandiseCategoryController extends Controller
      * @param  \App\MerchandiseCategory  $merchandiseCategory
      * @return \Illuminate\Http\Response
      */
-    public function show(MerchandiseCategory $merchandiseCategory)
+    public function show($param)
     {
-        //
+        $merchandiseCategory = MerchandiseCategory::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['merchandiseCategory' => $merchandiseCategory], 200);
     }
 
     /**
@@ -55,10 +65,7 @@ class MerchandiseCategoryController extends Controller
      * @param  \App\MerchandiseCategory  $merchandiseCategory
      * @return \Illuminate\Http\Response
      */
-    public function edit(MerchandiseCategory $merchandiseCategory)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.

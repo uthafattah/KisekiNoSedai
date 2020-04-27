@@ -14,6 +14,16 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['user' => User::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         //return response()->json(['user' => User::all()], 200);
@@ -37,9 +47,9 @@ class UserController extends Controller
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($param)
     {
-        $user = User::where('name', 'LIKE', "%$id%")->paginate();
+        $user = User::where('name', 'LIKE', "%$param%")->paginate();
         return response()->json(['user' => $user], 200);
     }
 

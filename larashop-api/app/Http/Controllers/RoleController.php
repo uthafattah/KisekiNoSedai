@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Role;
 use Illuminate\Http\Request;
+use App\Http\Resources\Role as RoleResource;
+use App\Http\Resources\RoleCollection as RoleResourceCollection;
 
 class RoleController extends Controller
 {
@@ -12,9 +14,19 @@ class RoleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['role' => Role::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new RoleResourceCollection(Role::paginate(10));
     }
 
     /**
@@ -22,10 +34,7 @@ class RoleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +53,10 @@ class RoleController extends Controller
      * @param  \App\Role  $role
      * @return \Illuminate\Http\Response
      */
-    public function show(Role $role)
+    public function show($param)
     {
-        //
+        $role = Role::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['role' => $role], 200);
     }
 
     /**
@@ -55,10 +65,7 @@ class RoleController extends Controller
      * @param  \App\Role  $role
      * @return \Illuminate\Http\Response
      */
-    public function edit(Role $role)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.

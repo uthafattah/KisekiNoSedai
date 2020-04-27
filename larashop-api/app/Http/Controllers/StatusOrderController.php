@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\StatusOrder;
 use Illuminate\Http\Request;
+use App\Http\Resources\StatusOrder as StatusOrderResource;
+use App\Http\Resources\StatusOrderCollection as StatusOrderResourceCollection;
 
 class StatusOrderController extends Controller
 {
@@ -12,9 +14,19 @@ class StatusOrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['statusOrder' => StatusOrder::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new StatusOrderResourceCollection(StatusOrder::paginate(10));
     }
 
     /**
@@ -22,10 +34,7 @@ class StatusOrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +53,10 @@ class StatusOrderController extends Controller
      * @param  \App\StatusOrder  $statusOrder
      * @return \Illuminate\Http\Response
      */
-    public function show(StatusOrder $statusOrder)
+    public function show($param)
     {
-        //
+        $statusOrder = StatusOrder::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['statusOrder' => $statusOrder], 200);
     }
 
     /**
@@ -55,10 +65,7 @@ class StatusOrderController extends Controller
      * @param  \App\StatusOrder  $statusOrder
      * @return \Illuminate\Http\Response
      */
-    public function edit(StatusOrder $statusOrder)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.

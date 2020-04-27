@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\StatusStore;
 use Illuminate\Http\Request;
+use App\Http\Resources\StatusStore as StatusStoreResource;
+use App\Http\Resources\StatusStoreCollection as StatusStoreResourceCollection;
 
 class StatusStoreController extends Controller
 {
@@ -12,9 +14,19 @@ class StatusStoreController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['statusStore' => StatusStore::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new StatusStoreResourceCollection(StatusStore::paginate(10));
     }
 
     /**
@@ -22,10 +34,7 @@ class StatusStoreController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +53,10 @@ class StatusStoreController extends Controller
      * @param  \App\StatusStore  $statusStore
      * @return \Illuminate\Http\Response
      */
-    public function show(StatusStore $statusStore)
+    public function show($param)
     {
-        //
+        $statusStore = StatusStore::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['statusStore' => $statusStore], 200);
     }
 
     /**
@@ -55,10 +65,7 @@ class StatusStoreController extends Controller
      * @param  \App\StatusStore  $statusStore
      * @return \Illuminate\Http\Response
      */
-    public function edit(StatusStore $statusStore)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.

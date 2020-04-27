@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Order;
 use Illuminate\Http\Request;
+use App\Http\Resources\Order as OrderResource;
+use App\Http\Resources\OrderCollection as OrderResourceCollection;
 
 class OrderController extends Controller
 {
@@ -12,9 +14,19 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['order' => Order::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new OrderResourceCollection(Order::paginate(10));
     }
 
     /**
@@ -22,10 +34,7 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +53,10 @@ class OrderController extends Controller
      * @param  \App\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function show(Order $order)
+    public function show($param)
     {
-        //
+        $order = Order::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['order' => $order], 200);
     }
 
     /**
@@ -55,10 +65,7 @@ class OrderController extends Controller
      * @param  \App\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function edit(Order $order)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.

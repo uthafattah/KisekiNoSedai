@@ -47,9 +47,9 @@ class CategoryController extends Controller
      * @param  \App\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($param)
     {
-        $category = Category::where('name', 'LIKE', "%$id%")->paginate();
+        $category = Category::where('name', 'LIKE', "%$param%")->paginate(10);
         return response()->json(['category' => $category], 200);
     }
 

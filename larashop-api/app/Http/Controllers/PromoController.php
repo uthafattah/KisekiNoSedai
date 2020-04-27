@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Promo;
 use Illuminate\Http\Request;
+use App\Http\Resources\Promo as PromoResource;
+use App\Http\Resources\PromoCollection as PromoResourceCollection;
 
 class PromoController extends Controller
 {
@@ -12,9 +14,19 @@ class PromoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['promo' => Promo::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new PromoResourceCollection(Promo::paginate(10));
     }
 
     /**
@@ -22,10 +34,7 @@ class PromoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +53,10 @@ class PromoController extends Controller
      * @param  \App\Promo  $promo
      * @return \Illuminate\Http\Response
      */
-    public function show(Promo $promo)
+    public function show($param)
     {
-        //
+        $promo = Promo::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['promo' => $promo], 200);
     }
 
     /**
@@ -55,10 +65,7 @@ class PromoController extends Controller
      * @param  \App\Promo  $promo
      * @return \Illuminate\Http\Response
      */
-    public function edit(Promo $promo)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.

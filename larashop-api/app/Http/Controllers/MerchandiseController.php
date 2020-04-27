@@ -27,7 +27,7 @@ class MerchandiseController extends Controller
     public function index()
     {
         //return response()->json(['merchandise' => Merchandise::all()], 200);
-        return new MerchandiseResourceCollection(Merchandise::paginate(5));
+        return new MerchandiseResourceCollection(Merchandise::paginate(10));
     }
 
     /**
@@ -47,9 +47,10 @@ class MerchandiseController extends Controller
      * @param  \App\Merchandise  $merchandise
      * @return \Illuminate\Http\Response
      */
-    public function show(Merchandise $merchandise)
+    public function show($param)
     {
-        //
+        $merchandise = Merchandise::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['merchandise' => $merchandise], 200);
     }
 
     /**

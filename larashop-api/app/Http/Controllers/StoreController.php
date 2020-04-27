@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Store;
 use Illuminate\Http\Request;
+use App\Http\Resources\Store as StoreResource;
+use App\Http\Resources\StoreCollection as StoreResourceCollection;
 
 class StoreController extends Controller
 {
@@ -12,9 +14,19 @@ class StoreController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['store' => Store::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new StoreResourceCollection(Store::paginate(10));
     }
 
     /**
@@ -22,10 +34,7 @@ class StoreController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +53,10 @@ class StoreController extends Controller
      * @param  \App\Store  $store
      * @return \Illuminate\Http\Response
      */
-    public function show(Store $store)
+    public function show($param)
     {
-        //
+        $store = Store::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['store' => $store], 200);
     }
 
     /**
@@ -55,10 +65,7 @@ class StoreController extends Controller
      * @param  \App\Store  $store
      * @return \Illuminate\Http\Response
      */
-    public function edit(Store $store)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Cart;
 use Illuminate\Http\Request;
+use App\Http\Resources\Cart as CartResource;
+use App\Http\Resources\CartCollection as CartResourceCollection;
 
 class CartController extends Controller
 {
@@ -12,9 +14,19 @@ class CartController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['cart' => Cart::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new CartResourceCollection(Cart::paginate(10));
     }
 
     /**
@@ -22,10 +34,7 @@ class CartController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +53,10 @@ class CartController extends Controller
      * @param  \App\Cart  $cart
      * @return \Illuminate\Http\Response
      */
-    public function show(Cart $cart)
+    public function show($param)
     {
-        //
+        $cart = Cart::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['cart' => $cart], 200);
     }
 
     /**
@@ -55,10 +65,7 @@ class CartController extends Controller
      * @param  \App\Cart  $cart
      * @return \Illuminate\Http\Response
      */
-    public function edit(Cart $cart)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.

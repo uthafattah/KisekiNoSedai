@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Payment;
 use Illuminate\Http\Request;
+use App\Http\Resources\Payment as PaymentResource;
+use App\Http\Resources\PaymentCollection as PaymentResourceCollection;
 
 class PaymentController extends Controller
 {
@@ -12,9 +14,19 @@ class PaymentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['payment' => Payment::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new PaymentResourceCollection(Payment::paginate(10));
     }
 
     /**
@@ -22,10 +34,7 @@ class PaymentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +53,10 @@ class PaymentController extends Controller
      * @param  \App\Payment  $payment
      * @return \Illuminate\Http\Response
      */
-    public function show(Payment $payment)
+    public function show($param)
     {
-        //
+        $payment = Payment::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['payment' => $payment], 200);
     }
 
     /**
@@ -55,10 +65,6 @@ class PaymentController extends Controller
      * @param  \App\Payment  $payment
      * @return \Illuminate\Http\Response
      */
-    public function edit(Payment $payment)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.

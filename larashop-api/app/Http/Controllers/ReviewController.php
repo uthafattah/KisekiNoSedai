@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Review;
 use Illuminate\Http\Request;
+use App\Http\Resources\Review as ReviewResource;
+use App\Http\Resources\ReviewCollection as ReviewResourceCollection;
 
 class ReviewController extends Controller
 {
@@ -12,9 +14,19 @@ class ReviewController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['review' => Review::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new ReviewResourceCollection(Review::paginate(10));
     }
 
     /**
@@ -22,10 +34,7 @@ class ReviewController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +53,10 @@ class ReviewController extends Controller
      * @param  \App\Review  $review
      * @return \Illuminate\Http\Response
      */
-    public function show(Review $review)
+    public function show($param)
     {
-        //
+        $review = Review::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['review' => $review], 200);
     }
 
     /**
@@ -55,10 +65,7 @@ class ReviewController extends Controller
      * @param  \App\Review  $review
      * @return \Illuminate\Http\Response
      */
-    public function edit(Review $review)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.

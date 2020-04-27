@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\StatusCategory;
 use Illuminate\Http\Request;
+use App\Http\Resources\StatusCategory as StatusCategoryResource;
+use App\Http\Resources\StatusCategoryCollection as StatusCategoryResourceCollection;
 
 class StatusCategoryController extends Controller
 {
@@ -12,9 +14,19 @@ class StatusCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function all()
+    {
+        return response()->json(['statusCategory' => StatusCategory::all()], 200);
+    }
+	
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        //
+        return new StatusCategoryResourceCollection(StatusCategory::paginate(10));
     }
 
     /**
@@ -22,10 +34,6 @@ class StatusCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +52,10 @@ class StatusCategoryController extends Controller
      * @param  \App\StatusCategory  $statusCategory
      * @return \Illuminate\Http\Response
      */
-    public function show(StatusCategory $statusCategory)
+    public function show($param)
     {
-        //
+        $statusCategory = StatusCategory::where('name', 'LIKE', "%$param%")->paginate(10);
+        return response()->json(['statusCategory' => $statusCategory], 200);
     }
 
     /**
@@ -55,10 +64,7 @@ class StatusCategoryController extends Controller
      * @param  \App\StatusCategory  $statusCategory
      * @return \Illuminate\Http\Response
      */
-    public function edit(StatusCategory $statusCategory)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.
