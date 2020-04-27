@@ -6,8 +6,7 @@
 				<v-divider class="mx-4" inset vertical></v-divider>
 				<v-spacer></v-spacer>
 				<v-dialog v-model="dialog" max-width="800px">
-					<!--template v-slot:activator="{ on }"-->
-					<template>
+					<template v-slot:activator="{ on }">
 						<v-btn color="primary" dark class="mb-2" v-on="on">Add New Merchandise</v-btn>
 						<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
 					</template>
@@ -50,7 +49,7 @@
 					</v-card>
 				</v-dialog>
 			</v-toolbar>
-			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
+			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details clear-icon="mdi-close-circle" clearable/>
 		</template>
 		<template v-slot:item.category="{ item }">
 			<v-edit-dialog large block persistent :return-value.sync="item.category" @save="updateCategory(item)">
@@ -232,12 +231,18 @@
 				}
 			},
 			searchIt(e) {
-				if(e.length > 2) {
-					this.axios.get(`http://localhost:8000/api/merchandise/searchStoreId/1/${e}`)
-					.then(res => this.merchandise = res.data.merchandise)
-					.catch(err => console.dir(err.response))
-				}
-				if(e.length<=0){
+				if(e) {
+					if(e.length > 2) {
+						this.axios.get(`http://localhost:8000/api/merchandise/searchStoreId/1/${e}`)
+						.then(res => this.merchandise = res.data.merchandise)
+						.catch(err => console.dir(err.response))
+					}
+					if(e.length<=0){
+						this.axios.get(`http://localhost:8000/api/merchandise/searchStoreId/1`)
+						.then(res => this.merchandise = res.data.merchandise)
+						.catch(err => console.dir(err.response))
+					}
+				} else {
 					this.axios.get(`http://localhost:8000/api/merchandise/searchStoreId/1`)
 					.then(res => this.merchandise = res.data.merchandise)
 					.catch(err => console.dir(err.response))

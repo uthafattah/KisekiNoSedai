@@ -36,7 +36,7 @@
 					</v-card>
 				</v-dialog>
 			</v-toolbar>
-			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
+			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details clear-icon="mdi-close-circle" clearable/>
 		</template>
 		<template v-slot:item.photo="{ item }">
 			<v-edit-dialog>
@@ -203,12 +203,18 @@
 				}
 			},
 			searchIt(e) {
-				if(e.length > 2) {
-					this.axios.get(`http://localhost:8000/api/category/${e}`)
-					.then(res => this.categories = res.data.category)
-					.catch(err => console.dir(err.response))
-				}
-				if(e.length<=0){
+				if(e) {
+					if(e.length > 2) {
+						this.axios.get(`http://localhost:8000/api/category/${e}`)
+						.then(res => this.categories = res.data.category)
+						.catch(err => console.dir(err.response))
+					}
+					if(e.length<=0){
+						this.axios.get(`http://localhost:8000/api/category`)
+						.then(res => this.categories = res.data)
+						.catch(err => console.dir(err.response))
+					}
+				} else {
 					this.axios.get(`http://localhost:8000/api/category`)
 					.then(res => this.categories = res.data)
 					.catch(err => console.dir(err.response))

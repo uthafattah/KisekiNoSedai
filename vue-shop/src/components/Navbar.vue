@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<v-navigation-drawer v-model="drawer" app clipped v-if="!isCostumer" >
+		<v-navigation-drawer v-model="drawer" app clipped v-if="isAdmin || isStore">
 			<v-list dense>
 				<div v-if="isAdmin">
 					<v-list-item v-for="item in admin_menu" :key="item.text" link :to="item.action">
@@ -26,13 +26,13 @@
 						</v-list-item-content>
 					</v-list-item>
 				</div>
-				<v-list-item class="mt-4" link to="/">
+				<v-list-item class="mt-4" link to="/" v-if="isAdmin || isStore">
 					<v-list-item-action>
 						<v-icon>mdi-tablet-dashboard</v-icon>
 					</v-list-item-action>
 					<v-list-item-title>Dashboard</v-list-item-title>
 				</v-list-item>
-				<v-list-item link>
+				<v-list-item link v-if="isAdmin || isStore">
 					<v-list-item-action>
 						<v-switch v-model="theme"></v-switch>
 					</v-list-item-action>
@@ -43,7 +43,7 @@
 			</v-list>
 		</v-navigation-drawer>
 		<v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app color="light-blue darken-1" dark class="pr-3">
-			<v-app-bar-nav-icon @click.stop="drawer = !drawer" v-if="!isCostumer" />
+			<v-app-bar-nav-icon @click.stop="drawer = !drawer" v-if="isAdmin || isStore" />
 
 			<v-btn text to="/admin" v-if="isAdmin" depressed>
 				<v-toolbar-title>
@@ -62,11 +62,14 @@
 			</v-btn>
 
 			<v-spacer v-if="!isCostumer" />
-			<v-text-field flat solo-inverted hide-details prepend-inner-icon="mdi-magnify" label="Search" class="pl-3 pr-3" v-if="isCostumer" />
+			<v-text-field flat solo-inverted hide-details prepend-inner-icon="mdi-magnify" label="Search" class="pl-3 pr-3" v-if="isCostumer" clear-icon="mdi-close-circle" clearable/>
 			<v-btn icon text to="/carts" v-if="isCostumer">
 				<v-icon>mdi-cart</v-icon>
 			</v-btn>
 			<Dialog v-if="isCostumer" />
+			<v-btn icon text to="/messages" v-if="isCostumer">
+				<v-icon>mdi-email</v-icon>
+			</v-btn>
 			<v-menu open-on-hover offsetY>
 				<template v-slot:activator="{ on }">
 					<v-btn icon v-on="on">
@@ -83,9 +86,6 @@
 					</v-list-item>
 				</v-list>
 			</v-menu>
-			<v-btn icon text to="/messages" v-if="isCostumer">
-				<v-icon>mdi-email</v-icon>
-			</v-btn>
 			<v-btn text @click="store" v-if="isCostumer">
 				<v-avatar size="36">
 					<!--v-img src="storage/logos/no_logo.png" aspect-ratio="1"></v-img-->
@@ -160,6 +160,10 @@
 					action: '/admin'
 				},
 				{
+					text: 'Checkout',
+					action: '/checkout'
+				},
+				{
 					text: 'Merchandise',
 					action: '/merchandise'
 				},
@@ -170,10 +174,6 @@
 				{
 					text: 'Promos',
 					action: '/promos'
-				},
-				{
-					text: 'Reports',
-					action: '/reports'
 				},
 			],
 			admin_menu: [
@@ -269,7 +269,6 @@
 					this.$route.path == '/messages' ||
 					this.$route.path == '/orders' ||
 					this.$route.path == '/promos' ||
-					this.$route.path == '/reports' ||
 					this.$route.path == '/settings' ||
 					this.$route.path == '/stores' ||
 					this.$route.path == '/wishlists'

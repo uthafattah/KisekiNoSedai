@@ -4,7 +4,7 @@
 			<v-row>
 				<v-col cols="3">
 					<v-list-item-avatar tile size="250">
-						<v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg" v-model="avatar"></v-img>
+						<v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg" v-model="storeField.logo"></v-img>
 						<!--v-icon>mdi-store</v-icon-->
 					</v-list-item-avatar>
 				</v-col>
@@ -20,7 +20,7 @@
 						</v-card-text>
 						<v-card-actions class="mr-2">
 							<v-spacer />
-							<v-btn outlined color="secondary" @click="clearProfile">Clear</v-btn>
+							<v-btn outlined color="secondary" @click="clear">Clear</v-btn>
 							<v-btn type="submit" :disabled="!valid" @click.prevent="updateStore" outlined color="success" @click="submit">Update Store</v-btn>
 						</v-card-actions>
 					</v-card>

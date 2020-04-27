@@ -27,12 +27,12 @@
 				<v-btn outlined color="secondary" to="/messages">Message Store</v-btn>
 			</v-card-actions>
 			<v-divider class="mt-4 mx-4" />
-			<v-row class="mx-4">
+			<v-row class="mx-4 mb-n6">
 				<v-col cols="9">
-					<v-text-field append-icon="mdi-magnify" label="Search..." single-line hide-details></v-text-field>
+					<v-text-field outlined dense append-icon="mdi-magnify" label="Search..." hide-details></v-text-field>
 				</v-col>
 				<v-col cols="3">
-					<v-select :items="sorting" label="Sort By"></v-select>
+					<v-select outlined dense :items="sorting" label="Sort By"></v-select>
 				</v-col>
 			</v-row>
 		</v-card>

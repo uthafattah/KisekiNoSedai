@@ -27,10 +27,10 @@
 							<v-container>
 								<v-row>
 									<v-col cols="12" sm="6">
-										<v-text-field v-model="editedItem.name" :rules="[rules.required]" :blur="checkRole" label="From Date"></v-text-field>
+										<v-text-field v-model="editedItem.name" :rules="[rules.required]" label="From Date"></v-text-field>
 									</v-col>
 									<v-col cols="12" sm="6">
-										<v-text-field v-model="editedItem.name" :rules="[rules.required]" :blur="checkRole" label="To Date"></v-text-field>
+										<v-text-field v-model="editedItem.name" :rules="[rules.required]" label="To Date"></v-text-field>
 									</v-col>
 								</v-row>
 							</v-container>
@@ -43,7 +43,7 @@
 					</v-card>
 				</v-dialog>
 			</v-toolbar>
-			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
+			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details clear-icon="mdi-close-circle" clearable/>
 		</template>
 		<template v-slot:no-data>
 			<v-btn color="primary" @click="initialize">Reset</v-btn>
@@ -132,7 +132,7 @@
 				handler(e) {
 					const sortBy = e.sortBy.length > 0 ? e.sortBy[0].trim() : 'id';
 					const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
-					axios.get(`/api/reports`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
+					this.axios.get(`/api/reports`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
 					.then(res => {
 						this.reports = res.data.reports
 					})
@@ -150,7 +150,7 @@
 			this.initialize()
 		},
 		methods: {
-			/*selectAll(e) {
+			selectAll(e) {
 				this.selected = []
 				if(e.length > 0) {
 					this.selected = e
@@ -158,13 +158,19 @@
 				}
 			},
 			searchIt(e) {
-				if(e.length > 2) {
-					axios.get(`/api/reports/${e}`)
-					.then(res => this.reports = res.data.reports)
-					.catch(err => console.dir(err.response))
-				}
-				if(e.length<=0){
-					axios.get(`/api/reports`)
+				if(e) {
+					if(e.length > 2) {
+						this.axios.get(`/api/reports/${e}`)
+						.then(res => this.reports = res.data.reports)
+						.catch(err => console.dir(err.response))
+					}
+					if(e.length<=0){
+						this.axios.get(`/api/reports`)
+						.then(res => this.reports = res.data.reports)
+						.catch(err => console.dir(err.response))
+					}
+				} else {
+					this.axios.get(`/api/reports`)
 					.then(res => this.reports = res.data.reports)
 					.catch(err => console.dir(err.response))
 				}
@@ -172,7 +178,7 @@
 			paginate(e) {
 				const sortBy = e.sortBy.length > 0 ? e.sortBy[0].trim() : 'name';
 				const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
-				axios.get(`/api/reports`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
+				this.axios.get(`/api/reports`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
 				.then(res => {
 					this.reports = res.data.reports
 				})
@@ -184,7 +190,7 @@
 				})
 			},
 			initialize () {
-				axios.interceptors.request.use((config) => {
+				this.axios.interceptors.request.use((config) => {
 					this.loading = true; 
 					return config;
 				}, (error) => {
@@ -192,7 +198,7 @@
 					return Promise.reject(error);
 				});
 
-				axios.interceptors.response.use((response) => {
+				this.axios.interceptors.response.use((response) => {
 					this.loading = false;
 					return response;
 				}, (error) => {
@@ -208,7 +214,7 @@
 				}, 300)
 			}, 
 			order () {
-				axios.post('/api/reports', {'name': this.editedItem.name })
+				this.axios.post('/api/reports', {'name': this.editedItem.name })
 				.then(res => {
 					this.text = "Record Added Successfully!";
 					this.snackbar = true;
@@ -220,7 +226,7 @@
 					this.snackbar = true;
 				})
 				this.close()
-			},*/
+			},
 		},
 	}
 </script>

@@ -43,7 +43,7 @@
 					</v-card>
 				</v-dialog>
 			</v-toolbar>
-			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
+			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details clear-icon="mdi-close-circle" clearable/>
 		</template>
 		<template v-slot:no-data>
 			<v-btn color="primary" @click="initialize">Reset</v-btn>
@@ -158,12 +158,18 @@
 				}
 			},
 			searchIt(e) {
-				if(e.length > 2) {
-					this.axios.get(`/api/orders/${e}`)
-					.then(res => this.orders = res.data.orders)
-					.catch(err => console.dir(err.response))
-				}
-				if(e.length<=0){
+				if(e) {
+					if(e.length > 2) {
+						this.axios.get(`/api/orders/${e}`)
+						.then(res => this.orders = res.data.orders)
+						.catch(err => console.dir(err.response))
+					}
+					if(e.length<=0){
+						this.axios.get(`/api/orders`)
+						.then(res => this.orders = res.data.orders)
+						.catch(err => console.dir(err.response))
+					}
+				} else {
 					this.axios.get(`/api/orders`)
 					.then(res => this.orders = res.data.orders)
 					.catch(err => console.dir(err.response))

@@ -4,7 +4,7 @@
 			<v-row>
 				<v-col cols="3" class="mt-12">
 					<v-list-item-avatar tile size="250">
-						<v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg" v-model="avatar"></v-img>
+						<v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg" v-model="profileField.avatar"></v-img>
 						<!--v-icon>mdi-store</v-icon-->
 					</v-list-item-avatar>
 				</v-col>

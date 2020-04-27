@@ -33,7 +33,7 @@
 					</v-card>
 				</v-dialog>
 			</v-toolbar>
-			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
+			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details clear-icon="mdi-close-circle" clearable/>
 		</template>
 		<template v-slot:item.actions="{ item }">
 			<v-icon small class="mr-2" @click="editItem(item)">
@@ -170,12 +170,18 @@
 				}
 			},
 			searchIt(e) {
-				if(e.length > 2) {
-					this.axios.get(`http://localhost:8000/api/status_store/${e}`)
-					.then(res => this.status_store = res.data.status_store)
-					.catch(err => console.dir(err.response))
-				}
-				if(e.length<=0){
+				if(e) {
+					if(e.length > 2) {
+						this.axios.get(`http://localhost:8000/api/status_store/${e}`)
+						.then(res => this.status_store = res.data.status_store)
+						.catch(err => console.dir(err.response))
+					}
+					if(e.length<=0){
+						this.axios.get(`http://localhost:8000/api/status_store`)
+						.then(res => this.status_store = res.data)
+						.catch(err => console.dir(err.response))
+					}
+				} else {
 					this.axios.get(`http://localhost:8000/api/status_store`)
 					.then(res => this.status_store = res.data)
 					.catch(err => console.dir(err.response))

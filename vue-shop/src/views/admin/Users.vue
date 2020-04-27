@@ -55,7 +55,7 @@
 					</v-card>
 				</v-dialog>
 			</v-toolbar>
-			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details></v-text-field>
+			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details clear-icon="mdi-close-circle" clearable/>
 		</template>
 		<template v-slot:item.role="{ item }">
 			<v-edit-dialog large block persistent :return-value.sync="item.role" @save="updateRole(item)">
@@ -261,12 +261,18 @@
 				}
 			},
 			searchIt(e) {
-				if(e.length > 2) {
-					this.axios.get(`http://localhost:8000/api/user/search/${e}`)
-					.then(res => this.users = res.data.user)
-					.catch(err => console.dir(err.response))
-				}
-				if(e.length<=0){
+				if(e) {
+					if(e.length > 2) {
+						this.axios.get(`http://localhost:8000/api/user/search/${e}`)
+						.then(res => this.users = res.data.user)
+						.catch(err => console.dir(err.response))
+					}
+					if(e.length<=0){
+						this.axios.get(`http://localhost:8000/api/user`)
+						.then(res => this.users = res.data)
+						.catch(err => console.dir(err.response))
+					}
+				} else {
 					this.axios.get(`http://localhost:8000/api/user`)
 					.then(res => this.users = res.data)
 					.catch(err => console.dir(err.response))

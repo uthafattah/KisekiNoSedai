@@ -6,7 +6,7 @@
 					Ringkasan Belanja
 				</v-card-text>
 				<v-divider class="mx-4" />
-				<v-card flat>
+				<v-card v-for="i in 3" :key="i" outlined class="mx-4 my-2">
 					<v-list-item three-line>
 						<v-list-item-avatar tile size="80">
 								<v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg"></v-img>
@@ -26,8 +26,8 @@
 						<v-text-field class="shrink justify-center" label="Qty" v-model="qty" style="width: 40px;" />
 						<v-btn icon color="green" @click="addQty"><v-icon>mdi-plus-circle</v-icon></v-btn>
 					</v-card-actions>
-					<v-divider class="mt-4 mx-4" />
 				</v-card>
+				<v-divider class="mt-4 mx-4" />
 			</v-card>
 		</v-col>
 		<v-col cols="4" sm="4">

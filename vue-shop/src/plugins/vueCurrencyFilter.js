@@ -10,3 +10,6 @@ Vue.use(VueCurrencyFilter,
     symbolPosition: 'front',
     symbolSpacing: true
 })
+
+export default ({
+});
