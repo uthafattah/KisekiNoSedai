@@ -86,7 +86,7 @@
 			},
 			/*checkEmail() {
 				if (/.+@.+\..+/.test(this.editedItem.email)) {
-					axios.post("/api/email/verify", { email: this.editedItem.email })
+					this.axios.post("/api/email/verify", { email: this.editedItem.email })
 					.then(res => {
 						this.success = res.data.message;
 						this.error = "";
@@ -100,6 +100,46 @@
 					this.error = "";
 				}
 			},*/
+		},
+		methods: {
+			login: function() {
+				this.axios.interceptors.request.use((config) => {
+					this.loading = true; 
+					return config;
+				}, (error) => {
+					this.loading = false;
+					return Promise.reject(error);
+				});
+
+				this.axios.interceptors.response.use((response) => {
+					this.loading = false;
+					return response;
+				}, (error) => {
+					this.loading = false;
+					return Promise.reject(error);
+				});
+				this.axios.post('http://localhost:8000/api/login', {'email': this.loginField.email, 'password': this.loginField.password})
+				.then(res => {
+					localStorage.setItem('token', res.data.token) 
+					localStorage.setItem('loggedIn', true)
+					if(res.data.isAdmin) {
+						this.$router.push('/admin')
+						.then(res => {
+							console.log('LoggedIn Successfully')
+							console.log(res)
+						})
+						.catch(err => console.log(err))
+					} else{
+						this.text = "You Need to be LoggedIn as an Administrator";
+						//this.snackbar = true
+						console.log(this.text)
+					}
+				}).catch(err => {
+					this.text = err.response.data.status
+					//this.snackbar = true;
+					console.log(this.text)
+				})
+			}
 		}
 	};
 </script>

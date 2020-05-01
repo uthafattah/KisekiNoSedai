@@ -66,11 +66,61 @@
 			<v-btn icon text to="/carts" v-if="isCostumer">
 				<v-icon>mdi-cart</v-icon>
 			</v-btn>
-			<Dialog v-if="isCostumer" />
-			<v-btn icon text to="/messages" v-if="isCostumer">
+			<!--Dialog v-if="!loggedIn" /-->
+			<v-dialog v-model="dialog" max-width="600px" v-if="!loggedIn">
+				<template v-slot:activator="{ on }">
+					<v-btn text icon v-on="on">
+						<v-icon>mdi-login</v-icon>
+					</v-btn>
+				</template>
+				<v-card>
+					<v-tabs fixed-tabs v-model="tab" background-color="light-blue darken-1" centered dark icons-and-text>
+						<v-progress-linear :active="loading" :indeterminate="loading" absolute top color="white accent-4"></v-progress-linear>
+						<v-tabs-slider></v-tabs-slider>
+						<v-tab href="#tab-login">
+							Login
+						</v-tab>
+						<v-tab href="#tab-register">
+							Register
+						</v-tab>
+					</v-tabs>
+					<v-tabs-items v-model="tab">
+						<v-tab-item :value="'tab-login'">
+							<v-card flat>
+								<v-card-text>
+									<v-form ref="form" v-model="valid_login">
+										<v-text-field  color="light-blue darken-1" label="Email" v-model="loginField.email" :rules="[rules.required, rules.validEmail]" name="email" prepend-icon="mdi-email" type="email" autocomplete="off" />
+										<v-text-field color="light-blue darken-1" label="Password" v-model="loginField.password" :rules="[rules.required, rules.min]" name="password" prepend-icon="mdi-lock" :append-icon="login_password ? 'mdi-eye' : 'mdi-eye-off'" :type="login_password ? 'text' : 'password'" @click:append="login_password = !login_password" autocomplete="off" />
+									</v-form>
+								</v-card-text>
+								<v-card-actions>
+									<v-btn type="submit" color="light-blue darken-1" :disabled="!valid_login" block @click.prevent="login" class="title white--text">Login</v-btn>
+								</v-card-actions>
+							</v-card>
+						</v-tab-item>
+						<v-tab-item :value="'tab-register'">
+							<v-card flat>
+								<v-card-text>
+									<v-form ref="form" v-model="valid_register">
+										<v-text-field :rules="[rules.required, rules.min]" label="Name" prepend-icon="mdi-account" autocomplete="off" />
+										<v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail]" label="Email" prepend-icon="mdi-email" autocomplete="off" />
+										<!--v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail]" :blur="checkEmail" label="Email" prepend-icon="mdi-email" autocomplete="off" /-->
+										<v-text-field :append-icon="register_password ? 'mdi-eye' : 'mdi-eye-off'" :type="register_password ? 'text' : 'password'" @click:append="register_password = !register_password" :rules="[rules.required, rules.min]" v-model="registerField.password" label="Type Password" autocomplete="off" prepend-icon="mdi-lock" />
+										<v-text-field :append-icon="register_rpassword ? 'mdi-eye' : 'mdi-eye-off'" :type="register_rpassword ? 'text' : 'password'" @click:append="register_rpassword = !register_rpassword" :rules="[rules.required, passwordMatch]" v-model="registerField.rpassword" label="Retype Password" prepend-icon="mdi-lock-check" autocomplete="off" />
+									</v-form>
+								</v-card-text>
+								<v-card-actions>
+									<v-btn type="submit" color="light-blue darken-1" :disabled="!valid_register" block @click.prevent="register" class="title white--text">Register</v-btn>
+								</v-card-actions>
+							</v-card>
+						</v-tab-item>
+					</v-tabs-items>
+				</v-card>
+			</v-dialog>
+			<v-btn icon text to="/messages" v-if="isCostumer && loggedIn">
 				<v-icon>mdi-email</v-icon>
 			</v-btn>
-			<v-menu open-on-hover offsetY>
+			<v-menu open-on-hover offsetY v-if="loggedIn">
 				<template v-slot:activator="{ on }">
 					<v-btn icon v-on="on">
 						<v-icon>mdi-bell</v-icon>
@@ -86,14 +136,14 @@
 					</v-list-item>
 				</v-list>
 			</v-menu>
-			<v-btn text @click="store" v-if="isCostumer">
+			<v-btn text @click="store" v-if="isCostumer && loggedIn">
 				<v-avatar size="36">
 					<!--v-img src="storage/logos/no_logo.png" aspect-ratio="1"></v-img-->
 					<v-icon>mdi-store</v-icon>
 				</v-avatar>
 				<div style="margin-left:0.5em">Jannah Gate</div>
 			</v-btn>
-			<v-menu open-on-hover offsetY>
+			<v-menu open-on-hover offsetY v-if="loggedIn">
 				<template v-slot:activator="{ on }">
 					<v-btn text v-on="on">
 						<v-avatar size="36">
@@ -114,29 +164,84 @@
 							</v-list-item-title>
 						</v-list-item-content>
 					</v-list-item>
+					<v-divider class="mx-2" />
+					<v-list-item link @click="logout">
+						<v-list-item-action>
+							<v-icon>mdi-logout</v-icon>
+						</v-list-item-action>
+						<v-list-item-title>Logout</v-list-item-title>
+					</v-list-item>
 				</v-list>
 			</v-menu>
 		</v-app-bar>
+		<!--Alert :alerts="alerts" v-if="isAlert"/-->
+		<v-snackbar v-model="snackbar" :color="alert.color" class="top mb-12">
+			{{alert.text}}
+			<v-btn dark text @click="snackbar = false">
+				<v-icon>mdi-close-circle</v-icon>
+			</v-btn>
+		</v-snackbar>
 	</div>
 </template>
 
 <script>
-	import Dialog from '@/components/Dialog'
+	//import Dialog from '@/components/Dialog'
 	export default {
 		props: {
 			source: String,
 		},
 		components: {
-			Dialog
+			//Dialog,
+			//Alert: () => import( /* webpackChunkName: "alert" */ '@/components/Alert.vue'),
 		},
 		data: () => ({
 			drawer: true,
-            theme: false,
+			theme: false,
+			loggedIn: false,
+			//---------------
+			loading: false,
+			dialog: false,
+			tab: null,
+			valid_login: false,
+			valid_register: false,
+			login_password: false,
+			register_password: false,
+			register_rpassword: false,
+			success: '',
+			error: '',
+			//---------------
+            snackbar: false,
+			alert: {
+				text: '',
+				color: '',
+				status: false,
+			},
+			rules: {
+				required: v => !!v || "This Field Required",
+				min: v => v.length >= 5 || "Minimum 5 Characters Required",
+				validEmail: v => /.+@.+\..+/.test(v) || "E-mail must be valid",
+			},
+			loginField: {
+				email: '',
+				password: '',
+			},
+			registerField: {
+				name: '',
+				email: '',
+				password: '',
+				created_at: '',
+				updated_at: '',
+			},
 			profile_menu: [
 				{
 					icon: 'mdi-account-cog',
 					text: 'Account Settings',
 					action: '/settings'
+				},
+				{
+					icon: 'mdi-monitor-dashboard',
+					text: 'Admin',
+					action: '/admin'
 				},
 				{
 					icon: 'mdi-heart',
@@ -148,17 +253,8 @@
 					text: 'My Order',
 					action: '/orders'
 				},
-				{
-					icon: 'mdi-logout',
-					text: 'Logout',
-					action: '/'
-				},
 			],
 			notification: [
-				{
-					text: 'Admin',
-					action: '/admin'
-				},
 				{
 					text: 'Checkout',
 					action: '/checkout'
@@ -251,17 +347,104 @@
 				},
 			],
 		}),
-        created() {
-            this.$vuetify.theme.dark = false
-        },
-        watch: {
-            theme: function(old) {
-                this.$vuetify.theme.dark = old;
-            }
-        },
+		created() {
+			this.loggedIn = localStorage.getItem('token') ? true : false
+			this.$vuetify.theme.dark = false
+		},
+		watch: {
+			theme: function(old) {
+				this.$vuetify.theme.dark = old;
+			}
+		},
+		mounted() {
+            //this.snackbar = localStorage.getItem('loggedIn') ? true : false;
+			localStorage.getItem('loggedIn') ? true : false;
+			localStorage.removeItem('loggedIn');
+		},
+		methods: {
+			store: function() {
+				this.$router.push('/my-store')
+			},
+			clear: function () {
+				this.loginField.email = ''
+				this.loginField.password = ''
+				this.registerField.name = ''
+				this.registerField.email = ''
+				this.registerField.password = ''
+				this.registerField.created_at = ''
+				this.registerField.updated_at = ''
+			},
+			login: function() {
+				this.axios.interceptors.request.use((config) => {
+					this.loading = true; 
+					return config;
+				}, (error) => {
+					this.loading = false;
+					return Promise.reject(error);
+				});
+
+				this.axios.interceptors.response.use((response) => {
+					this.loading = false;
+					return response;
+				}, (error) => {
+					this.loading = false;
+					return Promise.reject(error);
+				});
+				this.axios.post('http://localhost:8000/api/login', {'email': this.loginField.email, 'password': this.loginField.password})
+				.then(res => {
+					localStorage.setItem('token', res.data.token) 
+					localStorage.setItem('loggedIn', true)
+					this.loggedIn = localStorage.getItem('token') ? true : false
+					if(res.data.isAdmin) {
+						localStorage.setItem('role', 1)
+						this.alert.text = "LoggedIn as Admin Successfully"
+						this.alert.color = "success"
+					} else if (res.data.isStaff) {
+						this.alert.text = "LoggedIn as Staff Successfully"
+						this.alert.color = "success"
+						localStorage.setItem('role', 2)
+					} else if (res.data.isCostumer) {
+						this.alert.text = "LoggedIn Successfully"
+						this.alert.color = "success"
+						localStorage.setItem('role', 3)
+					} else {
+						console.log('LoggedIn Role Wrong')
+					}
+					this.snackbar = true
+					this.dialog = false
+					this.clear()
+					/*else {
+						this.text = "You Need to be LoggedIn as an Administrator";
+						//this.snackbar = true
+						console.log(this.text)
+					}*/
+				}).catch(err => {
+					this.alert.text = err.response.data.status
+					this.alert.color = "success"
+				})
+					this.alert.status = true
+			},
+			logout: function() {
+				localStorage.removeItem('token');
+				localStorage.removeItem('role');
+				this.loggedIn = localStorage.getItem('token') ? true : false
+				
+				//this.$router.push('/')
+					//.then(res => {
+						this.alert.text = "You are Logged Out Successfully";
+						this.alert.color = "success"
+						this.snackbar = true
+						//console.log(res)
+					//})
+					//.catch(err => console.log(err))
+			},
+		},
 		computed: {
+			passwordMatch() {
+				return this.registerField.password != this.registerField.rpassword ? "Password Does Not Match" : true;
+			},
 			isCostumer () {
-				return (
+				return ( 
 					this.$route.path == '/' ||
 					this.$route.path == '/carts' ||
 					this.$route.path == '/checkout' ||
@@ -275,7 +458,7 @@
 				)
 			},
 			isAdmin () {
-				return (
+				return ( 
 					this.$route.path == '/admin' ||
 					this.$route.path == '/admin/categories' ||
 					this.$route.path == '/admin/messages' ||
@@ -289,7 +472,7 @@
 				)
 			},
 			isStore () {
-				return (
+				return ( 
 					this.$route.path == '/my-store' ||
 					this.$route.path == '/my-store/merchandise' ||
 					this.$route.path == '/my-store/messages' ||
@@ -297,14 +480,8 @@
 					this.$route.path == '/my-store/reports' ||
 					this.$route.path == '/my-store/settings'
 				)
-			}
-		},
-		methods:
-		{
-			store: function() {
-				this.$router.push('/my-store')
 			},
-		}
+		},
 	}
 </script>
 <style scoped>

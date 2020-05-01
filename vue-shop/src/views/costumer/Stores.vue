@@ -38,22 +38,7 @@
 		</v-card>
 		<v-row>
 			<v-col cols="6" sm="3" v-for="(merchandise) in merchandises" :key="merchandise.id" link :to="merchandise.action">
-				<v-card :loading="loading">
-					<v-img width="300px" :src="getImage(merchandise.photo)">
-						<v-btn icon large :color="wishlist_color" @click="wishlist"><v-icon>mdi-heart</v-icon></v-btn>
-					</v-img>
-					<v-card-title>{{merchandise.name}}</v-card-title>
-					<v-card-text>
-						<v-row align="center" class="mx-0">
-							<v-rating :value="4.5" color="amber" dense half-increments readonly size="14"></v-rating>
-							<div class="grey--text ml-4">x.x (xxx)</div>
-						</v-row>
-						<v-row>
-							<v-col><b>{{merchandise.price | currency}}</b></v-col>
-							<v-col class="text-right">xxx Terjual</v-col>
-						</v-row>
-					</v-card-text>
-				</v-card>
+				<MerchandiseItem :merchandise="merchandise" />
 			</v-col>
 		</v-row>
 	</div>
@@ -62,6 +47,7 @@
 	export default {
 		data: () => ({
 			outlined: true,
+			loading: false,
 			messages: 'Follow',
 			follow_color: 'success',
 			wishlist_color: 'pink lighten-5',
@@ -70,8 +56,8 @@
 			sorting: ['Highest Rating', 'Highest Price', 'Lowest Price', 'Most Reviews', 'Most Purchases', 'Most Viewed'],
             merchandises: [],
 		}),
-		computed: {
-
+		components: {
+			MerchandiseItem: () => import(/* webpackChunkName: "merchandise-item" */ '@/components/MerchandiseItem.vue')
 		},
 		methods: {
 			follow() {

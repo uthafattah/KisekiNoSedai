@@ -25,10 +25,10 @@
 		</template>
 		<template v-slot:item.status_store="{ item }">
 			<v-edit-dialog large block persistent :return-value.sync="item.status_store" @save="updateStatus(item)">
-				{{item.category}}
+				{{item.status_store}}
 				<template v-slot:input>
 					<h4>Change Status</h4>
-					<v-select :rules="[rules.required]" :items="status_store" v-model="item.status_store" color="error" label="Select Status"></v-select>
+					<v-select :rules="[rules.required]" :items="status_stores" v-model="item.status_store" color="error" label="Select Status"></v-select>
 				</template>
 			</v-edit-dialog>
 		</template>
@@ -52,6 +52,7 @@
 			selected: [],
 			text: '',
 			categories: [],
+			status_stores: [],
 			success: '',
 			error: '',
 			options: {
@@ -116,7 +117,7 @@
 					.catch(err => {
 						if(err.response.status == 401) {
 							localStorage.removeItem('token');
-							this.$router.push('/login');
+							this.$router.push('/');
 						}
 					})
 				},
@@ -212,7 +213,7 @@
 				.catch(err => {
 					if(err.response.status == 401) {
 						localStorage.removeItem('token');
-						this.$router.push('/login');
+						this.$router.push('/');
 					}
 				})
 			},

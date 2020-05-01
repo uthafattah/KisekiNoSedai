@@ -185,13 +185,15 @@
 					const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
 					this.axios.get(`http://localhost:8000/api/user`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
 					.then(res => {
-						this.users = res.data;
+						this.users = res.data.users;
 						this.roles = res.data.roles;
+						console.log(this.users)
+						console.log(this.roles)
 					})
 					.catch(err => {
 						if(err.response.status == 401) {
 							localStorage.removeItem('token');
-							this.$router.push('/login');
+							this.$router.push('/');
 						}
 					})
 				},
@@ -274,7 +276,7 @@
 					}
 				} else {
 					this.axios.get(`http://localhost:8000/api/user`)
-					.then(res => this.users = res.data)
+					.then(res => this.users = res.data.users)
 					.catch(err => console.dir(err.response))
 				}
 			},
@@ -291,7 +293,7 @@
 				.catch(err => {
 					if(err.response.status == 401) {
 						localStorage.removeItem('token');
-						this.$router.push('/login');
+						this.$router.push('/');
 					}
 				})
 			},

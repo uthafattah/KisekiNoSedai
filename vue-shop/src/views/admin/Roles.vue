@@ -133,7 +133,7 @@
 					.catch(err => {
 						if(err.response.status == 401) {
 							localStorage.removeItem('token');
-							this.$router.push('/login');
+							this.$router.push('/');
 						}
 					})
 				},
@@ -200,7 +200,7 @@
 				.catch(err => {
 					if(err.response.status == 401) {
 						localStorage.removeItem('token');
-						this.$router.push('/login');
+						this.$router.push('/');
 					}
 				})
 			},

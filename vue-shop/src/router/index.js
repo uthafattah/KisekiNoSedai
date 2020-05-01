@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+//import axios from "axios";
 
 Vue.use(VueRouter)
 
@@ -138,14 +139,36 @@ Vue.use(VueRouter)
 				name: 'Users',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/admin/Users.vue')
 			},
-		]
+		],
+		/*beforeEnter: (to, from, next) => {
+			axios.get('http://localhost:8000/verify')
+			.then(res => {
+				console.log(res)
+				next()
+			})
+			.catch(err => {
+				console.log(err)
+				next('/')
+			})
+		}*/
 	},
 ]
+
+/*const router = new VueRouter({
+	mode: 'history',
+	base: process.env.BASE_URL,
+	routes
+})*/
 
 const router = new VueRouter({
 	mode: 'history',
 	base: process.env.BASE_URL,
-	routes
+	routes,
+})
+router.beforeEach((to, from, next) => {
+	const token = localStorage.getItem('token') || null
+	window.axios.defaults.headers['Authorization'] = "Bearer " + token;
+	next();
 })
 
 export default router
