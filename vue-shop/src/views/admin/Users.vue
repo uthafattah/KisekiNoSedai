@@ -14,8 +14,7 @@
 						<v-card-title>
 							<span class="headline">{{ formTitle }}</span>
 						</v-card-title>
-						<!--v-form v-model="valid" v-on:submit.stop.preverent="save"-->
-						<v-form v-model="valid">
+						<v-form v-model="valid" v-on:submit.stop.prevent="save">
 							<v-card-text>
 								<v-container>
 									<v-row>
@@ -49,7 +48,7 @@
 							<v-card-actions>
 								<v-spacer></v-spacer>
 								<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @clic.prevent="save">Save</v-btn>
+								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
 							</v-card-actions>
 						</v-form>
 					</v-card>
@@ -350,6 +349,8 @@
 					.then(res => {
 						this.text = "Record Updated Successfully!";
 						this.snackbar = true;
+						console.log(this.users.data[index])
+						console.log(res.data.user)
 						Object.assign(this.users.data[index], res.data.user)
 					})
 					.catch(err => {

@@ -4,7 +4,7 @@
 			<v-row>
 				<v-col cols="3" class="mt-12">
 					<v-list-item-avatar tile size="250">
-						<v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg" v-model="profileField.avatar"></v-img>
+						<v-img :src="getImage(profile.avatar)"></v-img>
 						<!--v-icon>mdi-store</v-icon-->
 					</v-list-item-avatar>
 				</v-col>
@@ -24,10 +24,10 @@
 							<v-card flat>
 								<v-card-text>
 									<v-form ref="form" v-model="valid_profile">
-										<v-text-field label="Name" v-model="profileField.name" :rules="[rules.required, rules.min]" prepend-icon="mdi-account" autocomplete="off" />
-										<v-text-field label="E-Mail" v-model="profileField.email" :rules="[rules.required, rules.validEmail]" prepend-icon="mdi-email" autocomplete="off" />
-										<v-text-field label="Phone" v-model="profileField.phone" :rules="[rules.required]" prepend-icon="mdi-cellphone" autocomplete="off" />
-										<v-textarea type="text" label="Address" v-model="profileField.address" :rules="[rules.required]" prepend-icon="mdi-map-marker" autocomplete="off" />
+										<v-text-field label="Name" v-model="profile.name" :rules="[rules.required, rules.min]" prepend-icon="mdi-account" autocomplete="off" />
+										<v-text-field label="E-Mail" v-model="profile.email" :rules="[rules.required, rules.validEmail]" prepend-icon="mdi-email" autocomplete="off" />
+										<v-text-field label="Phone" v-model="profile.phone" :rules="[rules.required]" prepend-icon="mdi-cellphone" autocomplete="off" />
+										<v-textarea type="text" label="Address" v-model="profile.address" :rules="[rules.required]" prepend-icon="mdi-map-marker" autocomplete="off" />
 									</v-form>
 								</v-card-text>
 								<v-card-actions class="mr-2">
@@ -71,22 +71,31 @@
 			new_rpassword: false,
 			rules: {
 				required: v => !!v || "This Field Required",
-				min: v => v.length >= 5 || "Minimum 5 Characters Required",
+				min: v => (v && v.length >= 5) || "Minimum 5 Characters Required",
 				validEmail: v => /.+@.+\..+/.test(v) || "E-mail must be valid",
-			},
-			profileField: {
-				name: 'Kiseki No Sedai',
-				email: 'kiseki-kun@gmail.com',
-				phone: '081234567890',
-				address: 'Jeruk Purut',
-				avatar: null,
 			},
 			resetPasswordField: {
 				old_password: '',
 				new_password: '',
 				new_rpassword: '',
 			},
+			profile: []
 		}),
+		created(){
+			this.axios.get('http://localhost:8000/api/user/' + localStorage.getItem('id'))
+			.then((res) => {
+				this.profile = res.data.user[0]
+			})
+			.catch((err) => {
+				if(err.response.status == 401) {
+					localStorage.removeItem('token');
+					localStorage.removeItem('role');
+					localStorage.removeItem('id');
+					this.$router.push('/');
+				}
+				console.log(err)
+			})
+		},
 		computed: {
 			passwordMatch() {
 				return this.resetPasswordField.new_password != this.resetPasswordField.new_rpassword ? "Password Does Not Match" : true;
@@ -100,19 +109,25 @@
 
 			},
 			clearProfile() {
-				this.profileField.name = 'Kiseki No Sedai'
-				this.profileField.email = 'kiseki-kun@gmail.com'
-				this.profileField.phone = '081234567890'
-				this.profileField.address = 'Jeruk Purut'
-				this.profileField.avatar = null
+				this.axios.get('http://localhost:8000/api/user/' + localStorage.getItem('id'))
+				.then((res) => {
+					this.profile = res.data.user[0]
+				})
+				.catch((err) => {
+					if(err.response.status == 401) {
+						localStorage.removeItem('token');
+						localStorage.removeItem('role');
+						localStorage.removeItem('id');
+						this.$router.push('/');
+					}
+					console.log(err)
+				})
 			},
 			clearPassword() {
 				this.resetPasswordField.old_password = ''
 				this.resetPasswordField.new_password = ''
 				this.resetPasswordField.new_rpassword = ''
 			}
-		},
-		created(){
 		},
 	}
 </script>

@@ -1,48 +1,90 @@
 <template>
-	<v-row>
-		<v-col cols="3" sm="3">
-			<v-card class="mt-3">
-				<v-card-text class="font-weight-black">
-					Filter
-				</v-card-text>
-				<v-divider class="mx-4" />
-				<v-card-actions>
+	<div>
+		<v-card outlined>
+			<v-list-item three-line>
+				<v-list-item-content>
+					<div class="mb-4 ml-n4 spacer" no-gutters>
+						<v-btn text dark>
+							<v-avatar tile size="24">
+								<v-icon color="grey">mdi-sticker-check</v-icon>
+							</v-avatar>
+							<div style="margin-left:0.5em" class="grey--text"><strong>Official Store</strong></div>
+						</v-btn> 
+					</div>
+					<v-list-item-title class="display-1 mb-1 font-weight-black">Jannah Gate</v-list-item-title>
+					<v-list-item-subtitle>Menjual Pakaian A, B, C</v-list-item-subtitle>
+				</v-list-item-content>
 
-				</v-card-actions>
-			</v-card>
-		</v-col>
-		<v-col cols="9" sm="9">
-			<v-row>
-				<v-col cols="6" sm="4" v-for="(merchandise) in merchandises" :key="merchandise.id" link :to="merchandise.action">
-					<MerchandiseItem :merchandise="merchandise" />
+				<v-list-item-avatar tile size="100">
+						<v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg"></v-img>
+						<!--v-icon>mdi-store</v-icon-->
+				</v-list-item-avatar>
+			</v-list-item>
+
+			<v-card-actions>
+				<v-spacer />
+				<v-btn :outlined="outlined" :color="follow_color" @click="follow" @mouseover="mouseOver" @mouseleave="mouseLeave">{{messages}}</v-btn>
+				<v-btn outlined color="secondary" to="/messages">Message Store</v-btn>
+			</v-card-actions>
+			<v-divider class="mt-4 mx-4" />
+			<v-row class="mx-4 mb-n6">
+				<v-col cols="9">
+					<v-text-field outlined dense append-icon="mdi-magnify" label="Search..." hide-details></v-text-field>
+				</v-col>
+				<v-col cols="3">
+					<v-select outlined dense :items="sorting" label="Sort By"></v-select>
 				</v-col>
 			</v-row>
-		</v-col>
-	</v-row>
+		</v-card>
+		<v-row>
+			<v-col cols="6" sm="3" v-for="(merchandise) in merchandises" :key="merchandise.id" link :to="merchandise.action">
+				<MerchandiseItem :merchandise="merchandise" />
+			</v-col>
+		</v-row>
+	</div>
 </template>
 <script>
 	export default {
 		data: () => ({
-			drawer: null,
+			outlined: true,
 			loading: false,
-            merchandises: [],
+			messages: 'Follow',
+			follow_color: 'success',
 			wishlist_color: 'pink lighten-5',
+			unfollow : false,
+			hover: '',
+			sorting: ['Highest Rating', 'Highest Price', 'Lowest Price', 'Most Reviews', 'Most Purchases', 'Most Viewed'],
+            merchandises: [],
 		}),
 		components: {
 			MerchandiseItem: () => import(/* webpackChunkName: "merchandise-item" */ '@/components/MerchandiseItem.vue')
 		},
-        created(){
-            this.axios.get('http://localhost:8000/api/merchandise/all')
-            .then((response) => {
-                  this.merchandises = response.data.merchandise
-                  console.log(this.merchandises)
-            })
-            .catch((error) => {
-                  let { responses } = error
-                  console.log(responses)
-            })
-        },
-        methods : {
+		methods: {
+			follow() {
+				if(this.messages === 'Follow') {
+					this.messages = 'Following'
+					this.outlined = false
+					this.unfollow = true
+				} else if (this.messages === 'Unfollow') {
+					this.messages = 'Follow'
+					this.follow_color = 'success'
+					this.outlined = true
+					this.unfollow = false
+				}
+			},
+			mouseOver: function() {
+				if(this.unfollow) {
+					this.messages = 'Unfollow'
+					this.follow_color = 'error'
+				}
+			},
+			mouseLeave: function() {
+				if(this.unfollow) {
+					this.messages = 'Following'
+					this.follow_color = 'success'
+					this.outlined = false
+				}
+			},
             getImage(image) {
                 return "http://localhost:8000/storage/" + image;
             },
@@ -53,7 +95,22 @@
 					this.wishlist_color = 'pink lighten-5'
 				}
 			},
-        }
+		},
+        created(){
+            this.axios.get('http://localhost:8000/api/merchandise')
+            .then((response) => {
+                  this.merchandises = response.data.data
+                  console.log(this.merchandises)
+            })
+            .catch((error) => {
+                  let { responses } = error
+                  console.log(responses)
+            })
+        },
 	}
 </script>
-<style scoped></style>
+<style scoped>
+	.btnCustom:hover {
+		background-color: #FF5252 !important;
+	}
+</style>

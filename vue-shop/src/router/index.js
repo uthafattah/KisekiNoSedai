@@ -22,32 +22,37 @@ Vue.use(VueRouter)
 			},
 			{
 				path: 'merchandise',
-				name: 'Merchandise',
+				name: 'Merchandise Costumer',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Merchandise.vue')
 			},
 			{
 				path: 'messages',
-				name: 'Messages',
+				name: 'Messages Costumer',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Messages.vue')
 			},
 			{
 				path: 'orders',
-				name: 'Orders',
+				name: 'Orders Costumer',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Orders.vue')
 			},
 			{
 				path: 'promos',
-				name: 'Promos',
+				name: 'Promos Costumer',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Promos.vue')
 			},
 			{
+				path: 'search',
+				name: 'Search',
+				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Search.vue')
+			},
+			{
 				path: 'settings',
-				name: 'Settings',
+				name: 'Settings Costumer',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Settings.vue')
 			},
 			{
 				path: 'stores',
-				name: 'Stores',
+				name: 'Stores Costumer',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Stores.vue')
 			},
 			{
@@ -64,12 +69,12 @@ Vue.use(VueRouter)
 		children: [
 			{
 				path: 'messages',
-				name: 'Messages',
+				name: 'Messages Store',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/store/Messages.vue')
 			},
 			{
 				path: 'orders',
-				name: 'Orders',
+				name: 'Orders Store',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/store/Orders.vue')
 			},
 			{
@@ -79,12 +84,12 @@ Vue.use(VueRouter)
 			},
 			{
 				path: 'merchandise',
-				name: 'Merchandise',
+				name: 'Merchandise Store',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/store/Merchandise.vue')
 			},
 			{
 				path: 'settings',
-				name: 'Settings',
+				name: 'Settings Store',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/store/Settings.vue')
 			},
 		]
@@ -101,7 +106,7 @@ Vue.use(VueRouter)
 			},
 			{
 				path: 'messages',
-				name: 'Messages',
+				name: 'Messages Admin',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/admin/Messages.vue')
 			},
 			{
@@ -111,7 +116,7 @@ Vue.use(VueRouter)
 			},
 			{
 				path: 'promos',
-				name: 'Promos',
+				name: 'Promos Admin',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/admin/Promos.vue')
 			},
 			{
@@ -121,7 +126,7 @@ Vue.use(VueRouter)
 			},
 			{
 				path: 'stores',
-				name: 'Stores',
+				name: 'Stores Admin',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/admin/Stores.vue')
 			},
 			{

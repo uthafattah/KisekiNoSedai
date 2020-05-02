@@ -61,9 +61,9 @@
 				</v-toolbar-title>
 			</v-btn>
 
-			<v-spacer v-if="!isCostumer" />
-			<v-text-field flat solo-inverted hide-details prepend-inner-icon="mdi-magnify" label="Search" class="pl-3 pr-3" v-if="isCostumer" clear-icon="mdi-close-circle" clearable/>
-			<v-btn icon text to="/carts" v-if="isCostumer">
+			<v-spacer v-if="isAdmin || isStore" />
+			<v-text-field flat solo-inverted hide-details prepend-inner-icon="mdi-magnify" label="Search" class="pl-3 pr-3" v-if="!isAdmin && !isStore" clear-icon="mdi-close-circle" clearable/>
+			<v-btn icon text to="/carts" v-if="(!isAdmin && !isStore) && loggedIn">
 				<v-icon>mdi-cart</v-icon>
 			</v-btn>
 			<!--Dialog v-if="!loggedIn" /-->
@@ -117,7 +117,7 @@
 					</v-tabs-items>
 				</v-card>
 			</v-dialog>
-			<v-btn icon text to="/messages" v-if="isCostumer && loggedIn">
+			<v-btn icon text to="/messages" v-if="(!isAdmin && !isStore) && loggedIn">
 				<v-icon>mdi-email</v-icon>
 			</v-btn>
 			<v-menu open-on-hover offsetY v-if="loggedIn">
@@ -136,7 +136,7 @@
 					</v-list-item>
 				</v-list>
 			</v-menu>
-			<v-btn text @click="store" v-if="isCostumer && loggedIn">
+			<v-btn text @click="store" v-if="(!isAdmin && !isStore) && loggedIn">
 				<v-avatar size="36">
 					<!--v-img src="storage/logos/no_logo.png" aspect-ratio="1"></v-img-->
 					<v-icon>mdi-store</v-icon>
@@ -218,7 +218,7 @@
 			},
 			rules: {
 				required: v => !!v || "This Field Required",
-				min: v => v.length >= 5 || "Minimum 5 Characters Required",
+				min: v => (v && v.length >= 5) || "Minimum 5 Characters Required",
 				validEmail: v => /.+@.+\..+/.test(v) || "E-mail must be valid",
 			},
 			loginField: {
@@ -393,23 +393,22 @@
 				this.axios.post('http://localhost:8000/api/login', {'email': this.loginField.email, 'password': this.loginField.password})
 				.then(res => {
 					localStorage.setItem('token', res.data.token) 
+					localStorage.setItem('id', res.data.id) 
 					localStorage.setItem('loggedIn', true)
 					this.loggedIn = localStorage.getItem('token') ? true : false
 					if(res.data.isAdmin) {
 						localStorage.setItem('role', 1)
 						this.alert.text = "LoggedIn as Admin Successfully"
-						this.alert.color = "success"
 					} else if (res.data.isStaff) {
 						this.alert.text = "LoggedIn as Staff Successfully"
-						this.alert.color = "success"
 						localStorage.setItem('role', 2)
 					} else if (res.data.isCostumer) {
 						this.alert.text = "LoggedIn Successfully"
-						this.alert.color = "success"
 						localStorage.setItem('role', 3)
 					} else {
 						console.log('LoggedIn Role Wrong')
 					}
+					this.alert.color = "success"
 					this.snackbar = true
 					this.dialog = false
 					this.clear()
@@ -427,16 +426,12 @@
 			logout: function() {
 				localStorage.removeItem('token');
 				localStorage.removeItem('role');
+				localStorage.removeItem('id');
 				this.loggedIn = localStorage.getItem('token') ? true : false
-				
-				//this.$router.push('/')
-					//.then(res => {
-						this.alert.text = "You are Logged Out Successfully";
-						this.alert.color = "success"
-						this.snackbar = true
-						//console.log(res)
-					//})
-					//.catch(err => console.log(err))
+				this.alert.text = "You are Logged Out Successfully";
+				this.alert.color = "success"
+				this.snackbar = true
+				if(this.$route.path != "/") this.$router.push('/')
 			},
 		},
 		computed: {

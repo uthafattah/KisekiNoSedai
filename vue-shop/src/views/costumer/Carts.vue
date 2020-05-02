@@ -6,27 +6,11 @@
 					Ringkasan Belanja
 				</v-card-text>
 				<v-divider class="mx-4" />
-				<v-card v-for="i in 3" :key="i" outlined class="mx-4 my-2">
-					<v-list-item three-line>
-						<v-list-item-avatar tile size="80">
-								<v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg"></v-img>
-								<!--v-icon>mdi-store</v-icon-->
-						</v-list-item-avatar>
-						<v-list-item-content>
-							<v-list-item-title class="title font-weight-bold">Bundle Package WD Green SSD 240GB</v-list-item-title>
-							<v-list-item-subtitle class="subtitle-1 font-weight-black warning--text">{{price | currency}}</v-list-item-subtitle>
-						</v-list-item-content>
-					</v-list-item>
-
-					<v-card-actions class="mt-n12">
-						<v-spacer />
-						<v-btn icon :color="wishlist_color" @click="wishlist"><v-icon>mdi-heart</v-icon></v-btn>
-						<v-btn icon color="grey"><v-icon>mdi-delete</v-icon></v-btn>
-						<v-btn icon color="grey" @click="subtractQty"><v-icon>mdi-do-not-disturb</v-icon></v-btn>
-						<v-text-field class="shrink justify-center" label="Qty" v-model="qty" style="width: 40px;" />
-						<v-btn icon color="green" @click="addQty"><v-icon>mdi-plus-circle</v-icon></v-btn>
-					</v-card-actions>
-				</v-card>
+				<v-row>
+					<v-col cols="12" v-for="(cart) in cart" :key="cart.id" link :to="cart.action">
+						<CartItem :cart="cart" />
+					</v-col>
+				</v-row>
 				<v-divider class="mt-4 mx-4" />
 			</v-card>
 		</v-col>
@@ -61,15 +45,32 @@
 <script>
 	export default {
 		data: () => ({
-			drawer: null,
 			loading: false,
 			wishlist_color: 'pink lighten-5',
 			qty: 1,
 			price: 1600000,
-			total: 0
+			total: 0,
+			cart: [],
 		}),
+		components: {
+			CartItem: () => import(/* webpackChunkName: "merchandise-item" */ '@/components/CartItem.vue')
+		},
         created() {
             this.total = this.price
+            this.axios.get('http://localhost:8000/api/cart/user_cart/' + localStorage.getItem('id'))
+				.then((res) => {
+					this.cart = res.data.cart
+					console.log(this.cart)
+				})
+				.catch((err) => {
+					if(err.response.status == 401) {
+						localStorage.removeItem('token');
+						localStorage.removeItem('role');
+						localStorage.removeItem('id');
+						this.$router.push('/');
+					}
+					console.log(err)
+				})
         },
 		methods : {
 			addQty() {

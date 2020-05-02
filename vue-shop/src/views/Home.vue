@@ -82,7 +82,6 @@
 			],
 			categories: [],
 			merchandises: [],
-			wishlist_color: 'pink lighten-5',
 		}),
 		created(){
 			if(this.$route.path == '/') {
@@ -96,7 +95,7 @@
 
 				this.axios.get('http://localhost:8000/api/merchandise/top/40')
 				.then((res) => {
-					this.merchandises = res.data.data
+					this.merchandises = res.data.merchandise
 				})
 				.catch((err) => {
 					console.log(err)
@@ -111,13 +110,6 @@
 		methods : {
 			getImage(image) {
 				return "http://localhost:8000/storage/" + image;
-			},
-			wishlist() {
-				if(this.wishlist_color === 'pink lighten-5') {
-					this.wishlist_color = 'pink'
-				} else if (this.wishlist_color === 'pink') {
-					this.wishlist_color = 'pink lighten-5'
-				}
 			},
 		}
 	}
