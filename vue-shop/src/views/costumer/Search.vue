@@ -1,7 +1,7 @@
 <template>
 	<v-row>
 		<v-col cols="3" sm="3">
-			<v-card class="mt-3">
+			<v-card class="mt-3" outlined>
 				<v-card-text class="font-weight-black">
 					Filter
 				</v-card-text>

@@ -1,7 +1,7 @@
 <template>
 	<v-row>
 		<v-col cols="3" sm="3">
-			<v-card class="mt-3">
+			<v-card class="mt-3" outlined>
 				<v-card-text class="font-weight-black">
 					Filter
 				</v-card-text>
@@ -31,16 +31,22 @@
 		components: {
 			MerchandiseItem: () => import(/* webpackChunkName: "merchandise-item" */ '@/components/MerchandiseItem.vue')
 		},
-        created(){
-            this.axios.get('http://localhost:8000/api/merchandise')
-            .then((response) => {
-                  this.merchandises = response.data.data
-                  console.log(this.merchandises)
-            })
-            .catch((error) => {
-                  let { responses } = error
-                  console.log(responses)
-            })
+        created() {
+            this.total = this.price
+            this.axios.get('http://localhost:8000/api/wishlist/user_wishlist/' + localStorage.getItem('id'))
+				.then((res) => {
+					this.merchandises = res.data.wishlist
+					console.log(this.merchandises)
+				})
+				.catch((err) => {
+					if(err.response.status == 401) {
+						localStorage.removeItem('token');
+						localStorage.removeItem('role');
+						localStorage.removeItem('id');
+						this.$router.push('/');
+					}
+					console.log(err)
+				})
         },
         methods : {
             getImage(image) {

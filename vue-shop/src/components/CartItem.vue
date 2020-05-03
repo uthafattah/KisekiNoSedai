@@ -2,12 +2,12 @@
 	<v-card outlined class="mx-4">
 		<v-list-item three-line>
 			<v-list-item-avatar tile size="80">
-				<v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg"></v-img>
+				<v-img :src="getImage(cart.photo)"></v-img>
 				<!--v-icon>mdi-store</v-icon-->
 			</v-list-item-avatar>
 			<v-list-item-content>
-				<v-list-item-title class="title font-weight-bold">Bundle Package WD Green SSD 240GB</v-list-item-title>
-				<v-list-item-subtitle class="subtitle-1 font-weight-black warning--text">{{price | currency}}</v-list-item-subtitle>
+				<v-list-item-title class="title font-weight-bold">{{cart.name}}</v-list-item-title>
+				<v-list-item-subtitle class="subtitle-1 font-weight-black warning--text">{{cart.price | currency}}</v-list-item-subtitle>
 			</v-list-item-content>
 		</v-list-item>
 
@@ -37,7 +37,6 @@
 		data: () => ({
 			wishlist_color: 'pink lighten-5',
 			qty: 1,
-			price: 1600000,
 			total: 0,
 		}),
 		methods : {

@@ -11,7 +11,7 @@
 		<v-divider class="mx-4" />
 		<v-row class="mx-1">
 			<v-col cols="12" md="6">
-				<v-card shaped>
+				<v-card shaped outlined>
 					<v-img src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg" height="200px"></v-img>
 					<v-card-title>
 						Promo ABCD

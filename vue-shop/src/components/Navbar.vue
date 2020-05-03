@@ -263,6 +263,10 @@
 					action: '/merchandise'
 				},
 				{
+					text: 'Seach',
+					action: '/search'
+				},
+				{
 					text: 'Stores',
 					action: '/stores'
 				},

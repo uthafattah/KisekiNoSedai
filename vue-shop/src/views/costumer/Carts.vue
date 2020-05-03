@@ -1,7 +1,7 @@
 <template>
 	<v-row>
 		<v-col cols="8" sm="8">
-			<v-card class="mt-3">
+			<v-card class="mt-3" outlined>
 				<v-card-text class="font-weight-black">
 					Ringkasan Belanja
 				</v-card-text>
@@ -15,7 +15,7 @@
 			</v-card>
 		</v-col>
 		<v-col cols="4" sm="4">
-			<v-card class="mt-3">
+			<v-card class="mt-3" outlined>
 				<v-card-text class="font-weight-black">
 					Ringkasan Belanja
 				</v-card-text>
@@ -45,10 +45,7 @@
 <script>
 	export default {
 		data: () => ({
-			loading: false,
-			wishlist_color: 'pink lighten-5',
 			qty: 1,
-			price: 1600000,
 			total: 0,
 			cart: [],
 		}),
@@ -60,7 +57,6 @@
             this.axios.get('http://localhost:8000/api/cart/user_cart/' + localStorage.getItem('id'))
 				.then((res) => {
 					this.cart = res.data.cart
-					console.log(this.cart)
 				})
 				.catch((err) => {
 					if(err.response.status == 401) {
@@ -73,25 +69,8 @@
 				})
         },
 		methods : {
-			addQty() {
-				this.qty++
-				this.total += this.price
-			},
-			subtractQty() {
-				if(this.qty > 1) {
-					this.qty--
-					this.total -= this.price
-				}
-			},
 			getImage(image) {
 				return "http://localhost:8000/storage/" + image;
-			},
-			wishlist() {
-				if(this.wishlist_color === 'pink lighten-5') {
-					this.wishlist_color = 'pink'
-				} else if (this.wishlist_color === 'pink') {
-					this.wishlist_color = 'pink lighten-5'
-				}
 			},
 		}
 	}
