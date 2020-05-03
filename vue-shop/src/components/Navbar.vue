@@ -175,9 +175,9 @@
 			</v-menu>
 		</v-app-bar>
 		<!--Alert :alerts="alerts" v-if="isAlert"/-->
-		<v-snackbar v-model="snackbar" :color="alert.color" class="top mb-12">
+		<v-snackbar v-model="alert.status" :color="alert.color" class="top mb-12">
 			{{alert.text}}
-			<v-btn dark text @click="snackbar = false">
+			<v-btn dark text @click="alert.status = false">
 				<v-icon>mdi-close-circle</v-icon>
 			</v-btn>
 		</v-snackbar>
@@ -210,7 +210,6 @@
 			success: '',
 			error: '',
 			//---------------
-            snackbar: false,
 			alert: {
 				text: '',
 				color: '',
@@ -357,7 +356,7 @@
 			}
 		},
 		mounted() {
-            //this.snackbar = localStorage.getItem('loggedIn') ? true : false;
+            //this.alert.status = localStorage.getItem('loggedIn') ? true : false;
 			localStorage.getItem('loggedIn') ? true : false;
 			localStorage.removeItem('loggedIn');
 		},
@@ -398,41 +397,40 @@
 					this.loggedIn = localStorage.getItem('token') ? true : false
 					if(res.data.isAdmin) {
 						localStorage.setItem('role', 1)
-						this.alert.text = "LoggedIn as Admin Successfully"
+						this.alerts("LoggedIn as Admin Successfully", "success")
 					} else if (res.data.isStaff) {
-						this.alert.text = "LoggedIn as Staff Successfully"
+						this.alerts("LoggedIn as Staff Successfully", "success")
 						localStorage.setItem('role', 2)
 					} else if (res.data.isCostumer) {
-						this.alert.text = "LoggedIn Successfully"
+						this.alerts("LoggedIn Successfully", "success")
 						localStorage.setItem('role', 3)
 					} else {
 						console.log('LoggedIn Role Wrong')
 					}
-					this.alert.color = "success"
-					this.snackbar = true
 					this.dialog = false
 					this.clear()
 					/*else {
 						this.text = "You Need to be LoggedIn as an Administrator";
-						//this.snackbar = true
+						//this.alert.status = true
 						console.log(this.text)
 					}*/
 				}).catch(err => {
-					this.alert.text = err.response.data.status
-					this.alert.color = "success"
+					this.alerts(err.response.data.status, "error")
 				})
-					this.alert.status = true
 			},
 			logout: function() {
 				localStorage.removeItem('token');
 				localStorage.removeItem('role');
 				localStorage.removeItem('id');
 				this.loggedIn = localStorage.getItem('token') ? true : false
-				this.alert.text = "You are Logged Out Successfully";
-				this.alert.color = "success"
-				this.snackbar = true
+				this.alerts("You are Logged Out Successfully", "success")
 				if(this.$route.path != "/") this.$router.push('/')
 			},
+			alerts (text, color) {
+				this.alert.text = text
+				this.alert.color = color
+				this.alert.status = true;
+			}
 		},
 		computed: {
 			passwordMatch() {

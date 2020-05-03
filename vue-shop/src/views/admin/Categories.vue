@@ -79,7 +79,7 @@
 			},
 			rules: {
 				required: v => !!v || "This Field Required",
-				min: v => v.length >= 5 || "Minimum 5 Characters Required",
+				min: v => (v && v.length >= 5) || "Minimum 5 Characters Required",
 			},
 			footerProps: {
 				itemsPerPageOptions: [10, 20, 30],
@@ -146,6 +146,8 @@
 					.catch(err => {
 						if(err.response.status == 401) {
 							localStorage.removeItem('token');
+							localStorage.removeItem('role');
+							localStorage.removeItem('id');
 							this.$router.push('/');
 						}
 					})

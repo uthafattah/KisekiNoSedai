@@ -1,92 +1,101 @@
 <template>
-	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="users.total" :items="users.data" show-select @input="selectAll" :footer-props="footerProps">
-		<template v-slot:top>
-			<v-toolbar flat>
-				<v-toolbar-title>User Management System</v-toolbar-title>
-				<v-divider class="mx-4" inset vertical></v-divider>
-				<v-spacer></v-spacer>
-				<v-dialog v-model="dialog" max-width="800px">
-					<template v-slot:activator="{ on }">
-						<v-btn color="primary" dark class="mb-2" v-on="on">Add New User</v-btn>
-						<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
+	<div>
+		<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="users.total" :items="users.data" show-select @input="selectAll" :footer-props="footerProps">
+			<template v-slot:top>
+				<v-toolbar flat>
+					<v-toolbar-title>User Management System</v-toolbar-title>
+					<v-divider class="mx-4" inset vertical></v-divider>
+					<v-spacer></v-spacer>
+					<v-dialog v-model="dialog" max-width="800px">
+						<template v-slot:activator="{ on }">
+							<v-btn color="primary" dark class="mb-2" v-on="on">Add New User</v-btn>
+							<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
+						</template>
+						<v-card>
+							<v-card-title>
+								<span class="headline">{{ formTitle }}</span>
+							</v-card-title>
+							<v-form v-model="valid" v-on:submit.stop.prevent="save">
+								<v-card-text>
+									<v-container>
+										<v-row>
+											<v-col cols="12" sm="6">
+												<v-text-field :rules="[rules.required, rules.min]" v-model="editedItem.name" label="Name"></v-text-field>
+											</v-col>
+											<v-col cols="12" sm="6">
+												<v-select :items="roles" :rules="[rules.required]" v-model="editedItem.role" label="Select Role"></v-select>
+											</v-col>
+										</v-row>
+										<v-row v-if="editedIndex == -1">
+											<v-col cols="12" sm="6">
+												<!--v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail ]" :blur="checkEmail" v-model="editedItem.email" label="Email"></v-text-field-->
+												<v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail ]" v-model="editedItem.email" label="Email"></v-text-field>
+											</v-col>
+											<v-col cols="12" sm="6">
+												<v-text-field type="text" :rules="[rules.required]" v-model="editedItem.phone" label="Phone"></v-text-field>
+											</v-col>
+											<v-col cols="12" sm="6">
+												<v-text-field :append-icon="add_password ? 'mdi-eye' : 'mdi-eye-off'" :type="add_password ? 'text' : 'password'" @click:append="add_password = !add_password" :rules="[rules.required, rules.min]" v-model="editedItem.password" label="Type Password"></v-text-field>
+											</v-col>
+											<v-col cols="12" sm="6">
+												<v-text-field :append-icon="add_rpassword ? 'mdi-eye' : 'mdi-eye-off'" :type="add_rpassword ? 'text' : 'password'" @click:append="add_rpassword = !add_rpassword" :rules="[rules.required, passwordMatch]" v-model="editedItem.rpassword" label="Retype Password"></v-text-field>
+											</v-col>
+											<v-col cols="12" md="12">
+												<v-textarea type="text" :rules="[rules.required]" v-model="editedItem.address" label="Address"></v-textarea>
+											</v-col>
+										</v-row>
+									</v-container>
+								</v-card-text>
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+									<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
+								</v-card-actions>
+							</v-form>
+						</v-card>
+					</v-dialog>
+				</v-toolbar>
+				<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details clear-icon="mdi-close-circle" clearable/>
+			</template>
+			<template v-slot:item.role="{ item }">
+				<v-edit-dialog large block persistent :return-value.sync="item.role" @save="updateRole(item)">
+					{{item.role}}
+					<template v-slot:input>
+						<h4>Change Role</h4>
+						<v-select :rules="[rules.required]" :items="roles" v-model="item.role" color="error" label="Select Role"></v-select>
 					</template>
-					<v-card>
-						<v-card-title>
-							<span class="headline">{{ formTitle }}</span>
-						</v-card-title>
-						<v-form v-model="valid" v-on:submit.stop.prevent="save">
-							<v-card-text>
-								<v-container>
-									<v-row>
-										<v-col cols="12" sm="6">
-											<v-text-field :rules="[rules.required, rules.min]" v-model="editedItem.name" label="Name"></v-text-field>
-										</v-col>
-										<v-col cols="12" sm="6">
-											<v-select :items="roles" :rules="[rules.required]" v-model="editedItem.role" label="Select Role"></v-select>
-										</v-col>
-									</v-row>
-									<v-row v-if="editedIndex == -1">
-										<v-col cols="12" sm="6">
-											<!--v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail ]" :blur="checkEmail" v-model="editedItem.email" label="Email"></v-text-field-->
-											<v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail ]" v-model="editedItem.email" label="Email"></v-text-field>
-										</v-col>
-										<v-col cols="12" sm="6">
-											<v-text-field type="text" :rules="[rules.required]" v-model="editedItem.phone" label="Phone"></v-text-field>
-										</v-col>
-										<v-col cols="12" sm="6">
-											<v-text-field :append-icon="add_password ? 'mdi-eye' : 'mdi-eye-off'" :type="add_password ? 'text' : 'password'" @click:append="add_password = !add_password" :rules="[rules.required, rules.min]" v-model="editedItem.password" label="Type Password"></v-text-field>
-										</v-col>
-										<v-col cols="12" sm="6">
-											<v-text-field :append-icon="add_rpassword ? 'mdi-eye' : 'mdi-eye-off'" :type="add_rpassword ? 'text' : 'password'" @click:append="add_rpassword = !add_rpassword" :rules="[rules.required, passwordMatch]" v-model="editedItem.rpassword" label="Retype Password"></v-text-field>
-										</v-col>
-										<v-col cols="12" md="12">
-											<v-textarea type="text" :rules="[rules.required]" v-model="editedItem.address" label="Address"></v-textarea>
-										</v-col>
-									</v-row>
-								</v-container>
-							</v-card-text>
-							<v-card-actions>
-								<v-spacer></v-spacer>
-								<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
-							</v-card-actions>
-						</v-form>
-					</v-card>
-				</v-dialog>
-			</v-toolbar>
-			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details clear-icon="mdi-close-circle" clearable/>
-		</template>
-		<template v-slot:item.role="{ item }">
-			<v-edit-dialog large block persistent :return-value.sync="item.role" @save="updateRole(item)">
-				{{item.role}}
-				<template v-slot:input>
-					<h4>Change Role</h4>
-					<v-select :rules="[rules.required]" :items="roles" v-model="item.role" color="error" label="Select Role"></v-select>
-				</template>
-			</v-edit-dialog>
-		</template>
-		<template v-slot:item.avatar="{ item }">
-			<v-edit-dialog>
-				<v-list-item-avatar>
-					<v-img :src="getImage(item.avatar)" aspect-ratio="1" class="grey lighten-2"></v-img>
-				</v-list-item-avatar>
-				<template v-slot:input>
-					<v-file-input v-model="editedItem.avatar" label="Select File" placeholder="Upload Avatar" accept="image/jpg, image/png, image/bmp, image/jpeg" @change="uploadAvatar(item)" />
-				</template>
-			</v-edit-dialog>
-		</template>
-		<template v-slot:item.actions="{ item }">
-			<v-icon small class="mr-2" @click="editItem(item)">
-				mdi-pencil
-			</v-icon>
-			<v-icon small @click="deleteItem(item)">
-				mdi-delete
-			</v-icon>
-		</template>
-		<template v-slot:no-data>
-			<v-btn color="primary" @click="initialize">Reset</v-btn>
-		</template>
-	</v-data-table>
+				</v-edit-dialog>
+			</template>
+			<template v-slot:item.avatar="{ item }">
+				<v-edit-dialog>
+					<v-list-item-avatar>
+						<v-img :src="getImage(item.avatar)" aspect-ratio="1" class="grey lighten-2"></v-img>
+					</v-list-item-avatar>
+					<template v-slot:input>
+						<v-file-input v-model="editedItem.avatar" label="Select File" placeholder="Upload Avatar" accept="image/jpg, image/png, image/bmp, image/jpeg" @change="uploadAvatar(item)" />
+					</template>
+				</v-edit-dialog>
+			</template>
+			<template v-slot:item.actions="{ item }">
+				<v-icon small class="mr-2" @click="editItem(item)">
+					mdi-pencil
+				</v-icon>
+				<v-icon small @click="deleteItem(item)">
+					mdi-delete
+				</v-icon>
+			</template>
+			<template v-slot:no-data>
+				<v-btn color="primary" @click="initialize">Reset</v-btn>
+			</template>
+		</v-data-table>
+		<!--Alert :alerts="alerts" v-if="isAlert"/-->
+		<v-snackbar v-model="alert.status" :color="alert.color" class="top mb-12">
+			{{alert.text}}
+			<v-btn dark text @click="alert.status = false">
+				<v-icon>mdi-close-circle</v-icon>
+			</v-btn>
+		</v-snackbar>
+	</div>
 </template>
 <script>
 	export default {
@@ -94,14 +103,17 @@
 			valid: true,
 			dialog: false,
 			loading: false,
-			snackbar: false,
 			add_password: false,
 			add_rpassword: false,
 			selected: [],
-			text: '',
 			roles: [],
 			success: '',
 			error: '',
+			alert: {
+				text: '',
+				color: '',
+				status: false,
+			},
 			options: {
 				itemsPerPage: 10,
 				sortBy: ['id'],
@@ -109,7 +121,7 @@
 			},
 			rules: {
 				required: v => !!v || "This Field Required",
-				min: v => v.length >= 5 || "Minimum 5 Characters Required",
+				min: v => (v && v.length >= 5) || "Minimum 5 Characters Required",
 				validEmail: v => /.+@.+\..+/.test(v) || "E-mail must be valid",
 			},
 			footerProps: {
@@ -186,12 +198,12 @@
 					.then(res => {
 						this.users = res.data.users;
 						this.roles = res.data.roles;
-						console.log(this.users)
-						console.log(this.roles)
 					})
 					.catch(err => {
 						if(err.response.status == 401) {
 							localStorage.removeItem('token');
+							localStorage.removeItem('role');
+							localStorage.removeItem('id');
 							this.$router.push('/');
 						}
 					})
@@ -212,7 +224,7 @@
 					let formData = new FormData();
 					formData.append( "avatar", this.editedItem.avatar, this.editedItem.avatar.name );
 					formData.append("user", item.id);
-					this.axios.post("/api/user/avatar", formData)
+					this.axios.post("http://localhost:8000/api/user/avatar", formData)
 					.then(res => {
 						this.users.data[index].avatar = res.data.user.avatar;
 						this.editedItem.avatar = null;
@@ -222,15 +234,13 @@
 			},
 			updateRole(item) {
 				const index = this.users.data.indexOf(item);
-				this.axios.post("/api/user/role", { role: item.role, user: item.id })
+				this.axios.post("http://localhost:8000/api/user/role", { role: item.role, user: item.id })
 				.then(res => {
-					this.text = res.data.user.name + "'s Role Updated to " + res.data.user.role;
-					this.snackbar = true;
+					this.alerts(res.data.user.name + "'s Role Updated to " + res.data.user.role, "success")
 				})
-				.catch(error => {
-					this.text = error.response.data.user.name + "'s Role Cannot Be Updated to " + error.response.data.user.role;
-					this.users.data[index].role = error.response.data.user.role;
-					this.snackbar = true;
+				.catch(err => {
+					this.users.data[index].role = err.response.data.user.role;
+					this.alerts(err.response.data.user.name + "'s Role Cannot Be Updated to " + err.response.data.user.role, "error")
 				});
 			},
 			selectAll(e) {
@@ -247,18 +257,17 @@
 					//this.axios.post('http://localhost:8000/api/user/delete', {'users': this.selected})
 					this.axios.post('http://localhost:8000/api/user/delete', {'users': selected_id})
 					.then(res => {
-						this.text = "Records Deleted Successfully!";
 						this.selected.map(val => {
 							const index = this.users.data.indexOf(val)
 							this.users.data.splice(index, 1)
 						})
 						console.log(res)
-						this.snackbar = true;
+						this.alerts("Records Deleted Successfully!", "success")
 					}).catch(err => {
 						console.log(err.response)
-						this.text = "Error Deleting Records!";
-						this.snackbar = true;
+						this.alerts("Error Deleting Records!", "error")
 					})
+					this.alert.status = true;
 				}
 			},
 			searchIt(e) {
@@ -324,14 +333,12 @@
 				if(decide) {
 					this.axios.delete('http://localhost:8000/api/user/' + item.id)
 					.then(res => {
-						this.text = "Record Deleted Successfully!";
-						this.snackbar = true;
+						this.alerts("Record Deleted Successfully!", "success")
 						this.users.data.splice(index, 1)
 						console.log(res)
 					}).catch(err => {
 						console.log(err.response)
-						this.text = "Error Deleting Record!";
-						this.snackbar = true;
+						this.alerts("Error Deleting Record!", "error")
 					})
 				}
 			},
@@ -347,32 +354,31 @@
 					const index = this.editedIndex
 					this.axios.put('http://localhost:8000/api/user/' + this.editedItem.id, this.editedItem)
 					.then(res => {
-						this.text = "Record Updated Successfully!";
-						this.snackbar = true;
-						console.log(this.users.data[index])
-						console.log(res.data.user)
+						this.alerts("Record Updated Successfully!", "success")
 						Object.assign(this.users.data[index], res.data.user)
 					})
 					.catch(err => {
 						console.log(err.response)
-						this.text = "Error Updating Record!";
-						this.snackbar = true;
+						this.alerts("Error Updating Record!", "error")
 					})
 				} else {
 					this.axios.post('http://localhost:8000/api/user', this.editedItem)
 					.then(res => {
-						this.text = "Record Added Successfully!";
-						this.snackbar = true;
 						this.users.data.push(res.data.user)
+						this.alerts("Record Added Successfully!", "success")
 					})
 					.catch(err => {
 						console.log(err.response)
-						this.text = "Error Inserting Record!";
-						this.snackbar = true;
+						this.alerts("Error Inserting Record!", "error")
 					})
 				}
 				this.close()
 			},
+			alerts (text, color) {
+				this.alert.text = text
+				this.alert.color = color
+				this.alert.status = true;
+			}
 		},
 	}
 </script>

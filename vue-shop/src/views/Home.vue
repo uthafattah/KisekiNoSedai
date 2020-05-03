@@ -87,7 +87,7 @@
 			if(this.$route.path == '/') {
 				this.axios.get('http://localhost:8000/api/category/all')
 				.then((res) => {
-					this.categories = res.data.data
+					this.categories = res.data.category
 				})
 				.catch((err) => {
 					console.log(err)
