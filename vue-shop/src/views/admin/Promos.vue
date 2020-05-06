@@ -14,28 +14,28 @@
 						<v-card-title>
 							<span class="headline">{{ formTitle }}</span>
 						</v-card-title>
-
-						<v-card-text>
-							<v-container>
-								<v-row>
-									<v-col cols="12" sm="6">
-										<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Promo Name"></v-text-field>
-									</v-col>
-									<v-col cols="12" sm="6">
-										<!--v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" :blur="checkCode" label="Promo Code"></v-text-field-->
-										<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Promo Code"></v-text-field>
-									</v-col>
-									<v-col cols="12" md="12">
-										<v-textarea type="text" :rules="[rules.required]" v-model="editedItem.description" label="Description"></v-textarea>
-									</v-col>
-								</v-row>
-							</v-container>
-						</v-card-text>
-						<v-card-actions>
-							<v-spacer></v-spacer>
-							<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-							<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
-						</v-card-actions>
+						<v-form ref="form" v-model="valid" v-on:submit.stop.prevent="save">
+							<v-card-text>
+								<v-container>
+									<v-row>
+										<v-col cols="12" sm="6">
+											<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Promo Name"></v-text-field>
+										</v-col>
+										<v-col cols="12" sm="6">
+											<v-text-field v-model="editedItem.promo_code" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" :blur="checkCode" label="Promo Code"></v-text-field>
+										</v-col>
+										<v-col cols="12" md="12">
+											<v-textarea type="text" :rules="[rules.required]" v-model="editedItem.description" label="Description"></v-textarea>
+										</v-col>
+									</v-row>
+								</v-container>
+							</v-card-text>
+							<v-card-actions>
+								<v-spacer></v-spacer>
+								<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
+							</v-card-actions>
+						</v-form>
 					</v-card>
 				</v-dialog>
 			</v-toolbar>
@@ -107,22 +107,9 @@
 			formTitle () {
 				return this.editedIndex === -1 ? 'New Promo' : 'Edit Promo'
 			},
-			/*checkCode() {
-				if (this.editedItem.name.length >= 5) {
-					this.axios.post("/api/promo/verify", { email: this.editedItem.name })
-					.then(res => {
-						this.success = res.data.message;
-						this.error = "";
-					})
-					.catch(err => {
-						this.success = "";
-						this.error = "Promo Already Exists";
-					});
-				} else {
-					this.success = "";
-					this.error = "";
-				}
-			},*/
+			checkCode() {
+				return this.verifyCode()
+			},
 		},
 		watch: {
 			dialog (val) {
@@ -152,6 +139,23 @@
 			this.initialize()
 		},
 		methods: {
+			verifyCode() {
+				if (this.editedItem.promo_code.length >= 5) {
+					this.axios.post("http://localhost:8000/api/promo/verify", { promo_code: this.editedItem.promo_code })
+					.then(res => {
+						this.success = res.data.message;
+						this.error = "";
+					})
+					.catch(err => {
+						console.log(err.response)
+						this.success = "";
+						this.error = "Promo Already Exists";
+					});
+				} else {
+					this.success = "";
+					this.error = "";
+				}
+			},
 			selectAll(e) {
 				this.selected = []
 				if(e.length > 0) {
@@ -271,6 +275,7 @@
 						console.log(err.response)
 						this.text = "Error Updating Record!";
 						this.snackbar = true;
+						this.$refs.form.reset()
 					})
 				} else {
 					this.axios.post('http://localhost:8000/api/promo', {'name': this.editedItem.name })
@@ -278,6 +283,7 @@
 						this.text = "Record Added Successfully!";
 						this.snackbar = true;
 						this.promos.data.push(res.data.promo)
+						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)

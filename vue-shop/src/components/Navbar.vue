@@ -88,7 +88,7 @@
 						<v-tab-item :value="'tab-login'">
 							<v-card flat>
 								<v-card-text>
-									<v-form ref="form" v-model="valid_login">
+									<v-form ref="form_login" v-model="valid_login">
 										<v-text-field  color="light-blue darken-1" label="Email" v-model="loginField.email" :rules="[rules.required, rules.validEmail]" name="email" prepend-icon="mdi-email" type="email" autocomplete="off" />
 										<v-text-field color="light-blue darken-1" label="Password" v-model="loginField.password" :rules="[rules.required, rules.min]" name="password" prepend-icon="mdi-lock" :append-icon="login_password ? 'mdi-eye' : 'mdi-eye-off'" :type="login_password ? 'text' : 'password'" @click:append="login_password = !login_password" autocomplete="off" />
 									</v-form>
@@ -101,10 +101,9 @@
 						<v-tab-item :value="'tab-register'">
 							<v-card flat>
 								<v-card-text>
-									<v-form ref="form" v-model="valid_register">
-										<v-text-field :rules="[rules.required, rules.min]" label="Name" prepend-icon="mdi-account" autocomplete="off" />
-										<v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail]" label="Email" prepend-icon="mdi-email" autocomplete="off" />
-										<!--v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail]" :blur="checkEmail" label="Email" prepend-icon="mdi-email" autocomplete="off" /-->
+									<v-form ref="form_register" v-model="valid_register">
+										<v-text-field :rules="[rules.required, rules.min]" label="Name" v-model="registerField.name" prepend-icon="mdi-account" autocomplete="off" />
+										<v-text-field type="email" :success-messages="success" v-model="registerField.email" :error-messages="error" :rules="[rules.required, rules.validEmail]" :blur="checkEmail" label="Email" prepend-icon="mdi-email" autocomplete="off" />
 										<v-text-field :append-icon="register_password ? 'mdi-eye' : 'mdi-eye-off'" :type="register_password ? 'text' : 'password'" @click:append="register_password = !register_password" :rules="[rules.required, rules.min]" v-model="registerField.password" label="Type Password" autocomplete="off" prepend-icon="mdi-lock" />
 										<v-text-field :append-icon="register_rpassword ? 'mdi-eye' : 'mdi-eye-off'" :type="register_rpassword ? 'text' : 'password'" @click:append="register_rpassword = !register_rpassword" :rules="[rules.required, passwordMatch]" v-model="registerField.rpassword" label="Retype Password" prepend-icon="mdi-lock-check" autocomplete="off" />
 									</v-form>
@@ -228,8 +227,7 @@
 				name: '',
 				email: '',
 				password: '',
-				created_at: '',
-				updated_at: '',
+				rpassword: '',
 			},
 			profile_menu: [
 				{
@@ -368,15 +366,6 @@
 			store: function() {
 				this.$router.push('/my-store')
 			},
-			clear: function () {
-				this.loginField.email = ''
-				this.loginField.password = ''
-				this.registerField.name = ''
-				this.registerField.email = ''
-				this.registerField.password = ''
-				this.registerField.created_at = ''
-				this.registerField.updated_at = ''
-			},
 			login: function() {
 				this.axios.interceptors.request.use((config) => {
 					this.loading = true; 
@@ -411,15 +400,25 @@
 					} else {
 						console.log('LoggedIn Role Wrong')
 					}
+					this.$refs.form_login.reset()
+					this.$refs.form_register.reset()
 					this.dialog = false
-					this.clear()
-					/*else {
-						this.text = "You Need to be LoggedIn as an Administrator";
-						//this.alert.status = true
-						console.log(this.text)
-					}*/
 				}).catch(err => {
 					this.alerts(err.response.data.status, "error")
+				})
+			},
+			register: function() {
+				this.axios.post('http://localhost:8000/api/register', this.registerField)
+				.then(res => {
+					console.log(res.response)
+					this.alerts("Register Successfully! Please Login Again!", "success")
+					this.$refs.form_login.reset()
+					this.$refs.form_register.reset()
+					this.dialog = false
+				})
+				.catch(err => {
+					console.log(err.response)
+					this.alerts("Register Failed!", "error")
 				})
 			},
 			logout: function() {
@@ -434,9 +433,29 @@
 				this.alert.text = text
 				this.alert.color = color
 				this.alert.status = true;
-			}
+			},
+			verifyEmail() {
+				if (/.+@.+\..+/.test(this.registerField.email)) {
+					this.axios.post("http://localhost:8000/api/email/verify", { email: this.registerField.email })
+					.then(res => {
+						this.success = res.data.message;
+						this.error = "";
+					})
+					.catch(err => {
+						console.log(err.response)
+						this.success = "";
+						this.error = "Email Already Exists";
+					});
+				} else {
+					this.success = "";
+					this.error = "";
+				}
+			},
 		},
 		computed: {
+			checkEmail() {
+				return this.verifyEmail()
+			},
 			passwordMatch() {
 				return this.registerField.password != this.registerField.rpassword ? "Password Does Not Match" : true;
 			},

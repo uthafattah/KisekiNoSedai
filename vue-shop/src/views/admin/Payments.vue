@@ -14,22 +14,22 @@
 						<v-card-title>
 							<span class="headline">{{ formTitle }}</span>
 						</v-card-title>
-
-						<v-card-text>
-							<v-container>
-								<v-row>
-									<v-col cols="12" sm="12">
-										<!--v-text-field autofocus v-model="editedItem.name" :rules="[rules.required, rules.min]" :blur="checkPayment" label="Payment Name"></v-text-field-->
-										<v-text-field autofocus v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Payment Name"></v-text-field>
-									</v-col>
-								</v-row>
-							</v-container>
-						</v-card-text>
-						<v-card-actions>
-							<v-spacer></v-spacer>
-							<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-							<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
-						</v-card-actions>
+						<v-form ref="form" v-model="valid" v-on:submit.stop.prevent="save">
+							<v-card-text>
+								<v-container>
+									<v-row>
+										<v-col cols="12" sm="12">
+											<v-text-field v-model="editedItem.name" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" :blur="checkPayment" label="Payment Name"></v-text-field>
+										</v-col>
+									</v-row>
+								</v-container>
+							</v-card-text>
+							<v-card-actions>
+								<v-spacer></v-spacer>
+								<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
+							</v-card-actions>
+						</v-form>
 					</v-card>
 				</v-dialog>
 			</v-toolbar>
@@ -66,7 +66,7 @@
 			},
 			rules: {
 				required: v => !!v || "This Field Required",
-				min: v => (v && v.length >= 5) || "Minimum 5 Characters Required",
+				min: v => (v && v.length >= 3) || "Minimum 3 Characters Required",
 			},
 			footerProps: {
 				itemsPerPageOptions: [5, 10, 15],
@@ -98,22 +98,9 @@
 			formTitle () {
 				return this.editedIndex === -1 ? 'New Payment' : 'Edit Payment'
 			},
-			/*checkPayment() {
-				if (this.editedItem.name.length >= 5) {
-					this.axios.post("/api/payment/verify", { email: this.editedItem.name })
-					.then(res => {
-						this.success = res.data.message;
-						this.error = "";
-					})
-					.catch(err => {
-						this.success = "";
-						this.error = "Payment Already Exists";
-					});
-				} else {
-					this.success = "";
-					this.error = "";
-				}
-			},*/
+			checkPayment() {
+				return this.verifyPayment()
+			},
 		},
 		watch: {
 			dialog (val) {
@@ -143,6 +130,23 @@
 			this.initialize()
 		},
 		methods: {
+			verifyPayment() {
+				if (this.editedItem.name.length >= 3) {
+					this.axios.post("http://localhost:8000/api/payment/verify", { name: this.editedItem.name })
+					.then(res => {
+						this.success = res.data.message;
+						this.error = "";
+					})
+					.catch(err => {
+						console.log(err.response)
+						this.success = "";
+						this.error = "Payment Already Exists";
+					});
+				} else {
+					this.success = "";
+					this.error = "";
+				}
+			},
 			selectAll(e) {
 				this.selected = []
 				if(e.length > 0) {
@@ -257,6 +261,7 @@
 						this.text = "Record Updated Successfully!";
 						this.snackbar = true;
 						Object.assign(this.payments.data[index], res.data.payment)
+						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)
@@ -269,6 +274,7 @@
 						this.text = "Record Added Successfully!";
 						this.snackbar = true;
 						this.payments.data.push(res.data.payment)
+						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)

@@ -153,10 +153,10 @@
 				handler(e) {
 					const sortBy = e.sortBy.length > 0 ? e.sortBy[0].trim() : 'id';
 					const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
-					this.axios.get(`http://localhost:8000/api/merchandise/searchStoreId/1`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
+					this.axios.get(`http://localhost:8000/api/merchandise/store_merchandise/1`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
 					.then(res => {
 						this.merchandise = res.data.merchandise;
-						this.categories = res.data.categories;
+						console.log(this.merchandise)
 					})
 					.catch(err => {
 						if(err.response.status == 401) {

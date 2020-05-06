@@ -14,23 +14,22 @@
 						<v-card-title>
 							<span class="headline">{{ formTitle }}</span>
 						</v-card-title>
-
-						<v-card-text>
-							<v-container>
-								<v-row>
-									<v-col cols="12" sm="12">
-										<!--v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" :blur="checkRole" label="Role Name"></v-text-field-->
-										<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Role Name"></v-text-field>
-									</v-col>
-								</v-row>
-							</v-container>
-						</v-card-text>
-						<v-card-actions>
-							<v-spacer></v-spacer>
-							<!--v-btn color="blue darken-1" text @click="close">Cancel</v-btn-->
-							<v-btn color="blue darken-1" text>Cancel</v-btn>
-							<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
-						</v-card-actions>
+						<v-form ref="form" v-model="valid" v-on:submit.stop.prevent="save">
+							<v-card-text>
+								<v-container>
+									<v-row>
+										<v-col cols="12" sm="12">
+											<v-text-field v-model="editedItem.name" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" :blur="checkRole" label="Role Name"></v-text-field>
+										</v-col>
+									</v-row>
+								</v-container>
+							</v-card-text>
+							<v-card-actions>
+								<v-spacer></v-spacer>
+								<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
+							</v-card-actions>
+						</v-form>
 					</v-card>
 				</v-dialog>
 			</v-toolbar>
@@ -99,24 +98,9 @@
 			formTitle () {
 				return this.editedIndex === -1 ? 'New Role' : 'Edit Role'
 			},
-			/*checkRole() {
-				if (this.editedItem.name.length >= 5) {
-					this.axios.post("http://localhost:8000/api/role/verify", { name: this.editedItem.name })
-					.then(res => {
-						this.success = res.data.message;
-						this.error = "";
-					})
-					.catch(err => {
-						console.log(err)
-						this.success = "";
-						this.error = "Role Already Exists";
-					});
-				} else {
-					this.success = "";
-					this.error = "";
-				}
-				return 0;
-			},*/
+			checkRole() {
+				return this.verifyRole()
+			},
 		},
 		watch: {
 			dialog (val) {
@@ -146,6 +130,23 @@
 			this.initialize()
 		},
 		methods: {
+			verifyRole() {
+				if (this.editedItem.name.length >= 5) {
+					this.axios.post("http://localhost:8000/api/role/verify", { name: this.editedItem.name })
+					.then(res => {
+						this.success = res.data.message;
+						this.error = "";
+					})
+					.catch(err => {
+						console.log(err.response)
+						this.success = "";
+						this.error = "Role Already Exists";
+					});
+				} else {
+					this.success = "";
+					this.error = "";
+				}
+			},
 			selectAll(e) {
 				this.selected = []
 				if(e.length > 0) {
@@ -260,6 +261,7 @@
 						this.text = "Record Updated Successfully!";
 						this.snackbar = true;
 						Object.assign(this.roles.data[index], res.data.role)
+						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)
@@ -272,6 +274,7 @@
 						this.text = "Record Added Successfully!";
 						this.snackbar = true;
 						this.roles.data.push(res.data.role)
+						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)

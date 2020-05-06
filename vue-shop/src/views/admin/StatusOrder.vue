@@ -1,52 +1,52 @@
 <template>
-    <v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="status_order.total" :items="status_order.data" show-select @input="selectAll" :footer-props="footerProps">
-        <template v-slot:top>
-            <v-toolbar flat>
-                <v-toolbar-title>Status Order Management System</v-toolbar-title>
-                <v-divider class="mx-4" inset vertical></v-divider>
-                <v-spacer></v-spacer>
-                <v-dialog v-model="dialog" max-width="500px">
-                    <template v-slot:activator="{ on }">
-                        <v-btn color="primary" dark class="mb-2" v-on="on">Add New Status Order</v-btn>
-                        <!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
-                    </template>
-                    <v-card>
-                        <v-card-title>
-                            <span class="headline">{{ formTitle }}</span>
-                        </v-card-title>
-
-                        <v-card-text>
-                            <v-container>
-                                <v-row>
-                                    <v-col cols="12" sm="12">
-                                        <!--v-text-field autofocus v-model="editedItem.name" :rules="[rules.required, rules.min]" :blur="checkPayment" label="Status Order Name"></v-text-field-->
-                                        <v-text-field autofocus v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Status Order Name"></v-text-field>
-                                    </v-col>
-                                </v-row>
-                            </v-container>
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-                            <v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-dialog>
-            </v-toolbar>
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="status_order.total" :items="status_order.data" show-select @input="selectAll" :footer-props="footerProps">
+		<template v-slot:top>
+			<v-toolbar flat>
+				<v-toolbar-title>Status Order Management System</v-toolbar-title>
+				<v-divider class="mx-4" inset vertical></v-divider>
+				<v-spacer></v-spacer>
+				<v-dialog v-model="dialog" max-width="500px">
+					<template v-slot:activator="{ on }">
+						<v-btn color="primary" dark class="mb-2" v-on="on">Add New Status Order</v-btn>
+						<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
+					</template>
+					<v-card>
+						<v-card-title>
+							<span class="headline">{{ formTitle }}</span>
+						</v-card-title>
+						<v-form ref="form" v-model="valid" v-on:submit.stop.prevent="save">
+							<v-card-text>
+								<v-container>
+									<v-row>
+										<v-col cols="12" sm="12">
+											<v-text-field v-model="editedItem.name" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" :blur="checkStatus" label="Status Order Name"></v-text-field>
+										</v-col>
+									</v-row>
+								</v-container>
+							</v-card-text>
+							<v-card-actions>
+								<v-spacer></v-spacer>
+								<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
+							</v-card-actions>
+						</v-form>
+					</v-card>
+				</v-dialog>
+			</v-toolbar>
 			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details clear-icon="mdi-close-circle" clearable/>
-        </template>
-        <template v-slot:item.actions="{ item }">
-            <v-icon small class="mr-2" @click="editItem(item)">
-                mdi-pencil
-            </v-icon>
-            <v-icon small @click="deleteItem(item)">
-                mdi-delete
-            </v-icon>
-        </template>
-        <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
-        </template>
-    </v-data-table>
+		</template>
+		<template v-slot:item.actions="{ item }">
+			<v-icon small class="mr-2" @click="editItem(item)">
+				mdi-pencil
+			</v-icon>
+			<v-icon small @click="deleteItem(item)">
+				mdi-delete
+			</v-icon>
+		</template>
+		<template v-slot:no-data>
+			<v-btn color="primary" @click="initialize">Reset</v-btn>
+		</template>
+	</v-data-table>
 </template>
 <script>
 	export default {
@@ -98,22 +98,9 @@
 			formTitle () {
 				return this.editedIndex === -1 ? 'New Status Order' : 'Edit Status Order'
 			},
-			/*checkPayment() {
-				if (this.editedItem.name.length >= 5) {
-					this.axios.post("/api/status_order/verify", { email: this.editedItem.name })
-					.then(res => {
-						this.success = res.data.message;
-						this.error = "";
-					})
-					.catch(err => {
-						this.success = "";
-						this.error = "Status Order Already Exists";
-					});
-				} else {
-					this.success = "";
-					this.error = "";
-				}
-			},*/
+			checkStatus() {
+				return this.verifyStatus()
+			},
 		},
 		watch: {
 			dialog (val) {
@@ -143,6 +130,23 @@
 			this.initialize()
 		},
 		methods: {
+			verifyStatus() {
+				if (this.editedItem.name.length >= 5) {
+					this.axios.post("http://localhost:8000/api/status_order/verify", { name: this.editedItem.name })
+					.then(res => {
+						this.success = res.data.message;
+						this.error = "";
+					})
+					.catch(err => {
+						console.log(err.response)
+						this.success = "";
+						this.error = "Status Order Already Exists";
+					});
+				} else {
+					this.success = "";
+					this.error = "";
+				}
+			},
 			selectAll(e) {
 				this.selected = []
 				if(e.length > 0) {
@@ -257,6 +261,7 @@
 						this.text = "Record Updated Successfully!";
 						this.snackbar = true;
 						Object.assign(this.status_order.data[index], res.data.status_order)
+						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)
@@ -269,6 +274,7 @@
 						this.text = "Record Added Successfully!";
 						this.snackbar = true;
 						this.status_order.data.push(res.data.status_order)
+						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)

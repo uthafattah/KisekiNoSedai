@@ -15,33 +15,32 @@
 							<v-card-title>
 								<span class="headline">{{ formTitle }}</span>
 							</v-card-title>
-							<v-form v-model="valid" v-on:submit.stop.prevent="save">
+							<v-form ref="form" v-model="valid" v-on:submit.stop.prevent="save">
 								<v-card-text>
 									<v-container>
 										<v-row>
 											<v-col cols="12" sm="6">
-												<v-text-field :rules="[rules.required, rules.min]" v-model="editedItem.name" label="Name"></v-text-field>
+												<v-text-field :rules="[rules.required, rules.min]" v-model="editedItem.name" label="Name" autocomplete="off" />
 											</v-col>
 											<v-col cols="12" sm="6">
-												<v-select :items="roles" :rules="[rules.required]" v-model="editedItem.role" label="Select Role"></v-select>
+												<v-select :items="roles" :rules="[rules.required]" v-model="editedItem.role" label="Select Role" autocomplete="off" />
 											</v-col>
 										</v-row>
 										<v-row v-if="editedIndex == -1">
 											<v-col cols="12" sm="6">
-												<!--v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail ]" :blur="checkEmail" v-model="editedItem.email" label="Email"></v-text-field-->
-												<v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail ]" v-model="editedItem.email" label="Email"></v-text-field>
+												<v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail ]" :blur="checkEmail" v-model="editedItem.email" label="Email" autocomplete="off" />
 											</v-col>
 											<v-col cols="12" sm="6">
-												<v-text-field type="text" :rules="[rules.required]" v-model="editedItem.phone" label="Phone"></v-text-field>
+												<v-text-field type="text" :rules="[rules.required]" v-model="editedItem.phone" label="Phone" autocomplete="off" />
 											</v-col>
 											<v-col cols="12" sm="6">
-												<v-text-field :append-icon="add_password ? 'mdi-eye' : 'mdi-eye-off'" :type="add_password ? 'text' : 'password'" @click:append="add_password = !add_password" :rules="[rules.required, rules.min]" v-model="editedItem.password" label="Type Password"></v-text-field>
+												<v-text-field :append-icon="add_password ? 'mdi-eye' : 'mdi-eye-off'" :type="add_password ? 'text' : 'password'" @click:append="add_password = !add_password" :rules="[rules.required, rules.min]" v-model="editedItem.password" label="Type Password" autocomplete="off" />
 											</v-col>
 											<v-col cols="12" sm="6">
-												<v-text-field :append-icon="add_rpassword ? 'mdi-eye' : 'mdi-eye-off'" :type="add_rpassword ? 'text' : 'password'" @click:append="add_rpassword = !add_rpassword" :rules="[rules.required, passwordMatch]" v-model="editedItem.rpassword" label="Retype Password"></v-text-field>
+												<v-text-field :append-icon="add_rpassword ? 'mdi-eye' : 'mdi-eye-off'" :type="add_rpassword ? 'text' : 'password'" @click:append="add_rpassword = !add_rpassword" :rules="[rules.required, passwordMatch]" v-model="editedItem.rpassword" label="Retype Password" autocomplete="off" />
 											</v-col>
 											<v-col cols="12" md="12">
-												<v-textarea type="text" :rules="[rules.required]" v-model="editedItem.address" label="Address"></v-textarea>
+												<v-textarea type="text" :rules="[rules.required]" v-model="editedItem.address" label="Address" autocomplete="off" />
 											</v-col>
 										</v-row>
 									</v-container>
@@ -169,22 +168,9 @@
 			passwordMatch() {
 				return this.editedItem.password != this.editedItem.rpassword ? "Password Does Not Match" : true;
 			},
-			/*checkEmail() {
-				if (/.+@.+\..+/.test(this.editedItem.email)) {
-					this.axios.post("/api/email/verify", { email: this.editedItem.email })
-					.then(res => {
-						this.success = res.data.message;
-						this.error = "";
-					})
-					.catch(err => {
-						this.success = "";
-						this.error = "Email Already Exists";
-					});
-				} else {
-					this.success = "";
-					this.error = "";
-				}
-			},*/
+			checkEmail() {
+				return this.verifyEmail()
+			},
 		},
 		watch: {
 			dialog (val) {
@@ -215,6 +201,23 @@
 			this.initialize()
 		},
 		methods: {
+			verifyEmail() {
+				if (/.+@.+\..+/.test(this.editedItem.email)) {
+					this.axios.post("http://localhost:8000/api/email/verify", { email: this.editedItem.email })
+					.then(res => {
+						this.success = res.data.message;
+						this.error = "";
+					})
+					.catch(err => {
+						console.log(err.response)
+						this.success = "";
+						this.error = "Email Already Exists";
+					});
+				} else {
+					this.success = "";
+					this.error = "";
+				}
+			},
 			getImage(image) {
 				return "http://localhost:8000/storage/" + image;
 			},
@@ -356,6 +359,7 @@
 					.then(res => {
 						this.alerts("Record Updated Successfully!", "success")
 						Object.assign(this.users.data[index], res.data.user)
+						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)
@@ -366,6 +370,7 @@
 					.then(res => {
 						this.users.data.push(res.data.user)
 						this.alerts("Record Added Successfully!", "success")
+						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)

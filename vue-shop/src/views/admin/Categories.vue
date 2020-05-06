@@ -14,25 +14,25 @@
 						<v-card-title>
 							<span class="headline">{{ formTitle }}</span>
 						</v-card-title>
-
-						<v-card-text>
-							<v-container>
-								<v-row>
-									<v-col cols="12" sm="6">
-										<!--v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" :blur="checkCategory" label="Category Name"></v-text-field-->
-										<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Category Name"></v-text-field>
-									</v-col>
-									<v-col cols="12" sm="6">
-										<v-file-input v-model="editedItem.photo" :rules="[rules.required]" label="Select File" placeholder="Upload Photo" accept="image/jpg, image/png, image/bmp, image/jpeg" />
-									</v-col>
-								</v-row>
-							</v-container>
-						</v-card-text>
-						<v-card-actions>
-							<v-spacer></v-spacer>
-							<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-							<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
-						</v-card-actions>
+						<v-form ref="form" v-model="valid" v-on:submit.stop.prevent="save">
+							<v-card-text>
+								<v-container>
+									<v-row>
+										<v-col cols="12" sm="6">
+											<v-text-field v-model="editedItem.name" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" :blur="checkCategory" label="Category Name"></v-text-field>
+										</v-col>
+										<v-col cols="12" sm="6">
+											<v-file-input v-model="editedItem.photo" :rules="[rules.required]" label="Select File" placeholder="Upload Photo" accept="image/jpg, image/png, image/bmp, image/jpeg" />
+										</v-col>
+									</v-row>
+								</v-container>
+							</v-card-text>
+							<v-card-actions>
+								<v-spacer></v-spacer>
+								<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
+							</v-card-actions>
+						</v-form>
 					</v-card>
 				</v-dialog>
 			</v-toolbar>
@@ -79,7 +79,7 @@
 			},
 			rules: {
 				required: v => !!v || "This Field Required",
-				min: v => (v && v.length >= 5) || "Minimum 5 Characters Required",
+				min: v => (v && v.length >= 3) || "Minimum 3 Characters Required",
 			},
 			footerProps: {
 				itemsPerPageOptions: [10, 20, 30],
@@ -114,22 +114,9 @@
 			formTitle () {
 				return this.editedIndex === -1 ? 'New Category' : 'Edit Category'
 			},
-			/*checkCategory() {
-				if (this.editedItem.name.length >= 5) {
-					this.axios.post("/api/category/verify", { email: this.editedItem.name })
-					.then(res => {
-						this.success = res.data.message;
-						this.error = "";
-					})
-					.catch(err => {
-						this.success = "";
-						this.error = "Category Already Exists";
-					});
-				} else {
-					this.success = "";
-					this.error = "";
-				}
-			},*/
+			checkCategory() {
+				return this.verifyCategory()
+			},
 		},
 		watch: {
 			dialog (val) {
@@ -159,6 +146,23 @@
 			this.initialize()
 		},
 		methods: {
+			verifyCategory() {
+				if (this.editedItem.name.length >= 3) {
+					this.axios.post("http://localhost:8000/api/category/verify", { name: this.editedItem.name })
+					.then(res => {
+						this.success = res.data.message;
+						this.error = "";
+					})
+					.catch(err => {
+						console.log(err.response)
+						this.success = "";
+						this.error = "Category Already Exists";
+					});
+				} else {
+					this.success = "";
+					this.error = "";
+				}
+			},
 			getImage(image) {
 				return "http://localhost:8000/storage/" + image;
 			},
@@ -168,7 +172,7 @@
 					let formData = new FormData();
 					formData.append( "photo", this.editedItem.photo, this.editedItem.photo.name );
 					formData.append("user", item.id);
-					this.axios.post("/api/user/photo", formData)
+					this.axios.post("http://localhost:8000/api/user/photo", formData)
 					.then(res => {
 						this.users.data[index].photo = res.data.user.photo;
 						this.editedItem.photo = null;
@@ -290,6 +294,7 @@
 						this.text = "Record Updated Successfully!";
 						this.snackbar = true;
 						Object.assign(this.categories.data[index], res.data.category)
+						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)
@@ -302,6 +307,7 @@
 						this.text = "Record Added Successfully!";
 						this.snackbar = true;
 						this.categories.data.push(res.data.category)
+						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)
