@@ -3,7 +3,6 @@
 		<v-list-item three-line>
 			<v-list-item-avatar tile size="80">
 				<v-img :src="getImage(cart.photo)"></v-img>
-				<!--v-icon>mdi-store</v-icon-->
 			</v-list-item-avatar>
 			<v-list-item-content>
 				<v-list-item-title class="title font-weight-bold">{{cart.name}}</v-list-item-title>
@@ -19,11 +18,11 @@
 			<v-btn icon color="grey">
 				<v-icon>mdi-delete</v-icon>
 			</v-btn>
-			<v-btn icon color="grey" @click="subtractQty">
+			<v-btn icon color="grey" @click="subtractQty(cart)">
 				<v-icon>mdi-do-not-disturb</v-icon>
 			</v-btn>
-			<v-text-field class="shrink justify-center" label="Qty" v-model="qty" style="width: 40px;" />
-			<v-btn icon color="green" @click="addQty">
+			<v-text-field type="text" class="shrink justify-center" label="Qty" v-model="cart.quantity" style="width: 40px;" readonly/>
+			<v-btn icon color="green" @click="addQty(cart)">
 				<v-icon>mdi-plus-circle</v-icon>
 			</v-btn>
 		</v-card-actions>
@@ -31,27 +30,31 @@
 </template>
 
 <script>
+	import { mapActions } from 'vuex'
 	export default {
 		name: 'CartItem',
 		props: ['cart'],
 		data: () => ({
 			wishlist_color: 'pink lighten-5',
-			qty: 1,
-			total: 0,
 		}),
 		methods : {
+			...mapActions({
+				updateQty: 'cart/updateQuantity',
+			}),
+			addQty(cart) {
+				this.axios.get('http://localhost:8000/api/cart/add_quantity/' + cart.id)
+				.then(res => this.updateQty(res.data.cart))
+				.catch(err => console.log(err.response))
+			},
+			subtractQty(cart) {
+				if(cart.quantity > 1) {
+					this.axios.get('http://localhost:8000/api/cart/subtract_quantity/' + cart.id)
+					.then(res => this.updateQty(res.data.cart))
+					.catch(err => console.log(err.response) )
+				}
+			},
 			getImage(image) {
 				return "http://localhost:8000/storage/" + image;
-			},
-			addQty() {
-				this.qty++
-				this.total += this.price
-			},
-			subtractQty() {
-				if(this.qty > 1) {
-					this.qty--
-					this.total -= this.price
-				}
 			},
 			wishlist() {
 				if(this.wishlist_color === 'pink lighten-5') {
@@ -60,6 +63,6 @@
 					this.wishlist_color = 'pink lighten-5'
 				}
 			}
-		}
+		},
 	}
 </script>

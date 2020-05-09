@@ -1,7 +1,7 @@
 <template>
 	<v-app class="grey lighten-4">
 		<Navbar />
-		<!--Alert /-->
+		<Alert />
 		<v-content>
 			<v-container>
 				<router-view></router-view>
@@ -21,7 +21,7 @@
 		}),
 		components: {
 			Navbar: () => import( /* webpackChunkName: "navbar" */ '@/components/Navbar.vue'),
-			//Alert: () => import( /* webpackChunkName: "alert" */ '@/components/Alert.vue'),
+			Alert: () => import( /* webpackChunkName: "alert" */ '@/components/Alert.vue'),
 		},
 	};
 </script>

@@ -4,7 +4,7 @@
 			<v-row>
 				<v-col cols="3" class="mt-12">
 					<v-list-item-avatar tile size="250">
-						<v-img :src="getImage(profile.avatar)"></v-img>
+						<v-img :src="getImage(avatar)"></v-img>
 						<!--v-icon>mdi-store</v-icon-->
 					</v-list-item-avatar>
 				</v-col>
@@ -24,10 +24,10 @@
 							<v-card flat>
 								<v-card-text>
 									<v-form ref="form" v-model="valid_profile">
-										<v-text-field label="Name" v-model="profile.name" :rules="[rules.required, rules.min]" prepend-icon="mdi-account" autocomplete="off" />
-										<v-text-field label="E-Mail" v-model="profile.email" :rules="[rules.required, rules.validEmail]" prepend-icon="mdi-email" autocomplete="off" />
-										<v-text-field label="Phone" v-model="profile.phone" :rules="[rules.required]" prepend-icon="mdi-cellphone" autocomplete="off" />
-										<v-textarea type="text" label="Address" v-model="profile.address" :rules="[rules.required]" prepend-icon="mdi-map-marker" autocomplete="off" />
+										<v-text-field label="Name" v-model="user.name" :rules="[rules.required, rules.min]" prepend-icon="mdi-account" autocomplete="off" />
+										<v-text-field label="E-Mail" v-model="user.email" :rules="[rules.required, rules.validEmail]" prepend-icon="mdi-email" autocomplete="off" />
+										<v-text-field label="Phone" v-model="user.phone" :rules="[rules.required]" prepend-icon="mdi-cellphone" autocomplete="off" />
+										<v-textarea type="text" label="Address" v-model="user.address" :rules="[rules.required]" prepend-icon="mdi-map-marker" autocomplete="off" />
 									</v-form>
 								</v-card-text>
 								<v-card-actions class="mr-2">
@@ -60,6 +60,7 @@
 	</v-card>
 </template>
 <script>
+	import { mapGetters, mapActions } from 'vuex'
 	export default {
 		data: () => ({
 			loading: false,
@@ -79,29 +80,23 @@
 				new_password: '',
 				new_rpassword: '',
 			},
-			profile: []
 		}),
 		created(){
-			this.axios.get('http://localhost:8000/api/user/' + localStorage.getItem('id'))
-			.then((res) => {
-				this.profile = res.data.user[0]
-			})
-			.catch((err) => {
-				if(err.response.status == 401) {
-					localStorage.removeItem('token');
-					localStorage.removeItem('role');
-					localStorage.removeItem('id');
-					this.$router.push('/');
-				}
-				console.log(err)
-			})
+			//this.setUser()
 		},
 		computed: {
+			...mapGetters({
+				user: 'auth/getData',
+				avatar: 'auth/getAvatar'
+			}),
 			passwordMatch() {
 				return this.resetPasswordField.new_password != this.resetPasswordField.new_rpassword ? "Password Does Not Match" : true;
 			},
 		},
 		methods: {
+			...mapActions({
+				//setUser: 'auth/fetchUser'
+			}),
 			getImage(image) {
 				return "http://localhost:8000/storage/" + image;
 			},
@@ -111,7 +106,7 @@
 			clearProfile() {
 				this.axios.get('http://localhost:8000/api/user/' + localStorage.getItem('id'))
 				.then((res) => {
-					this.profile = res.data.user[0]
+					this.user = res.data.user[0]
 				})
 				.catch((err) => {
 					if(err.response.status == 401) {

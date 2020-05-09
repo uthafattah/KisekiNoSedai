@@ -43,35 +43,39 @@
 	</v-row>
 </template>
 <script>
+	import { mapGetters, mapActions } from 'vuex'
 	export default {
 		data: () => ({
-			qty: 1,
-			total: 0,
-			cart: [],
+
 		}),
 		components: {
 			CartItem: () => import(/* webpackChunkName: "merchandise-item" */ '@/components/CartItem.vue')
 		},
-        created() {
-            this.total = this.price
-            this.axios.get('http://localhost:8000/api/cart/user_cart/' + localStorage.getItem('id'))
-				.then((res) => {
-					this.cart = res.data.cart
-				})
-				.catch((err) => {
-					if(err.response.status == 401) {
-						localStorage.removeItem('token');
-						localStorage.removeItem('role');
-						localStorage.removeItem('id');
-						this.$router.push('/');
-					}
-					console.log(err)
-				})
-        },
-		methods : {
-			getImage(image) {
-				return "http://localhost:8000/storage/" + image;
-			},
+		created() {
+			this.axios.get('http://localhost:8000/api/cart/user_cart/' + this.userId)
+			.then((res) => {
+				this.setCart(res.data.cart)
+			})
+			.catch((err) => {
+				if(err.response.status == 401) {
+					localStorage.removeItem('token');
+					this.$router.push('/');
+				}
+				console.log(err.response)
+			})
+		},
+		computed: {
+			...mapGetters({
+				userId: 'auth/getId',
+				cart: 'cart/getCart',
+				total: 'cart/getTotal',
+				qty: 'cart/getQuantity'
+			}),
+		},
+		methods: {
+			...mapActions({
+				setCart: 'cart/set'
+			}),
 		}
 	}
 </script>

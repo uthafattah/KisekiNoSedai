@@ -94,7 +94,7 @@
 									</v-form>
 								</v-card-text>
 								<v-card-actions>
-									<v-btn type="submit" color="light-blue darken-1" :disabled="!valid_login" block @click.prevent="login" class="title white--text">Login</v-btn>
+									<v-btn type="submit" color="light-blue darken-1" :disabled="!valid_login" block @click.prevent="login(loginField)" class="title white--text">Login</v-btn>
 								</v-card-actions>
 							</v-card>
 						</v-tab-item>
@@ -173,25 +173,15 @@
 				</v-list>
 			</v-menu>
 		</v-app-bar>
-		<!--Alert :alerts="alerts" v-if="isAlert"/-->
-		<v-snackbar v-model="alert.status" :color="alert.color" class="top mb-12">
-			{{alert.text}}
-			<v-btn dark text @click="alert.status = false">
-				<v-icon>mdi-close-circle</v-icon>
-			</v-btn>
-		</v-snackbar>
 	</div>
 </template>
 
 <script>
+	import { mapActions, mapGetters } from 'vuex'
 	//import Dialog from '@/components/Dialog'
 	export default {
-		props: {
-			source: String,
-		},
 		components: {
 			//Dialog,
-			//Alert: () => import( /* webpackChunkName: "alert" */ '@/components/Alert.vue'),
 		},
 		data: () => ({
 			drawer: true,
@@ -209,11 +199,6 @@
 			success: '',
 			error: '',
 			//---------------
-			alert: {
-				text: '',
-				color: '',
-				status: false,
-			},
 			rules: {
 				required: v => !!v || "This Field Required",
 				min: v => (v && v.length >= 5) || "Minimum 5 Characters Required",
@@ -229,128 +214,11 @@
 				password: '',
 				rpassword: '',
 			},
-			profile_menu: [
-				{
-					icon: 'mdi-account-cog',
-					text: 'Account Settings',
-					action: '/settings'
-				},
-				{
-					icon: 'mdi-monitor-dashboard',
-					text: 'Admin',
-					action: '/admin'
-				},
-				{
-					icon: 'mdi-heart',
-					text: 'Wishlists',
-					action: 'wishlists'
-				},
-				{
-					icon: 'mdi-package',
-					text: 'My Order',
-					action: '/orders'
-				},
-			],
-			notification: [
-				{
-					text: 'Checkout',
-					action: '/checkout'
-				},
-				{
-					text: 'Merchandise',
-					action: '/merchandise'
-				},
-				{
-					text: 'Seach',
-					action: '/search'
-				},
-				{
-					text: 'Stores',
-					action: '/stores'
-				},
-				{
-					text: 'Promos',
-					action: '/promos'
-				},
-			],
-			admin_menu: [
-				{
-					icon: 'mdi-account-group',
-					text: 'Users',
-					action: '/admin/users'
-				}, 
-				{
-					icon: 'mdi-animation-outline',
-					text: 'Roles',
-					action: '/admin/roles'
-				}, 
-				{
-					icon: 'mdi-briefcase-edit-outline',
-					text: 'Categories',
-					action: '/admin/categories'
-				}, 
-				{
-					icon: 'mdi-store',
-					text: 'Stores',
-					action: '/admin/stores'
-				}, 
-				{
-					icon: 'mdi-wallet',
-					text: 'Payments',
-					action: '/admin/payments'
-				}, 
-				{
-					icon: 'mdi-ticket-percent',
-					text: 'Promos',
-					action: '/admin/promos'
-				}, 
-				{
-					icon: 'mdi-sticker-check',
-					text: 'Status Store',
-					action: '/admin/status-store'
-				}, 
-				{
-					icon: 'mdi-truck-check',
-					text: 'Status Order',
-					action: '/admin/status-order'
-				}, 
-				{
-					icon: 'mdi-email',
-					text: 'Messages',
-					action: '/admin/messages'
-				},
-			],
-			store_menu: [
-				{
-					icon: 'mdi-gift',
-					text: 'Merchandise',
-					action: '/my-store/merchandise'
-				}, 
-				{
-					icon: 'mdi-package',
-					text: 'Orders',
-					action: '/my-store/orders'
-				},
-				{
-					icon: 'mdi-book-multiple',
-					text: 'Reports',
-					action: '/my-store/reports'
-				},
-				{
-					icon: 'mdi-email',
-					text: 'Messages',
-					action: '/my-store/messages'
-				},
-				{
-					icon: 'mdi-cog',
-					text: 'Store Settings',
-					action: '/my-store/settings'
-				},
-			],
 		}),
 		created() {
 			this.loggedIn = localStorage.getItem('token') ? true : false
 			this.$vuetify.theme.dark = false
+			if(this.userId == null && localStorage.getItem('token')) this.getLoggedUser()
 		},
 		watch: {
 			theme: function(old) {
@@ -358,81 +226,64 @@
 			}
 		},
 		mounted() {
-            //this.alert.status = localStorage.getItem('loggedIn') ? true : false;
 			localStorage.getItem('loggedIn') ? true : false;
 			localStorage.removeItem('loggedIn');
 		},
 		methods: {
+			...mapActions({
+				setAuth: 'auth/set',
+				setAlert: 'alert/set'
+			}),
 			store: function() {
 				this.$router.push('/my-store')
 			},
+			getLoggedUser() {
+				this.axios.get('http://localhost:8000/api/logged_user')
+				.then((res) => {
+					this.setAuth(res.data.user)
+				})
+				.catch((err) => {
+					console.log(err.response)
+				})
+			},
 			login: function() {
-				this.axios.interceptors.request.use((config) => {
-					this.loading = true; 
-					return config;
-				}, (error) => {
-					this.loading = false;
-					return Promise.reject(error);
-				});
-
-				this.axios.interceptors.response.use((response) => {
-					this.loading = false;
-					return response;
-				}, (error) => {
-					this.loading = false;
-					return Promise.reject(error);
-				});
+				this.initialize()
 				this.axios.post('http://localhost:8000/api/login', {'email': this.loginField.email, 'password': this.loginField.password})
 				.then(res => {
 					localStorage.setItem('token', res.data.token) 
-					localStorage.setItem('id', res.data.id) 
 					localStorage.setItem('loggedIn', true)
+					this.setAuth(res.data.user)
+					this.setAlert({status: true, color: 'success', text: 'LoggedIn Successfully'})
 					this.loggedIn = localStorage.getItem('token') ? true : false
-					if(res.data.isAdmin) {
-						localStorage.setItem('role', 1)
-						this.alerts("LoggedIn as Admin Successfully", "success")
-					} else if (res.data.isStaff) {
-						this.alerts("LoggedIn as Staff Successfully", "success")
-						localStorage.setItem('role', 2)
-					} else if (res.data.isCostumer) {
-						this.alerts("LoggedIn Successfully", "success")
-						localStorage.setItem('role', 3)
-					} else {
-						console.log('LoggedIn Role Wrong')
-					}
 					this.$refs.form_login.reset()
 					this.$refs.form_register.reset()
 					this.dialog = false
 				}).catch(err => {
-					this.alerts(err.response.data.status, "error")
+					this.setAlert({status: true, color: 'error', text: err.response.data.status})
 				})
 			},
 			register: function() {
+				this.initialize()
 				this.axios.post('http://localhost:8000/api/register', this.registerField)
 				.then(res => {
 					console.log(res.response)
-					this.alerts("Register Successfully! Please Login Again!", "success")
+					this.setAlert({status: true, color: 'success', text: 'Register Successfully! Please Login Again!'})
 					this.$refs.form_login.reset()
 					this.$refs.form_register.reset()
 					this.dialog = false
 				})
 				.catch(err => {
 					console.log(err.response)
-					this.alerts("Register Failed!", "error")
+					this.setAlert({status: true, color: 'error', text: 'Register Failed!'})
 				})
 			},
 			logout: function() {
+				this.initialize()
 				localStorage.removeItem('token');
-				localStorage.removeItem('role');
-				localStorage.removeItem('id');
 				this.loggedIn = localStorage.getItem('token') ? true : false
-				this.alerts("You are Logged Out Successfully", "success")
+				this.setAlert({status: true, color: 'success', text: 'You are Logged Out Successfully'})
+				this.dialog = false
 				if(this.$route.path != "/") this.$router.push('/')
-			},
-			alerts (text, color) {
-				this.alert.text = text
-				this.alert.color = color
-				this.alert.status = true;
 			},
 			verifyEmail() {
 				if (/.+@.+\..+/.test(this.registerField.email)) {
@@ -451,8 +302,33 @@
 					this.error = "";
 				}
 			},
+			initialize () {
+				this.axios.interceptors.request.use((config) => {
+					this.loading = true; 
+					return config;
+				}, (error) => {
+					this.loading = false;
+					return Promise.reject(error);
+				});
+
+				this.axios.interceptors.response.use((response) => {
+					this.loading = false;
+					return response;
+				}, (error) => {
+					this.loading = false;
+					return Promise.reject(error);
+				});
+			},
 		},
 		computed: {
+			...mapGetters({
+				user: 'auth/getData',
+				userId: 'auth/getId',
+				store_menu: 'menu/getStoreMenu',
+				admin_menu: 'menu/getAdminMenu',
+				profile_menu: 'menu/getProfileMenu',
+				notification: 'menu/getNotification',
+			}),
 			checkEmail() {
 				return this.verifyEmail()
 			},
@@ -460,42 +336,13 @@
 				return this.registerField.password != this.registerField.rpassword ? "Password Does Not Match" : true;
 			},
 			isCostumer () {
-				return ( 
-					this.$route.path == '/' ||
-					this.$route.path == '/carts' ||
-					this.$route.path == '/checkout' ||
-					this.$route.path == '/merchandise' ||
-					this.$route.path == '/messages' ||
-					this.$route.path == '/orders' ||
-					this.$route.path == '/promos' ||
-					this.$route.path == '/settings' ||
-					this.$route.path == '/stores' ||
-					this.$route.path == '/wishlists'
-				)
+				return this.$store.getters.isCostumer(this.$route.path)
 			},
 			isAdmin () {
-				return ( 
-					this.$route.path == '/admin' ||
-					this.$route.path == '/admin/categories' ||
-					this.$route.path == '/admin/messages' ||
-					this.$route.path == '/admin/payments' ||
-					this.$route.path == '/admin/promos' ||
-					this.$route.path == '/admin/roles' ||
-					this.$route.path == '/admin/status-store' ||
-					this.$route.path == '/admin/status-order' ||
-					this.$route.path == '/admin/stores' ||
-					this.$route.path == '/admin/users'
-				)
+				return this.$store.getters.isAdmin(this.$route.path)
 			},
 			isStore () {
-				return ( 
-					this.$route.path == '/my-store' ||
-					this.$route.path == '/my-store/merchandise' ||
-					this.$route.path == '/my-store/messages' ||
-					this.$route.path == '/my-store/orders' ||
-					this.$route.path == '/my-store/reports' ||
-					this.$route.path == '/my-store/settings'
-				)
+				return this.$store.getters.isStore(this.$route.path)
 			},
 		},
 	}
