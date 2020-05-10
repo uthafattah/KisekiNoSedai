@@ -26,8 +26,12 @@ class MerchandiseController extends Controller
      */
     public function index()
     {
-        //return response()->json(['merchandise' => Merchandise::all()], 200);
-        return new MerchandiseResourceCollection(Merchandise::paginate(10));
+        $per_page = $request->per_page ? $request->per_page : 10;
+		$sortBy = $request->sort_by ? $request->sort_by : 'id';
+		$orderBy = $request->order_by ? $request->order_by : 'asc';
+		return response()->json([
+			'roles' => Role::orderBy($sort_by,$order_by)->paginate($per_page)
+		]. 200);
     }
 
     /**
