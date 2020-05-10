@@ -21,7 +21,7 @@ Vue.use(VueRouter)
 				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Checkout.vue')
 			},
 			{
-				path: 'merchandise',
+				path: 'merchandise/:id',
 				name: 'Merchandise Costumer',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Merchandise.vue')
 			},

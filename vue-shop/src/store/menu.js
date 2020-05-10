@@ -22,7 +22,7 @@ export default {
 		profile_menu: [
 			{ icon: 'mdi-account-cog', text: 'Account Settings', action: '/settings' },
 			{ icon: 'mdi-monitor-dashboard', text: 'Admin', action: '/admin' },
-			{ icon: 'mdi-heart', text: 'Wishlists', action: 'wishlists' },
+			{ icon: 'mdi-heart', text: 'Wishlists', action: '/wishlists' },
 			{ icon: 'mdi-package', text: 'My Order', action: '/orders' },
 		],
 		notification: [

@@ -1,5 +1,5 @@
 <template>
-	<v-card :loading="loading" :to="toMerchandise(merchandise.id)">
+	<v-card :loading="loading" :to="toMerchandise(merchandise.merchandise_id)">
 		<v-img width="300px" :src="getImage(merchandise.photo)">
 			<v-btn icon large :color="wishlist_color" @click="wishlist"><v-icon>mdi-heart</v-icon></v-btn>
 		</v-img>
@@ -14,6 +14,9 @@
 				<v-col class="text-right">xxx Terjual</v-col>
 			</v-row>
 		</v-card-text>
+		<v-card-actions class="mt-n4">
+			<v-btn block outlined large rounded color="primary" to="/carts">Add to Cart</v-btn>
+		</v-card-actions>
 	</v-card>
 </template>
 
@@ -24,8 +27,8 @@
 		props: ['merchandise'],
 		data: () => ({
 			loading: false,
-			wishlist_color: 'pink lighten-5',
-			status: false,
+			wishlist_color: 'pink',
+			status: true,
 		}),
 		methods : {
 			...mapActions({

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import cart from '@/store/cart'
 import auth from '@/store/auth'
+import store from '@/store/store'
 import alert from '@/store/alert'
 import menu from '@/store/menu'
 
@@ -42,6 +43,7 @@ export default new Vuex.Store({
 	modules: {
 		cart,
 		auth,
+		store,
 		alert,
 		menu,
 	}

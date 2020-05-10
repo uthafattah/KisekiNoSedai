@@ -52,7 +52,8 @@
 			</v-btn>
 			<v-btn text to="/my-store" v-else-if="isStore" depressed>
 				<v-toolbar-title>
-					<span class="font-weight-black">JANNNAH GATE</span>
+					<span class="font-weight-black" v-if="store">{{store.name}} STORE</span>
+					<span class="font-weight-black" v-else>Open Your Store!</span>
 				</v-toolbar-title>
 			</v-btn>
 			<v-btn text to="/" large v-else depressed>
@@ -64,7 +65,8 @@
 			<v-spacer v-if="isAdmin || isStore" />
 			<v-text-field flat solo-inverted hide-details prepend-inner-icon="mdi-magnify" label="Search" class="pl-3 pr-3" v-if="!isAdmin && !isStore" clear-icon="mdi-close-circle" clearable/>
 			<v-btn icon text to="/carts" v-if="(!isAdmin && !isStore) && loggedIn">
-				<v-icon>mdi-cart</v-icon>
+				<v-badge :content="qty" :value="qty" color="green" overlap v-if="qty != 0"><v-icon>mdi-cart</v-icon></v-badge>
+				<v-badge dot color="green" overlap v-else><v-icon>mdi-cart</v-icon></v-badge>
 			</v-btn>
 			<!--Dialog v-if="!loggedIn" /-->
 			<v-dialog v-model="dialog" max-width="600px" v-if="!loggedIn">
@@ -135,21 +137,23 @@
 					</v-list-item>
 				</v-list>
 			</v-menu>
-			<v-btn text @click="store" v-if="(!isAdmin && !isStore) && loggedIn">
-				<v-avatar size="36">
-					<!--v-img src="storage/logos/no_logo.png" aspect-ratio="1"></v-img-->
+			<v-btn text @click="storePage" v-if="(!isAdmin && !isStore) && loggedIn">
+				<v-avatar size="28" v-if="store">
+					<v-img :src="getImage(store.logo)" aspect-ratio="1"/>
+				</v-avatar>
+				<v-avatar size="36" v-else>
 					<v-icon>mdi-store</v-icon>
 				</v-avatar>
-				<div style="margin-left:0.5em">Jannah Gate</div>
+				<div style="margin-left:0.5em" v-if="store">{{store.name}}</div>
+				<div style="margin-left:0.5em" v-else>Open Your Store!</div>
 			</v-btn>
 			<v-menu open-on-hover offsetY v-if="loggedIn">
 				<template v-slot:activator="{ on }">
 					<v-btn text v-on="on">
-						<v-avatar size="36">
-							<!--v-img src="storage/avatars/no_image.png" aspect-ratio="1"></v-img-->
-							<v-icon>mdi-account</v-icon>
+						<v-avatar size="28">
+							<v-img :src="getImage(avatar)" aspect-ratio="1"></v-img>
 						</v-avatar>
-						<div style="margin-left:0.5em">Kiseki no Sedai</div>
+						<div style="margin-left:0.5em">{{user.name}}</div>
 					</v-btn>
 				</template>
 				<v-list dense>
@@ -218,7 +222,7 @@
 		created() {
 			this.loggedIn = localStorage.getItem('token') ? true : false
 			this.$vuetify.theme.dark = false
-			if(this.userId == null && localStorage.getItem('token')) this.getLoggedUser()
+			if(this.id == null && localStorage.getItem('token')) this.getLoggedUser()
 		},
 		watch: {
 			theme: function(old) {
@@ -232,15 +236,18 @@
 		methods: {
 			...mapActions({
 				setAuth: 'auth/set',
+				setStore: 'store/set',
+				setCart: 'cart/set',
 				setAlert: 'alert/set'
 			}),
-			store: function() {
+			storePage: function() {
 				this.$router.push('/my-store')
 			},
 			getLoggedUser() {
 				this.axios.get('http://localhost:8000/api/logged_user')
 				.then((res) => {
 					this.setAuth(res.data.user)
+					this.setStore(res.data.store)
 				})
 				.catch((err) => {
 					console.log(err.response)
@@ -253,6 +260,7 @@
 					localStorage.setItem('token', res.data.token) 
 					localStorage.setItem('loggedIn', true)
 					this.setAuth(res.data.user)
+					this.setStore(res.data.store)
 					this.setAlert({status: true, color: 'success', text: 'LoggedIn Successfully'})
 					this.loggedIn = localStorage.getItem('token') ? true : false
 					this.$refs.form_login.reset()
@@ -283,6 +291,9 @@
 				this.loggedIn = localStorage.getItem('token') ? true : false
 				this.setAlert({status: true, color: 'success', text: 'You are Logged Out Successfully'})
 				this.dialog = false
+				this.setAuth({})
+				this.setStore({})
+				this.setCart([])
 				if(this.$route.path != "/") this.$router.push('/')
 			},
 			verifyEmail() {
@@ -319,11 +330,17 @@
 					return Promise.reject(error);
 				});
 			},
+			getImage(image) {
+				return "http://localhost:8000/storage/" + image;
+			},
 		},
 		computed: {
 			...mapGetters({
+				id: 'auth/getId',
 				user: 'auth/getData',
-				userId: 'auth/getId',
+				avatar: 'auth/getAvatar',
+				store: 'store/getStore',
+				qty: 'cart/getQuantity',
 				store_menu: 'menu/getStoreMenu',
 				admin_menu: 'menu/getAdminMenu',
 				profile_menu: 'menu/getProfileMenu',

@@ -20,21 +20,24 @@
 								<div class="mb-4 ml-n4 spacer" no-gutters>
 									<v-btn text dark>
 										<v-avatar tile size="24">
-											<v-icon color="grey">mdi-sticker-check</v-icon>
+											<v-icon color="grey" v-if="merchandise.status_store == 'Official Store'">mdi-sticker-check</v-icon>
+											<v-icon color="grey" v-else-if="merchandise.status_store == 'Starred Store'">mdi-star-circle</v-icon>
+											<v-icon color="grey" v-else-if="merchandise.status_store == 'Verified Store'">mdi-shield-check</v-icon>
+											<v-icon color="grey" v-else>mdi-storefront</v-icon>
 										</v-avatar>
-										<div style="margin-left:0.5em" class="grey--text"><strong>Official Store</strong></div>
+										<div style="margin-left:0.5em" class="grey--text"><strong>{{merchandise.status_store}}</strong></div>
 									</v-btn> 
 								</div>
-								<v-list-item-title class="title mb-1 font-weight-black">Bundle Package WD Green SSD 240GB + WD Blue PC 1TB HDD/ Hardisk/ Hard</v-list-item-title>
+								<v-list-item-title class="title mb-1 font-weight-black">{{merchandise.name}}</v-list-item-title>
 								<v-list-item-subtitle>
-									<strong>Terjual 1 Produk</strong> (100%)
+									<strong>Sold 1 Product</strong> (100%)
 									<v-divider class="mx-4" inset vertical />
-									<strong>680x</strong> Dilihat
+									<strong>{{merchandise.view_count}}x</strong> Viewed
 								</v-list-item-subtitle>
 								<v-divider class="my-4" />
 								<v-list-item class="ml-n4">
 									<span class="title mb-1 font-weight-black grey--text">Harga</span>
-									<span class="headline font-weight-bold warning--text" style="margin-left:1em">Rp. 1.600.000</span>
+									<span class="headline font-weight-bold warning--text" style="margin-left:1em">{{merchandise.price | currency}}</span>
 								</v-list-item>
 								<v-divider class="my-4" />
 								<v-list-item class="ml-n4">
@@ -46,7 +49,7 @@
 									<v-btn icon color="green" @click="addQty">
 										<v-icon>mdi-plus-circle</v-icon>
 									</v-btn>
-									<span class="caption font-weight-bold error--text" style="margin-left:1em">Tersisa {{stock}}, beli segera!</span>
+									<span class="caption font-weight-bold error--text" style="margin-left:1em">Tersisa {{merchandise.stock}}, beli segera!</span>
 									<v-spacer />
 									<v-btn color="primary" @click="subtractQty" style="margin-left:1em">
 										<v-icon left>mdi-cart</v-icon> Add to Cart
@@ -86,26 +89,7 @@
 					<v-col cols="12">
 						<v-card flat>
 							<v-card-text>
-								Deskripsi Bundle Package WD Green SSD 240GB + WD Blue PC 1TB HDD/ Hardisk/ Hard
-								<br><br>
-								Bundle Package] WD Green SSD 120GB + WD Blue PC 1TB HDD/ HD/ Hardisk/ Harddisk Internal 3.5"
-								<br><br>
-								WD Green Garansi 3 Tahun
-								<br><br>
-								Form Factor: 2.5Inch<br>
-								Interface: SATA III 6Gb/s<br>
-								Ketebalan: 7mm<br>
-								Kapasitas: 240GB<br>
-								Read Speed: Up to 540Mb/s<br>
-								Write Speed: Up to 465MB/s<br>
-								<br><br>
-								WD Blue HDD Garansi 2 Tahun
-								<br><br>
-								Interface: SATA 6 GB/s<br>
-								Form Factor: 3.5Inch<br>
-								Kapasitas: 1TB<br>
-								Speed: 7200 RPM<br>
-								Cache: 64MB<br>
+								{{merchandise.description}}
 							</v-card-text>
 						</v-card>
 					</v-col>
@@ -120,7 +104,6 @@
 			loading: false,
 			tab: null,
 			qty: 1,
-			stock: 5,
 			colors: [
 				'indigo',
 				'warning',
@@ -141,11 +124,12 @@
 					text: 'Review',
 				},
 			],
+			merchandise: {}
 		}),
 		created(){
-			this.axios.get('http://localhost:8000/api/user/' + localStorage.getItem('id'))
+			this.axios.get('http://localhost:8000/api/merchandise/search/' + this.$route.params.id)
 			.then((res) => {
-				this.profile = res.data.user[0]
+				this.merchandise = res.data.merchandise
 			})
 			.catch((err) => {
 				if(err.response.status == 401) {
@@ -167,7 +151,7 @@
 
 			},
 			addQty() {
-				if(this.qty < this.stock) this.qty++
+				if(this.qty < this.merchandise.stock) this.qty++
 			},
 			subtractQty() {
 				if(this.qty > 1) this.qty--
