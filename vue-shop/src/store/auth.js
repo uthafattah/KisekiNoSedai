@@ -20,7 +20,7 @@ export default {
 			return state.user.avatar
 		},
 		getRole: state => {
-			return state.user.role
+			return state.user.role_id
 		},
 		getPassword: state => {
 			return state.user.password

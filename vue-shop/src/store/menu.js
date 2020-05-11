@@ -4,7 +4,6 @@ export default {
 		store_menu: [
 			{ icon: 'mdi-gift', text: 'Merchandise', action: '/my-store/merchandise' }, 
 			{ icon: 'mdi-package', text: 'Orders', action: '/my-store/orders' },
-			{ icon: 'mdi-book-multiple', text: 'Reports', action: '/my-store/reports' },
 			{ icon: 'mdi-email', text: 'Messages', action: '/my-store/messages' },
 			{ icon: 'mdi-cog', text: 'Store Settings', action: '/my-store/settings' },
 		],

@@ -26,7 +26,8 @@
 						</v-list-item-content>
 					</v-list-item>
 				</div>
-				<v-list-item class="mt-4" link to="/" v-if="isAdmin || isStore">
+				<v-divider class="mx-2" />
+				<v-list-item link to="/" v-if="isAdmin || isStore">
 					<v-list-item-action>
 						<v-icon>mdi-tablet-dashboard</v-icon>
 					</v-list-item-action>
@@ -167,7 +168,7 @@
 							</v-list-item-title>
 						</v-list-item-content>
 					</v-list-item>
-					<v-list-item link to="/admin" v-if="role == 'administrator'">
+					<v-list-item link to="/admin" v-if="roleAdmin">
 						<v-list-item-action>
 							<v-icon>mdi-monitor-dashboard</v-icon>
 						</v-list-item-action>
@@ -258,12 +259,12 @@
 					this.setStore(res.data.store)
 					this.setAlert({status: true, color: 'success', text: 'LoggedIn Successfully'})
 					this.loggedIn = localStorage.getItem('token') ? true : false
-					this.$refs.form_login.reset()
-					this.$refs.form_register.reset()
 					this.dialog = false
 				}).catch(err => {
 					this.setAlert({status: true, color: 'error', text: err.response.data.status})
 				})
+				if(this.$refs.form_login) this.$refs.form_login.reset()
+				if(this.$refs.register) this.$refs.form_register.reset()
 			},
 			register: function() {
 				this.initialize()
@@ -271,14 +272,14 @@
 				.then(res => {
 					console.log(res.response)
 					this.setAlert({status: true, color: 'success', text: 'Register Successfully! Please Login Again!'})
-					this.$refs.form_login.reset()
-					this.$refs.form_register.reset()
 					this.dialog = false
 				})
 				.catch(err => {
 					console.log(err.response)
 					this.setAlert({status: true, color: 'error', text: 'Register Failed!'})
 				})
+				if(this.$refs.form_login) this.$refs.form_login.reset()
+				if(this.$refs.register) this.$refs.form_register.reset()
 			},
 			logout: function() {
 				this.initialize()
@@ -356,6 +357,9 @@
 			isStore () {
 				return this.$store.getters.isStore(this.$route.path)
 			},
+			roleAdmin() {
+				return this.role === 1 ? true : false
+			}
 		},
 	}
 </script>

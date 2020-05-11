@@ -1,5 +1,5 @@
 <template>
-	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="categories.total" :items="categories.data" :show-select="show_select" @input="selectAll" :footer-props="footerProps">
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="categories.total" :items="categories.data" :footer-props="footerProps">
 		<template v-slot:top>
 			<v-toolbar flat>
 				<v-toolbar-title>Category Management System</v-toolbar-title>
@@ -8,7 +8,6 @@
 				<v-dialog v-model="dialog" max-width="800px">
 					<template v-slot:activator="{ on }">
 						<v-btn color="primary" dark class="mb-2" v-on="on">Add New Category</v-btn>
-						<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
 					</template>
 					<v-card>
 						<v-card-title>
@@ -19,12 +18,12 @@
 								<v-container>
 									<v-row v-if="editedIndex > -1">
 										<v-col cols="12" sm="12">
-											<v-text-field v-model="editedItem.name" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" label="Category Name"></v-text-field>
+											<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Category Name" />
 										</v-col>
 									</v-row>
 									<v-row v-if="editedIndex == -1">
 										<v-col cols="12" sm="6">
-											<v-text-field v-model="editedItem.name" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" :blur="checkCategory" label="Category Name"></v-text-field>
+											<v-text-field v-model="editedItem.name" :success-messages="msg.success" :error-messages="msg.error" :rules="[rules.required, rules.min]" :blur="checkCategory" label="Category Name" />
 										</v-col>
 										<v-col cols="12" sm="6">
 											<v-file-input v-model="editedItem.photo" :rules="[rules.required]" label="Select File" placeholder="Upload Photo" accept="image/jpg, image/png, image/bmp, image/jpeg" />
@@ -49,7 +48,7 @@
 					<v-img :src="getImage(item.photo)" aspect-ratio="1" class="grey lighten-2"></v-img>
 				</v-list-item-avatar>
 				<template v-slot:input>
-					<v-file-input v-model="editedItem.photo" label="Select File" placeholder="Upload Photo" accept="image/jpg, image/png, image/bmp, image/jpeg" @change="uploadAvatar(item)" />
+					<v-file-input v-model="editedItem.photo" label="Select File" placeholder="Upload Photo" accept="image/jpg, image/png, image/bmp, image/jpeg" @change="uploadPhoto(item)" />
 				</template>
 			</v-edit-dialog>
 		</template>
@@ -62,7 +61,7 @@
 			</v-icon>
 		</template>
 		<template v-slot:no-data>
-			<v-btn color="primary" @click="initialize">Reset</v-btn>
+			<v-btn color="primary" @click="refresh">Reset</v-btn>
 		</template>
 	</v-data-table>
 </template>
@@ -73,10 +72,10 @@
 			valid: true,
 			dialog: false,
 			loading: false,
-			show_select: false,
-			selected: [],
-			success: '',
-			error: '',
+			msg: {
+				success: '',
+				error: '',
+			},
 			options: {
 				itemsPerPage: 10,
 				sortBy: ['id'],
@@ -156,23 +155,23 @@
 				if (this.editedItem.name.length >= 3) {
 					this.axios.post("http://localhost:8000/api/category/verify", { name: this.editedItem.name })
 					.then(res => {
-						this.success = res.data.message;
-						this.error = "";
+						this.msg.success = res.data.message;
+						this.msg.error = "";
 					})
 					.catch(err => {
 						console.log(err.response)
-						this.success = "";
-						this.error = "Category Already Exists";
+						this.msg.success = "";
+						this.msg.error = "Category Already Exists";
 					});
 				} else {
-					this.success = "";
-					this.error = "";
+					this.msg.success = "";
+					this.msg.error = "";
 				}
 			},
 			getImage(image) {
 				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
-			uploadAvatar(item) {
+			uploadPhoto(item) {
 				if (this.editedItem.photo != null) {
 					const index = this.users.data.indexOf(item);
 					let formData = new FormData();
@@ -186,32 +185,6 @@
 					.catch(err => console.log(err.response));
 				}
 			},
-			selectAll(e) {
-				this.selected = []
-				if(e.length > 0) {
-					this.selected = e
-					//this.selected = e.map(val => val.id)
-				}
-			},
-			deleteAll() {
-				let decide = confirm('Are you sure you want to delete these items?')
-				if(decide) {
-					const selected_id = this.selected.map(val => val.id)
-					//this.axios.post('http://localhost:8000/api/category/delete', {'categories': this.selected})
-					this.axios.post('http://localhost:8000/api/category/delete', {'categories': selected_id})
-					.then(res => {
-						this.selected.map(val => {
-							const index = this.categories.data.indexOf(val)
-							this.categories.data.splice(index, 1)
-						})
-						console.log(res)
-						this.setAlert({status: true, color: 'success', text: 'Records Deleted Successfully!'})
-					}).catch(err => {
-						console.log(err.response)
-						this.setAlert({status: true, color: 'error', text: 'Error Deleting Records!'})
-					})
-				}
-			},
 			searchIt(e) {
 				if(e) {
 					if(e.length > 2) {
@@ -219,30 +192,11 @@
 						.then(res => this.categories = res.data.category)
 						.catch(err => console.dir(err.response))
 					}
-					if(e.length<=0){
-						this.axios.get(`http://localhost:8000/api/category`)
-						.then(res => this.categories = res.data)
-						.catch(err => console.dir(err.response))
-					}
 				} else {
 					this.axios.get(`http://localhost:8000/api/category`)
-					.then(res => this.categories = res.data)
+					.then(res => this.categories = res.data.categories)
 					.catch(err => console.dir(err.response))
 				}
-			},
-			paginate(e) {
-				const sortBy = e.sortBy.length > 0 ? e.sortBy[0].trim() : 'name';
-				const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
-				this.axios.get(`http://localhost:8000/api/category`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
-				.then(res => {
-					this.categories = res.data.categories
-				})
-				.catch(err => {
-					if(err.response.status == 401) {
-						localStorage.removeItem('token');
-						this.$router.push('/');
-					}
-				})
 			},
 			initialize () {
 				this.axios.interceptors.request.use((config) => {
@@ -260,6 +214,19 @@
 					this.loading = false;
 					return Promise.reject(error);
 				});
+			},
+			refresh() {
+				this.initialize()
+				this.axios.get(`http://localhost:8000/api/category`)
+				.then(res => {
+					this.categories = res.data.categories
+				})
+				.catch(err => {
+					if(err.response.status == 401) {
+						localStorage.removeItem('token');
+						this.$router.push('/');
+					}
+				})
 			},
 			editItem (item) {
 				this.editedIndex = this.categories.data.indexOf(item)

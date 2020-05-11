@@ -1,233 +1,143 @@
 <template>
-	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="orders.total" :items="orders.data" show-select @input="selectAll" :footer-props="footerProps">
-		<template v-slot:top>
-			<v-toolbar flat>
-				<v-toolbar-title>Order Management System</v-toolbar-title>
-				<v-divider class="mx-4" inset vertical></v-divider>
-				<v-spacer></v-spacer>
-				<v-dialog v-model="dialog" max-width="500px">
+	<v-card outlined>
+		<!--v-card-title class="text-center justify-center py-6">
+			<h1 class="font-weight-bold display-1 basil--text">BASiL</h1>
+		</v-card-title-->
+		<v-row class="mx-4 mt-4 mb-n4">
+			<v-col cols="4">
+				<v-menu v-model="datepicker" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y min-width="290px">
 					<template v-slot:activator="{ on }">
-						<v-btn color="primary" dark class="mb-2" v-on="on">Order By</v-btn>
-						<!--v-list dense>
-								<v-list-item v-for="(item, index) in order_report" :key="index" link :to="item.action">
-									<v-list-item-content>
-										<v-list-item-title>
-											{{ item.text }}
-										</v-list-item-title>
-									</v-list-item-content>
-								</v-list-item>
-							</v-list-->
+						<v-text-field dense outlined :value="dateRangeText" label="Lihat Transaksi" prepend-icon="mdi-calendar-blank" readonly v-on="on" @click:clear="clearDate" clear-icon="mdi-close-circle" clearable/>
+						<!--v-text-field v-model="dateRangeText" label="Date range" prepend-icon="mdi-calendar-blank" readonly v-on="on"></v-text-field-->
 					</template>
-					<v-card>
-						<v-card-title>
-							<span class="headline">{{ formTitle }}</span>
-						</v-card-title>
-
-						<v-card-text>
-							<v-container>
-								<v-row>
-									<v-col cols="12" sm="6">
-										<v-text-field v-model="editedItem.name" :rules="[rules.required]" label="From Date"></v-text-field>
-									</v-col>
-									<v-col cols="12" sm="6">
-										<v-text-field v-model="editedItem.name" :rules="[rules.required]" label="To Date"></v-text-field>
-									</v-col>
-								</v-row>
-							</v-container>
-						</v-card-text>
-						<v-card-actions>
-							<v-spacer></v-spacer>
-							<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-							<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="order">Order</v-btn>
-						</v-card-actions>
-					</v-card>
-				</v-dialog>
-			</v-toolbar>
-			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details clear-icon="mdi-close-circle" clearable/>
-		</template>
-		<template v-slot:no-data>
-			<v-btn color="primary" @click="initialize">Reset</v-btn>
-		</template>
-	</v-data-table>
+					<v-date-picker v-model="dates" @input="pickCount++, pickCount == 2 ? (datepicker = false, pickCount = 0) : datepicker " range></v-date-picker>
+				</v-menu>
+			</v-col>
+			<v-col cols="6">
+				<v-text-field dense outlined append-icon="mdi-magnify" label="Search..." hide-details clear-icon="mdi-close-circle" clearable/>
+			</v-col>
+			<v-col cols="2">
+				<v-select dense outlined :items="sorting" label="Sort By"></v-select>
+			</v-col>
+		</v-row>
+		<v-divider class="mx-4" />
+		<v-tabs fixed-tabs v-model="tab" background-color="white" icons-and-text>
+			<v-progress-linear :active="loading" :indeterminate="loading" absolute top color="white accent-4"></v-progress-linear>
+			<v-tabs-slider></v-tabs-slider>
+			<v-tab v-for="(item, index) in tab_header" :key="index" :href="`#tab-${index}`">
+				{{item.text}}
+				<v-icon>{{item.icon}}</v-icon>
+			</v-tab>
+		</v-tabs>
+		<v-tabs-items v-model="tab">
+			<v-tab-item v-for="(item, index) in tab_item" :key="index" :value="`tab-${index}`">
+				<v-row class="mx-2">
+					<v-col cols="12" v-for="(order) in orders" :key="order.id" link :to="order.action">
+						<OrderItem :order="order" />
+					</v-col>
+				</v-row>
+			</v-tab-item>
+		</v-tabs-items>
+		<v-card-actions>
+			<v-spacer />
+			<v-text-field dense outlined readonly v-model="total" label="Total Shopping" prefix="Rp" class="mr-3 mt-4 shrink" style="width: 250px;"/>
+		</v-card-actions>
+	</v-card>
 </template>
 <script>
 	export default {
 		data: () => ({
-			valid: true,
-			dialog: false,
 			loading: false,
-			snackbar: false,
-			selected: [],
-			text: '',
-			success: '',
-			error: '',
-			options: {
-				itemsPerPage: 5,
-				sortBy: ['id'],
-				sortDesc: [false]
-			},
-			rules: {
-				required: v => !!v || "This Field Required",
-			},
-			footerProps: {
-				itemsPerPageOptions: [5, 10, 15],
-				itemsPerPageText: 'Orders Per Page',
-				'show-current-page': true,
-				'show-first-last-page': true
-			},
-			headers: [
-				{ text: '#', align: 'left', sortable: false, value: 'id'},
-				{ text: 'Merchandise', value: 'merchandise' },
-				{ text: 'Price', value: 'price' },
-				{ text: 'Qty', value: 'qty' },
-				{ text: 'Total', value: 'total' },
-				{ text: 'Actions', sortable: false, value: 'actions'},
-			],
-			orders: [],
-			editedIndex: -1,
-			editedItem: {
-				id: '',
-				name: '',
-			},
-			defaultItem: {
-				id: '',
-				name: '',
-				slug: '',
-				created_at: '',
-				updated_at: '',
-			},
-			order_report: [
+			tab: null,
+			dates: [],
+			datepicker: false,
+			pickCount: 0,
+			total: '1.000.000.000',
+			sorting: ['The Latest', 'Highest Price', 'Lowest Price'],
+			tab_header: [
 				{
-					text: 'Daily',
-					action: '#'
+					icon: 'mdi-package',
+					text: 'All',
 				},
 				{
-					text: 'Weekly',
-					action: '#'
+					icon: 'mdi-note-text',
+					text: 'Requested',
 				},
 				{
-					text: 'Monthly',
-					action: '#'
+					icon: 'mdi-clock',
+					text: 'Waiting',
 				},
 				{
-					text: '6 Month',
-					action: '#'
+					icon: 'mdi-package-variant',
+					text: 'On Process',
 				},
 				{
-					text: 'Year',
-					action: '#'
+					icon: 'mdi-truck-fast',
+					text: 'Shipped',
+				},
+				{
+					icon: 'mdi-truck-check',
+					text: 'Arrived',
+				},
+				{
+					icon: 'mdi-briefcase-check',
+					text: 'Success',
+				},
+				{
+					icon: 'mdi-file-cancel',
+					text: 'Canceled',
 				},
 			],
+			tab_item: [
+				{
+					text: 'All',
+				},
+				{
+					text: 'Requested',
+				},
+				{
+					text: 'Waiting',
+				},
+				{
+					text: 'On Process',
+				},
+				{
+					text: 'Shipped',
+				},
+				{
+					text: 'Arrived',
+				},
+				{
+					text: 'Success',
+				},
+				{
+					text: 'Canceled',
+				},
+			],
+			orders: ['1', '2'],
 		}),
+		components: {
+			OrderItem: () => import(/* webpackChunkName: "order-item" */ '@/components/OrderItem.vue')
+		},
 		computed: {
-			formTitle () {
-				return this.editedIndex === -1 ? 'Order Order' : 'Edit Order'
+			dateRangeText () {
+				return this.dates.join(' ~ ')
 			},
-		},
-		watch: {
-			dialog (val) {
-				val || this.close()
-			},
-			/*options: {
-				handler(e) {
-					const sortBy = e.sortBy.length > 0 ? e.sortBy[0].trim() : 'id';
-					const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
-					this.axios.get(`/api/orders`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
-					.then(res => {
-						this.orders = res.data.orders
-					})
-					.catch(err => {
-						if(err.response.status == 401) {
-							localStorage.removeItem('token');
-							this.$router.push('/');
-						}
-					})
-				},
-				deep: true
-			},*/
-		},
-		created () {
-			this.initialize()
 		},
 		methods: {
-			selectAll(e) {
-				this.selected = []
-				if(e.length > 0) {
-					this.selected = e
-					//this.selected = e.map(val => val.id)
-				}
+			getImage(image) {
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
-			searchIt(e) {
-				if(e) {
-					if(e.length > 2) {
-						this.axios.get(`/api/orders/${e}`)
-						.then(res => this.orders = res.data.orders)
-						.catch(err => console.dir(err.response))
-					}
-					if(e.length<=0){
-						this.axios.get(`/api/orders`)
-						.then(res => this.orders = res.data.orders)
-						.catch(err => console.dir(err.response))
-					}
-				} else {
-					this.axios.get(`/api/orders`)
-					.then(res => this.orders = res.data.orders)
-					.catch(err => console.dir(err.response))
-				}
+			clearDate () {
+				this.dates = []
 			},
-			paginate(e) {
-				const sortBy = e.sortBy.length > 0 ? e.sortBy[0].trim() : 'name';
-				const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
-				this.axios.get(`/api/orders`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
-				.then(res => {
-					this.orders = res.data.orders
-				})
-				.catch(err => {
-					if(err.response.status == 401) {
-						localStorage.removeItem('token');
-						this.$router.push('/');
-					}
-				})
-			},
-			initialize () {
-				this.axios.interceptors.request.use((config) => {
-					this.loading = true; 
-					return config;
-				}, (error) => {
-					this.loading = false;
-					return Promise.reject(error);
-				});
-
-				this.axios.interceptors.response.use((response) => {
-					this.loading = false;
-					return response;
-				}, (error) => {
-					this.loading = false;
-					return Promise.reject(error);
-				});
-			},
-			close () {
-				this.dialog = false
-				setTimeout(() => {
-					this.editedItem = Object.assign({}, this.defaultItem)
-					this.editedIndex = -1
-				}, 300)
-			}, 
-			order () {
-				this.axios.post('/api/orders', {'name': this.editedItem.name })
-				.then(res => {
-					this.text = "Record Added Successfully!";
-					this.snackbar = true;
-					this.orders.data.push(res.data.order)
-				})
-				.catch(err => {
-					console.log(err.response)
-					this.text = "Error Inserting Record!";
-					this.snackbar = true;
-				})
-				this.close()
-			},
+		},
+		created(){
 		},
 	}
 </script>
-<style scoped></style>
+<style scoped>
+	.btnCustom:hover {
+		background-color: #FF5252 !important;
+	}
+</style>

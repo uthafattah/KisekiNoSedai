@@ -78,11 +78,6 @@ Vue.use(VueRouter)
 				component: () => import( /*webpackChunkName: "about"*/ '../views/store/Orders.vue')
 			},
 			{
-				path: 'reports',
-				name: 'Reports',
-				component: () => import( /*webpackChunkName: "about"*/ '../views/store/Reports.vue')
-			},
-			{
 				path: 'merchandise',
 				name: 'Merchandise Store',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/store/Merchandise.vue')

@@ -12,7 +12,7 @@
 						<v-card-text>
 							<v-form ref="form" v-model="valid">
 								<v-text-field label="Name" v-model="store.name" :rules="[rules.required, rules.min]" prepend-icon="mdi-account" autocomplete="off" />
-								<v-select label="Category" v-model="store.category" :items="category" :rules="[rules.category]" attach chips  prepend-icon="mdi-apps" multiple  required/>
+								<v-select label="Category" v-model="store.category" :items="categories" :rules="[rules.category]" attach chips  prepend-icon="mdi-apps" multiple  required/>
 								<v-textarea type="text" label="Address" v-model="store.address" :rules="[rules.required]" prepend-icon="mdi-map-marker" autocomplete="off" />
 								<v-textarea type="text" label="Description" v-model="store.description" :rules="[rules.required]" prepend-icon="mdi-text-box" autocomplete="off" />
 							</v-form>
@@ -36,9 +36,9 @@
 			rules: {
 				required: v => !!v || "This Field Required",
 				category: v => v.length > 0 || "Category Required",
-				min: v => v.length >= 5 || "Minimum 5 Characters Required",
+				min: v => (v && v.length >= 5) || "Minimum 5 Characters Required",
 			},
-			category: ['foo', 'bar', 'fizz', 'buzz'],
+			categories: [],
 		}),
 		computed: {
 			...mapGetters({
@@ -60,6 +60,14 @@
 			},
 		},
 		created(){
+			/*this.axios.get('http://localhost:8000/api/category/all')
+			.then((res) => {
+				this.categories = res.data.categories
+				console.log(res.data.categories)
+			})
+			.catch((err) => {
+				console.log(err)
+			})*/
 		},
 	}
 </script>

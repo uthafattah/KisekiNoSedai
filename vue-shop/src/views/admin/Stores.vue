@@ -1,15 +1,11 @@
 <template>
-		<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="stores.total" :items="stores.data" :show-select="show_select" @input="selectAll" :footer-props="footerProps">
+		<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="stores.total" :items="stores.data" :footer-props="footerProps">
 			<template v-slot:top>
 				<v-toolbar flat>
 					<v-toolbar-title>Store Management System</v-toolbar-title>
 					<v-divider class="mx-4" inset vertical></v-divider>
 					<v-spacer></v-spacer>
 					<v-dialog v-model="dialog" max-width="500px">
-						<!--template v-slot:activator="{ on }"-->
-						<!--template>
-							<v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn>
-						</template-->
 						<v-card>
 							<v-card-title>
 								<span class="headline">{{ formTitle }}</span>
@@ -26,8 +22,7 @@
 							</v-card-text>
 							<v-card-actions>
 								<v-spacer></v-spacer>
-								<!--v-btn color="blue darken-1" text @click="close">Cancel</v-btn-->
-								<v-btn color="blue darken-1" text>Cancel</v-btn>
+								<v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
 								<v-btn type="submit" :disabled="!valid" color="blue darken-1" text @click.prevent="save">Save</v-btn>
 							</v-card-actions>
 						</v-card>
@@ -59,7 +54,7 @@
 				</v-icon-->
 			</template>
 			<template v-slot:no-data>
-				<v-btn color="primary" @click="initialize">Reset</v-btn>
+				<v-btn color="primary" @click="refresh">Reset</v-btn>
 			</template>
 		</v-data-table>
 </template>
@@ -70,11 +65,6 @@
 			valid: true,
 			dialog: false,
 			loading: false,
-			show_select: false,
-			selected: [],
-			text: '',
-			success: '',
-			error: '',
 			options: {
 				itemsPerPage: 10,
 				sortBy: ['id'],
@@ -163,42 +153,11 @@
 					this.setAlert({status: true, color: 'error', text: err.response.data.store.name + "'s Store Status Cannot Be Updated to " + err.response.data.store.status_store})
 				});
 			},
-			selectAll(e) {
-				this.selected = []
-				if(e.length > 0) {
-					this.selected = e
-					//this.selected = e.map(val => val.id)
-				}
-			},
-			deleteAll() {
-				let decide = confirm('Are you sure you want to delete these items?')
-				if(decide) {
-					const selected_id = this.selected.map(val => val.id)
-					//this.axios.post('http://localhost:8000/api/store//delete', {'stores': this.selected})
-					this.axios.post('http://localhost:8000/api/store/delete', {'stores': selected_id})
-					.then(res => {
-						this.selected.map(val => {
-							const index = this.stores.data.indexOf(val)
-							this.stores.data.splice(index, 1)
-						})
-						this.setAlert({status: true, color: 'success', text: 'Records Deleted Successfully!'})
-						console.log(res)
-					}).catch(err => {
-						console.log(err.response)
-						this.setAlert({status: true, color: 'error', text: 'Error Deleting Records!'})
-					})
-				}
-			},
 			searchIt(e) {
 				if(e) {
 					if(e.length > 2) {
 						this.axios.get(`http://localhost:8000/api/store/${e}`)
-						.then(res => this.stores = res.data.stores)
-						.catch(err => console.dir(err.response))
-					}
-					if(e.length<=0){
-						this.axios.get(`http://localhost:8000/api/store/`)
-						.then(res => this.stores = res.data.stores)
+						.then(res => this.stores = res.data.store)
 						.catch(err => console.dir(err.response))
 					}
 				} else {
@@ -206,23 +165,6 @@
 					.then(res => this.stores = res.data.stores)
 					.catch(err => console.dir(err.response))
 				}
-			},
-			paginate(e) {
-				const sortBy = e.sortBy.length == 0 ? "name" : e.sortBy[0];
-				const orderBy = e.sortDesc.length > 0 && e.sortDesc[0] ? "asc" : "desc";
-				//const sortBy = this.options.sortBy.length == 0 ? "name" : this.options.sortBy[0];
-				//const orderBy = this.options.sortDesc.length > 0 && this.options.sortDesc[0] ? "asc" : "desc";
-				this.axios.get(`http://localhost:8000/api/store`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
-				.then(res => {
-					this.stores = res.data.stores;
-					this.status_store = res.data.status_store;
-				})
-				.catch(err => {
-					if(err.response.status == 401) {
-						localStorage.removeItem('token');
-						this.$router.push('/');
-					}
-				})
 			},
 			initialize () {
 				this.axios.interceptors.request.use((config) => {
@@ -240,6 +182,20 @@
 					this.loading = false;
 					return Promise.reject(error);
 				});
+			},
+			refresh() {
+				this.initialize()
+				this.axios.get(`http://localhost:8000/api/store`)
+				.then(res => {
+					this.stores = res.data.stores;
+					this.status_stores = res.data.status_stores;
+				})
+				.catch(err => {
+					if(err.response.status == 401) {
+						localStorage.removeItem('token');
+						this.$router.push('/');
+					}
+				})
 			},
 			editItem (item) {
 				this.editedIndex = this.stores.data.indexOf(item)

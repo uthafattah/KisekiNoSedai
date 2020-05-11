@@ -1,5 +1,5 @@
 <template>
-	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="users.total" :items="users.data" :show-select="show_select" @input="selectAll" :footer-props="footerProps">
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="users.total" :items="users.data" :footer-props="footerProps">
 		<template v-slot:top>
 			<v-toolbar flat>
 				<v-toolbar-title>User Management System</v-toolbar-title>
@@ -8,7 +8,6 @@
 				<v-dialog v-model="dialog" max-width="800px">
 					<template v-slot:activator="{ on }">
 						<v-btn color="primary" dark class="mb-2" v-on="on">Add New User</v-btn>
-						<!--v-btn color="primary" dark class="mb-2 mr-2" @click="deleteAll" disabled>Delete</v-btn-->
 					</template>
 					<v-card>
 						<v-card-title>
@@ -27,7 +26,7 @@
 									</v-row>
 									<v-row v-if="editedIndex == -1">
 										<v-col cols="12" sm="6">
-											<v-text-field type="email" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.validEmail ]" :blur="checkEmail" v-model="editedItem.email" label="Email" autocomplete="off" />
+											<v-text-field type="email" :success-messages="msg.success" :error-messages="msg.error" :rules="[rules.required, rules.validEmail ]" :blur="checkEmail" v-model="editedItem.email" label="Email" autocomplete="off" />
 										</v-col>
 										<v-col cols="12" sm="6">
 											<v-text-field type="text" :rules="[rules.required]" v-model="editedItem.phone" label="Phone" autocomplete="off" />
@@ -84,7 +83,7 @@
 				</v-icon>
 		</template>
 		<template v-slot:no-data>
-			<v-btn color="primary" @click="initialize">Reset</v-btn>
+			<v-btn color="primary" @click="refresh">Reset</v-btn>
 		</template>
 	</v-data-table>
 </template>
@@ -97,15 +96,9 @@
 			loading: false,
 			add_password: false,
 			add_rpassword: false,
-			show_select: false,
-			selected: [],
-			roles: [],
-			success: '',
-			error: '',
-			alert: {
-				text: '',
-				color: '',
-				status: false,
+			msg: {
+				success: '',
+				error: '',
 			},
 			options: {
 				itemsPerPage: 10,
@@ -132,6 +125,7 @@
 				{ text: 'Actions', sortable: false, value: 'actions' },
 			],
 			users: [],
+			roles: [],
 			editedIndex: -1,
 			editedItem: {
 				id: '',
@@ -163,7 +157,7 @@
 				return this.editedItem.password != this.editedItem.rpassword ? "Password Does Not Match" : true;
 			},
 			checkEmail() {
-				return this.verifyEmail()
+				return this.editedItem.email != undefined ? this.verifyEmail() : null
 			},
 		},
 		watch: {
@@ -200,17 +194,17 @@
 				if (/.+@.+\..+/.test(this.editedItem.email)) {
 					this.axios.post("http://localhost:8000/api/email/verify", { email: this.editedItem.email })
 					.then(res => {
-						this.success = res.data.message;
-						this.error = "";
+						this.msg.success = res.data.message;
+						this.msg.error = "";
 					})
 					.catch(err => {
 						console.log(err.response)
-						this.success = "";
-						this.error = "Email Already Exists";
+						this.msg.success = "";
+						this.msg.error = "Email Already Exists";
 					});
 				} else {
-					this.success = "";
-					this.error = "";
+					this.msg.success = "";
+					this.msg.error = "";
 				}
 			},
 			getImage(image) {
@@ -241,42 +235,11 @@
 					this.setAlert({status: true, color: 'error', text: err.response.data.user.name + "'s Role Cannot Be Updated to " + err.response.data.user.role})
 				});
 			},
-			selectAll(e) {
-				this.selected = []
-				if(e.length > 0) {
-					this.selected = e
-					//this.selected = e.map(val => val.id)
-				}
-			},
-			deleteAll() {
-				let decide = confirm('Are you sure you want to delete these items?')
-				if(decide) {
-					const selected_id = this.selected.map(val => val.id)
-					//this.axios.post('http://localhost:8000/api/user/delete', {'users': this.selected})
-					this.axios.post('http://localhost:8000/api/user/delete', {'users': selected_id})
-					.then(res => {
-						this.selected.map(val => {
-							const index = this.users.data.indexOf(val)
-							this.users.data.splice(index, 1)
-						})
-						console.log(res)
-						this.setAlert({status: true, color: 'success', text: 'Records Deleted Successfully!'})
-					}).catch(err => {
-						console.log(err.response)
-						this.setAlert({status: true, color: 'error', text: 'Error Deleting Records!'})
-					})
-				}
-			},
 			searchIt(e) {
 				if(e) {
 					if(e.length > 2) {
-						this.axios.get(`http://localhost:8000/api/user/search/${e}`)
+						this.axios.get(`http://localhost:8000/api/user/${e}`)
 						.then(res => this.users = res.data.user)
-						.catch(err => console.dir(err.response))
-					}
-					if(e.length<=0){
-						this.axios.get(`http://localhost:8000/api/user`)
-						.then(res => this.users = res.data)
 						.catch(err => console.dir(err.response))
 					}
 				} else {
@@ -284,23 +247,6 @@
 					.then(res => this.users = res.data.users)
 					.catch(err => console.dir(err.response))
 				}
-			},
-			paginate(e) {
-				const sortBy = e.sortBy.length == 0 ? "name" : e.sortBy[0];
-				const orderBy = e.sortDesc.length > 0 && e.sortDesc[0] ? "asc" : "desc";
-				//const sortBy = this.options.sortBy.length == 0 ? "name" : this.options.sortBy[0];
-				//const orderBy = this.options.sortDesc.length > 0 && this.options.sortDesc[0] ? "asc" : "desc";
-				this.axios.get(`http://localhost:8000/api/user`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
-				.then(res => {
-					this.users = res.data
-					this.roles = res.data.roles;
-				})
-				.catch(err => {
-					if(err.response.status == 401) {
-						localStorage.removeItem('token');
-						this.$router.push('/');
-					}
-				})
 			},
 			initialize () {
 				this.axios.interceptors.request.use((config) => {
@@ -318,6 +264,20 @@
 					this.loading = false;
 					return Promise.reject(error);
 				});
+			},
+			refresh() {
+				this.initialize()
+				this.axios.get(`http://localhost:8000/api/user`)
+				.then(res => {
+					this.users = res.data.users;
+					this.roles = res.data.roles;
+				})
+				.catch(err => {
+					if(err.response.status == 401) {
+						localStorage.removeItem('token');
+						this.$router.push('/');
+					}
+				})
 			},
 			editItem (item) {
 				this.editedIndex = this.users.data.indexOf(item)
