@@ -1,5 +1,5 @@
 <template>
-	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="users.total" :items="users.data" show-select @input="selectAll" :footer-props="footerProps">
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="users.total" :items="users.data" :show-select="show_select" @input="selectAll" :footer-props="footerProps">
 		<template v-slot:top>
 			<v-toolbar flat>
 				<v-toolbar-title>User Management System</v-toolbar-title>
@@ -97,6 +97,7 @@
 			loading: false,
 			add_password: false,
 			add_rpassword: false,
+			show_select: false,
 			selected: [],
 			roles: [],
 			success: '',
@@ -108,7 +109,7 @@
 			},
 			options: {
 				itemsPerPage: 10,
-				sortBy: ['id'],
+				sortBy: ['role_id'],
 				sortDesc: [false]
 			},
 			rules: {
@@ -123,7 +124,7 @@
 				'show-first-last-page': true
 			},
 			headers: [
-				{ text: '#', align: 'left', sortable: false, value: 'id' },
+				{ text: 'id', align: 'left', sortable: false, value: 'id' },
 				{ text: 'Name', value: 'name' },
 				{ text: 'Email', value: 'email' },
 				{ text: 'Role', value: 'role' },

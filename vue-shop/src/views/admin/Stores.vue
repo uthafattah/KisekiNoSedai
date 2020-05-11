@@ -1,6 +1,5 @@
 <template>
-	<div>
-		<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="stores.total" :items="stores.data" show-select @input="selectAll" :footer-props="footerProps">
+		<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="stores.total" :items="stores.data" :show-select="show_select" @input="selectAll" :footer-props="footerProps">
 			<template v-slot:top>
 				<v-toolbar flat>
 					<v-toolbar-title>Store Management System</v-toolbar-title>
@@ -51,32 +50,27 @@
 				</v-edit-dialog>
 			</template>
 			<template v-slot:item.actions="{ item }">
-				<v-icon small class="mr-2" @click="editItem(item)">
+				<!--v-icon small class="mr-2" @click="editItem(item)"-->
+				<v-icon small class="ml-3" @click="editItem(item)">
 					mdi-pencil
 				</v-icon>
-				<v-icon small @click="deleteItem(item)">
+				<!--v-icon small @click="deleteItem(item)">
 					mdi-delete
-				</v-icon>
+				</v-icon-->
 			</template>
 			<template v-slot:no-data>
 				<v-btn color="primary" @click="initialize">Reset</v-btn>
 			</template>
 		</v-data-table>
-		<!--Alert :alerts="alerts" v-if="isAlert"/-->
-		<v-snackbar v-model="alert.status" :color="alert.color" class="top mb-12">
-			{{alert.text}}
-			<v-btn dark text @click="alert.status = false">
-				<v-icon>mdi-close-circle</v-icon>
-			</v-btn>
-		</v-snackbar>
-	</div>
 </template>
 <script>
+	import { mapActions } from 'vuex'
 	export default {
 		data: () => ({
 			valid: true,
 			dialog: false,
 			loading: false,
+			show_select: false,
 			selected: [],
 			text: '',
 			success: '',
@@ -85,11 +79,6 @@
 				itemsPerPage: 10,
 				sortBy: ['id'],
 				sortDesc: [false]
-			},
-			alert: {
-				text: '',
-				color: '',
-				status: false,
 			},
 			rules: {
 				required: v => !!v || "This Field Required",
@@ -157,6 +146,9 @@
 			this.initialize()
 		},
 		methods: {
+			...mapActions({
+				setAlert: 'alert/set'
+			}),
 			getImage(image) {
 				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
@@ -164,11 +156,11 @@
 				const index = this.stores.data.indexOf(item);
 				this.axios.post("http://localhost:8000/api/store/status_store", { status_store: item.status_store, store: item.id })
 				.then(res => {
-					this.alerts(res.data.store.name + "'s Store Status Updated to " + res.data.store.status_store, "success")
+					this.setAlert({status: true, color: 'success', text: res.data.store.name + "'s Store Status Updated to " + res.data.store.status_store})
 				})
 				.catch(err => {
 					this.stores.data[index].status_store = err.response.data.store.status_store;
-					this.alerts(err.response.data.store.name + "'s Store Status Cannot Be Updated to " + err.response.data.store.status_store, "error")
+					this.setAlert({status: true, color: 'error', text: err.response.data.store.name + "'s Store Status Cannot Be Updated to " + err.response.data.store.status_store})
 				});
 			},
 			selectAll(e) {
@@ -189,11 +181,11 @@
 							const index = this.stores.data.indexOf(val)
 							this.stores.data.splice(index, 1)
 						})
-						this.alerts("Records Deleted Successfully!", "success")
+						this.setAlert({status: true, color: 'success', text: 'Records Deleted Successfully!'})
 						console.log(res)
 					}).catch(err => {
 						console.log(err.response)
-						this.alerts("Error Deleting Records!", "error")
+						this.setAlert({status: true, color: 'error', text: 'Error Deleting Records!'})
 					})
 				}
 			},
@@ -260,12 +252,12 @@
 				if(decide) {
 					this.axios.delete('http://localhost:8000/api/store/' + item.id)
 					.then(res => {
-						this.alerts("Record Deleted Successfully!", "success")
+						this.setAlert({status: true, color: 'success', text: 'Records Deleted Successfully!'})
 						this.stores.data.splice(index, 1)
 						console.log(res)
 					}).catch(err => {
 						console.log(err.response)
-						this.alerts("Error Deleting Record!", "error")
+						this.setAlert({status: true, color: 'error', text: 'Error Deleting Records!'})
 					})
 				}
 			},
@@ -279,23 +271,18 @@
 			save () {
 				if (this.editedIndex > -1) {
 					const index = this.editedIndex
-					this.axios.put('http://localhost:8000/api/store/' + this.editedItem.id, this.editedItem)
+					this.axios.put('http://localhost:8000/api/store/status/' + this.editedItem.id, this.editedItem)
 					.then(res => {
 						Object.assign(this.stores.data[index], res.data.store)
-						this.alerts("Record Updated Successfully!", "success")
+						this.setAlert({status: true, color: 'success', text: 'Record Updated Successfully!'})
 					})
 					.catch(err => {
 						console.log(err.response)
-						this.alerts("Error Updating Record!", "error")
+						this.setAlert({status: true, color: 'error', text: 'Error Updating Record!'})
 					})
 				}
 				this.close()
 			},
-			alerts (text, color) {
-				this.alert.text = text
-				this.alert.color = color
-				this.alert.status = true;
-			}
 		},
 	}
 </script>

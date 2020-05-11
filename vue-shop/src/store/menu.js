@@ -16,8 +16,7 @@ export default {
 			{ icon: 'mdi-wallet', text: 'Payments', action: '/admin/payments' }, 
 			{ icon: 'mdi-ticket-percent', text: 'Promos', action: '/admin/promos' }, 
 			{ icon: 'mdi-sticker-check', text: 'Status Store', action: '/admin/status-store' }, 
-			{ icon: 'mdi-truck-check', text: 'Status Order', action: '/admin/status-order' }, 
-			{ icon: 'mdi-email', text: 'Messages', action: '/admin/messages' },
+			{ icon: 'mdi-truck-check', text: 'Status Order', action: '/admin/status-order' },
 		],
 		profile_menu: [
 			{ icon: 'mdi-account-cog', text: 'Account Settings', action: '/settings' },

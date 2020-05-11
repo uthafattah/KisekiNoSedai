@@ -1,5 +1,5 @@
 <template>
-	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="promos.total" :items="promos.data" show-select @input="selectAll" :footer-props="footerProps">
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="promos.total" :items="promos.data" :show-select="show_select" @input="selectAll" :footer-props="footerProps">
 		<template v-slot:top>
 			<v-toolbar flat>
 				<v-toolbar-title>Promo Management System</v-toolbar-title>
@@ -19,10 +19,11 @@
 								<v-container>
 									<v-row>
 										<v-col cols="12" sm="6">
-											<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Promo Name"></v-text-field>
+											<v-text-field v-model="editedItem.name" :rules="[rules.required, rules.min]" label="Promo Name" />
 										</v-col>
 										<v-col cols="12" sm="6">
-											<v-text-field v-model="editedItem.promo_code" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" :blur="checkCode" label="Promo Code"></v-text-field>
+											<v-text-field v-model="editedItem.promo_code" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" label="Promo Code" v-if="editedIndex > 0" />
+											<v-text-field v-model="editedItem.promo_code" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" :blur="checkCode" label="Promo Code" v-else/>
 										</v-col>
 										<v-col cols="12" md="12">
 											<v-textarea type="text" :rules="[rules.required]" v-model="editedItem.description" label="Description"></v-textarea>
@@ -55,14 +56,14 @@
 	</v-data-table>
 </template>
 <script>
+	import { mapActions } from 'vuex'
 	export default {
 		data: () => ({
 			valid: true,
 			dialog: false,
 			loading: false,
-			snackbar: false,
+			show_select: false,
 			selected: [],
-			text: '',
 			success: '',
 			error: '',
 			options: {
@@ -108,7 +109,7 @@
 				return this.editedIndex === -1 ? 'New Promo' : 'Edit Promo'
 			},
 			checkCode() {
-				return this.verifyCode()
+				return this.editedItem.promo_code != undefined ? this.verifyCode() : null
 			},
 		},
 		watch: {
@@ -121,7 +122,7 @@
 					const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
 					this.axios.get(`http://localhost:8000/api/promo`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
 					.then(res => {
-						this.promos = res.data
+						this.promos = res.data.promos
 					})
 					.catch(err => {
 						if(err.response.status == 401) {
@@ -137,6 +138,9 @@
 			this.initialize()
 		},
 		methods: {
+			...mapActions({
+				setAlert: 'alert/set'
+			}),
 			verifyCode() {
 				if (this.editedItem.promo_code.length >= 5) {
 					this.axios.post("http://localhost:8000/api/promo/verify", { promo_code: this.editedItem.promo_code })
@@ -168,17 +172,15 @@
 					//this.axios.post('http://localhost:8000/api/promo/delete', {'promos': this.selected})
 					this.axios.post('http://localhost:8000/api/promo/delete', {'promos': selected_id})
 					.then(res => {
-						this.text = "Records Deleted Successfully!";
 						this.selected.map(val => {
 							const index = this.promos.data.indexOf(val)
 							this.promos.data.splice(index, 1)
 						})
 						console.log(res)
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'success', text: 'Records Deleted Successfully!'})
 					}).catch(err => {
 						console.log(err.response)
-						this.text = "Error Deleting Records!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'error', text: 'Error Deleting Records!'})
 					})
 				}
 			},
@@ -242,14 +244,12 @@
 				if(decide) {
 					this.axios.delete('http://localhost:8000/api/promo/' + item.id)
 					.then(res => {
-						this.text = "Record Deleted Successfully!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'success', text: 'Record Deleted Successfully!'})
 						this.promos.data.splice(index, 1)
 						console.log(res)
 					}).catch(err => {
 						console.log(err.response)
-						this.text = "Error Deleting Record!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'error', text: 'Error Deleting Record!'})
 					})
 				}
 			},
@@ -263,30 +263,26 @@
 			save () {
 				if (this.editedIndex > -1) {
 					const index = this.editedIndex
-					this.axios.put('http://localhost:8000/api/promo/' + this.editedItem.id, {'name': this.editedItem.name })
+					this.axios.put('http://localhost:8000/api/promo/' + this.editedItem.id, this.editedItem)
 					.then(res => {
-						this.text = "Record Updated Successfully!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'success', text: 'Record Updated Successfully!'})
 						Object.assign(this.promos.data[index], res.data.promo)
 					})
 					.catch(err => {
 						console.log(err.response)
-						this.text = "Error Updating Record!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'error', text: 'Error Updating Record!'})
 						this.$refs.form.reset()
 					})
 				} else {
-					this.axios.post('http://localhost:8000/api/promo', {'name': this.editedItem.name })
+					this.axios.post('http://localhost:8000/api/promo', this.editedItem)
 					.then(res => {
-						this.text = "Record Added Successfully!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'success', text: 'Record Added Successfully!'})
 						this.promos.data.push(res.data.promo)
 						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)
-						this.text = "Error Inserting Record!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'error', text: 'Error Inserting Record!'})
 					})
 				}
 				this.close()

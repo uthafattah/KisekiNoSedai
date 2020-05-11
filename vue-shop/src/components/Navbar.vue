@@ -167,7 +167,7 @@
 							</v-list-item-title>
 						</v-list-item-content>
 					</v-list-item>
-					<v-list-item link to="/admin" v-if="role == 1">
+					<v-list-item link to="/admin" v-if="role == 'administrator'">
 						<v-list-item-action>
 							<v-icon>mdi-monitor-dashboard</v-icon>
 						</v-list-item-action>

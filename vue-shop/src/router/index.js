@@ -105,11 +105,6 @@ Vue.use(VueRouter)
 				component: () => import( /*webpackChunkName: "about"*/ '../views/admin/Categories.vue')
 			},
 			{
-				path: 'messages',
-				name: 'Messages Admin',
-				component: () => import( /*webpackChunkName: "about"*/ '../views/admin/Messages.vue')
-			},
-			{
 				path: 'payments',
 				name: 'Payments',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/admin/Payments.vue')

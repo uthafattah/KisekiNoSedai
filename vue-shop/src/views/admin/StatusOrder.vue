@@ -1,5 +1,5 @@
 <template>
-	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="status_order.total" :items="status_order.data" show-select @input="selectAll" :footer-props="footerProps">
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="status_orders.total" :items="status_orders.data" :show-select="show_select" @input="selectAll" :footer-props="footerProps">
 		<template v-slot:top>
 			<v-toolbar flat>
 				<v-toolbar-title>Status Order Management System</v-toolbar-title>
@@ -19,7 +19,8 @@
 								<v-container>
 									<v-row>
 										<v-col cols="12" sm="12">
-											<v-text-field v-model="editedItem.name" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" :blur="checkStatus" label="Status Order Name"></v-text-field>
+											<v-text-field v-model="editedItem.name" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" label="Status Order Name" v-if="editedIndex > -1" />
+											<v-text-field v-model="editedItem.name" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" :blur="checkStatus" label="Status Order Name" v-else/>
 										</v-col>
 									</v-row>
 								</v-container>
@@ -49,14 +50,14 @@
 	</v-data-table>
 </template>
 <script>
+	import { mapActions } from 'vuex'
 	export default {
 		data: () => ({
 			valid: true,
 			dialog: false,
 			loading: false,
-			snackbar: false,
+			show_select: false,
 			selected: [],
-			text: '',
 			success: '',
 			error: '',
 			options: {
@@ -80,7 +81,7 @@
 				{ text: 'Slug', value: 'slug' },
 				{ text: 'Actions', sortable: false, value: 'actions'},
 			],
-			status_order: [],
+			status_orders: [],
 			editedIndex: -1,
 			editedItem: {
 				id: '',
@@ -99,7 +100,7 @@
 				return this.editedIndex === -1 ? 'New Status Order' : 'Edit Status Order'
 			},
 			checkStatus() {
-				return this.verifyStatus()
+				return this.editedItem.name != undefined ? this.verifyStatus() : null
 			},
 		},
 		watch: {
@@ -112,7 +113,7 @@
 					const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
 					this.axios.get(`http://localhost:8000/api/status_order`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
 					.then(res => {
-						this.status_order = res.data
+						this.status_orders = res.data.status_orders
 					})
 					.catch(err => {
 						if(err.response.status == 401) {
@@ -128,6 +129,9 @@
 			this.initialize()
 		},
 		methods: {
+			...mapActions({
+				setAlert: 'alert/set'
+			}),
 			verifyStatus() {
 				if (this.editedItem.name.length >= 5) {
 					this.axios.post("http://localhost:8000/api/status_order/verify", { name: this.editedItem.name })
@@ -159,17 +163,15 @@
 					//this.axios.post('http://localhost:8000/api/status_order/delete', {'status_order': this.selected})
 					this.axios.post('http://localhost:8000/api/status_order/delete', {'status_order': selected_id})
 					.then(res => {
-						this.text = "Records Deleted Successfully!";
 						this.selected.map(val => {
-							const index = this.status_order.data.indexOf(val)
-							this.status_order.data.splice(index, 1)
+							const index = this.status_orders.data.indexOf(val)
+							this.status_orders.data.splice(index, 1)
 						})
 						console.log(res)
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'success', text: 'Records Deleted Successfully!'})
 					}).catch(err => {
 						console.log(err.response)
-						this.text = "Error Deleting Records!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'error', text: 'Error Deleting Records!'})
 					})
 				}
 			},
@@ -177,17 +179,17 @@
 				if(e) {
 					if(e.length > 2) {
 						this.axios.get(`http://localhost:8000/api/status_order/${e}`)
-						.then(res => this.status_order = res.data.status_order)
+						.then(res => this.status_orders = res.data.status_order)
 						.catch(err => console.dir(err.response))
 					}
 					if(e.length<=0){
 						this.axios.get(`http://localhost:8000/api/status_order`)
-						.then(res => this.status_order = res.data)
+						.then(res => this.status_orders = res.data)
 						.catch(err => console.dir(err.response))
 					}
 				} else {
 					this.axios.get(`http://localhost:8000/api/status_order`)
-					.then(res => this.status_order = res.data)
+					.then(res => this.status_orders = res.data)
 					.catch(err => console.dir(err.response))
 				}
 			},
@@ -196,7 +198,7 @@
 				const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
 				this.axios.get(`http://localhost:8000/api/status_order`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
 				.then(res => {
-					this.status_order = res.data.status_order
+					this.status_orders = res.data.status_order
 				})
 				.catch(err => {
 					if(err.response.status == 401) {
@@ -223,24 +225,22 @@
 				});
 			},
 			editItem (item) {
-				this.editedIndex = this.status_order.data.indexOf(item)
+				this.editedIndex = this.status_orders.data.indexOf(item)
 				this.editedItem = Object.assign({}, item)
 				this.dialog = true
 			},
 			deleteItem (item) {
-				const index = this.status_order.data.indexOf(item)
+				const index = this.status_orders.data.indexOf(item)
 				let decide = confirm('Are you sure you want to delete this item?')
 				if(decide) {
 					this.axios.delete('http://localhost:8000/api/status_order/' + item.id)
 					.then(res => {
-						this.text = "Record Deleted Successfully!";
-						this.snackbar = true;
-						this.status_order.data.splice(index, 1)
+						this.setAlert({status: true, color: 'success', text: 'Record Deleted Successfully!'})
+						this.status_orders.data.splice(index, 1)
 						console.log(res)
 					}).catch(err => {
 						console.log(err.response)
-						this.text = "Error Deleting Record!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'error', text: 'Error Deleting Record!'})
 					})
 				}
 			},
@@ -254,30 +254,26 @@
 			save () {
 				if (this.editedIndex > -1) {
 					const index = this.editedIndex
-					this.axios.put('http://localhost:8000/api/status_order/' + this.editedItem.id, {'name': this.editedItem.name })
+					this.axios.put('http://localhost:8000/api/status_order/' + this.editedItem.id, this.editedItem)
 					.then(res => {
-						this.text = "Record Updated Successfully!";
-						this.snackbar = true;
-						Object.assign(this.status_order.data[index], res.data.status_order)
+						this.setAlert({status: true, color: 'success', text: 'Record Updated Successfully!'})
+						Object.assign(this.status_orders.data[index], res.data.status_order)
 						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)
-						this.text = "Error Updating Record!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'error', text: 'Error Updating Record!'})
 					})
 				} else {
-					this.axios.post('http://localhost:8000/api/status_order', {'name': this.editedItem.name })
+					this.axios.post('http://localhost:8000/api/status_order', this.editedItem)
 					.then(res => {
-						this.text = "Record Added Successfully!";
-						this.snackbar = true;
-						this.status_order.data.push(res.data.status_order)
+						this.setAlert({status: true, color: 'success', text: 'Record Added Successfully!'})
+						this.status_orders.data.push(res.data.status_order)
 						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)
-						this.text = "Error Inserting Record!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'error', text: 'Error Inserting Record!'})
 					})
 				}
 				this.close()

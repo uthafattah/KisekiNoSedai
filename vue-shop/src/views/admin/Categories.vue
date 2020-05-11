@@ -1,5 +1,5 @@
 <template>
-	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="categories.total" :items="categories.data" show-select @input="selectAll" :footer-props="footerProps">
+	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="categories.total" :items="categories.data" :show-select="show_select" @input="selectAll" :footer-props="footerProps">
 		<template v-slot:top>
 			<v-toolbar flat>
 				<v-toolbar-title>Category Management System</v-toolbar-title>
@@ -17,7 +17,12 @@
 						<v-form ref="form" v-model="valid" v-on:submit.stop.prevent="save">
 							<v-card-text>
 								<v-container>
-									<v-row>
+									<v-row v-if="editedIndex > -1">
+										<v-col cols="12" sm="12">
+											<v-text-field v-model="editedItem.name" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" label="Category Name"></v-text-field>
+										</v-col>
+									</v-row>
+									<v-row v-if="editedIndex == -1">
 										<v-col cols="12" sm="6">
 											<v-text-field v-model="editedItem.name" :success-messages="success" :error-messages="error" :rules="[rules.required, rules.min]" :blur="checkCategory" label="Category Name"></v-text-field>
 										</v-col>
@@ -62,14 +67,14 @@
 	</v-data-table>
 </template>
 <script>
+	import { mapActions } from 'vuex'
 	export default {
 		data: () => ({
 			valid: true,
 			dialog: false,
 			loading: false,
-			snackbar: false,
+			show_select: false,
 			selected: [],
-			text: '',
 			success: '',
 			error: '',
 			options: {
@@ -99,13 +104,13 @@
 			editedItem: {
 				id: '',
 				name: '',
-				photo: null,
+				photo: [],
 			},
 			defaultItem: {
 				id: '',
 				name: '',
 				slug: '',
-				photo: '',
+				photo: [],
 				created_at: '',
 				updated_at: '',
 			},
@@ -115,7 +120,7 @@
 				return this.editedIndex === -1 ? 'New Category' : 'Edit Category'
 			},
 			checkCategory() {
-				return this.verifyCategory()
+				return this.editedItem.name != undefined ? this.verifyCategory() : null
 			},
 		},
 		watch: {
@@ -128,7 +133,7 @@
 					const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
 					this.axios.get(`http://localhost:8000/api/category`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
 					.then(res => {
-						this.categories = res.data
+						this.categories = res.data.categories
 					})
 					.catch(err => {
 						if(err.response.status == 401) {
@@ -144,6 +149,9 @@
 			this.initialize()
 		},
 		methods: {
+			...mapActions({
+				setAlert: 'alert/set'
+			}),
 			verifyCategory() {
 				if (this.editedItem.name.length >= 3) {
 					this.axios.post("http://localhost:8000/api/category/verify", { name: this.editedItem.name })
@@ -192,17 +200,15 @@
 					//this.axios.post('http://localhost:8000/api/category/delete', {'categories': this.selected})
 					this.axios.post('http://localhost:8000/api/category/delete', {'categories': selected_id})
 					.then(res => {
-						this.text = "Records Deleted Successfully!";
 						this.selected.map(val => {
 							const index = this.categories.data.indexOf(val)
 							this.categories.data.splice(index, 1)
 						})
 						console.log(res)
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'success', text: 'Records Deleted Successfully!'})
 					}).catch(err => {
 						console.log(err.response)
-						this.text = "Error Deleting Records!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'error', text: 'Error Deleting Records!'})
 					})
 				}
 			},
@@ -266,14 +272,12 @@
 				if(decide) {
 					this.axios.delete('http://localhost:8000/api/category/' + item.id)
 					.then(res => {
-						this.text = "Record Deleted Successfully!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'success', text: 'Record Deleted Successfully!'})
 						this.categories.data.splice(index, 1)
 						console.log(res)
 					}).catch(err => {
 						console.log(err.response)
-						this.text = "Error Deleting Record!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'error', text: 'Error Deleting Record!'})
 					})
 				}
 			},
@@ -287,30 +291,26 @@
 			save () {
 				if (this.editedIndex > -1) {
 					const index = this.editedIndex
-					this.axios.put('http://localhost:8000/api/category/' + this.editedItem.id, {'name': this.editedItem.name })
+					this.axios.put('http://localhost:8000/api/category/' + this.editedItem.id, this.editedItem)
 					.then(res => {
-						this.text = "Record Updated Successfully!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'success', text: 'Record Updated Successfully!'})
 						Object.assign(this.categories.data[index], res.data.category)
 						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)
-						this.text = "Error Updating Record!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'error', text: 'Error Updating Record!'})
 					})
 				} else {
-					this.axios.post('http://localhost:8000/api/category', {'name': this.editedItem.name })
+					this.axios.post('http://localhost:8000/api/category', this.editedItem)
 					.then(res => {
-						this.text = "Record Added Successfully!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'success', text: 'Record Added Successfully!'})
 						this.categories.data.push(res.data.category)
 						this.$refs.form.reset()
 					})
 					.catch(err => {
 						console.log(err.response)
-						this.text = "Error Inserting Record!";
-						this.snackbar = true;
+						this.setAlert({status: true, color: 'error', text: 'Error Inserting Record!'})
 					})
 				}
 				this.close()
