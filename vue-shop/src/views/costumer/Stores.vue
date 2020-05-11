@@ -6,18 +6,20 @@
 					<div class="mb-4 ml-n4 spacer" no-gutters>
 						<v-btn text dark>
 							<v-avatar tile size="24">
-								<v-icon color="grey">mdi-sticker-check</v-icon>
+								<v-icon color="grey" v-if="store.status_store == 'Official Store'">mdi-sticker-check</v-icon>
+								<v-icon color="grey" v-else-if="store.status_store == 'Starred Store'">mdi-star-circle</v-icon>
+								<v-icon color="grey" v-else-if="store.status_store == 'Verified Store'">mdi-shield-check</v-icon>
+								<v-icon color="grey" v-else>mdi-storefront</v-icon>
 							</v-avatar>
-							<div style="margin-left:0.5em" class="grey--text"><strong>Official Store</strong></div>
+							<div style="margin-left:0.5em" class="grey--text"><strong>{{store.status_store}}</strong></div>
 						</v-btn> 
 					</div>
-					<v-list-item-title class="display-1 mb-1 font-weight-black">Jannah Gate</v-list-item-title>
-					<v-list-item-subtitle>Menjual Pakaian A, B, C</v-list-item-subtitle>
+					<v-list-item-title class="display-1 mb-1 font-weight-black">{{store.name}}</v-list-item-title>
+					<v-list-item-subtitle>{{store.description}}</v-list-item-subtitle>
 				</v-list-item-content>
 
-				<v-list-item-avatar tile size="100">
-						<v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg"></v-img>
-						<!--v-icon>mdi-store</v-icon-->
+				<v-list-item-avatar size="100">
+					<v-img :src="getImage(store.logo)" aspect-ratio="1" rounded />
 				</v-list-item-avatar>
 			</v-list-item>
 
@@ -44,22 +46,26 @@
 	</div>
 </template>
 <script>
+	import { mapActions, mapGetters } from 'vuex'
 	export default {
 		data: () => ({
 			outlined: true,
-			loading: false,
 			messages: 'Follow',
 			follow_color: 'success',
 			wishlist_color: 'pink lighten-5',
 			unfollow : false,
 			hover: '',
 			sorting: ['Highest Rating', 'Highest Price', 'Lowest Price', 'Most Reviews', 'Most Purchases', 'Most Viewed'],
-            merchandises: [],
+			merchandises: [],
+			store: {}
 		}),
 		components: {
 			MerchandiseItem: () => import(/* webpackChunkName: "merchandise-item" */ '@/components/MerchandiseItem.vue')
 		},
 		methods: {
+			...mapActions({
+				setAlert: 'alert/set'
+			}),
 			follow() {
 				if(this.messages === 'Follow') {
 					this.messages = 'Following'
@@ -85,9 +91,9 @@
 					this.outlined = false
 				}
 			},
-            getImage(image) {
-                return "http://localhost:8000/storage/" + image;
-            },
+			getImage(image) {
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
+			},
 			wishlist() {
 				if(this.wishlist_color === 'pink lighten-5') {
 					this.wishlist_color = 'pink'
@@ -96,17 +102,28 @@
 				}
 			},
 		},
-        created(){
-            this.axios.get('http://localhost:8000/api/merchandise')
-            .then((response) => {
-                  this.merchandises = response.data.data
-                  console.log(this.merchandises)
-            })
-            .catch((error) => {
-                  let { responses } = error
-                  console.log(responses)
-            })
-        },
+		computed: {
+			...mapGetters({
+
+			}),
+		},
+		created(){
+			this.axios.get('http://localhost:8000/api/store/search/' + this.$route.params.id)
+			.then((res) => {
+				this.store = res.data.store
+			})
+			.catch((err) => {
+				console.log(err.response)
+			})
+
+			this.axios.get('http://localhost:8000/api/merchandise/user_merchandise/' + this.$route.params.id)
+			.then((res) => {
+				this.merchandises = res.data.merchandise
+			})
+			.catch((err) => {
+				console.log(err.response)
+			})
+		},
 	}
 </script>
 <style scoped>

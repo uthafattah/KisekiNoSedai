@@ -9,17 +9,16 @@
 				<v-divider class="ml-4 mb-2" />
 				<v-sheet id="scrolling-techniques-7" class="overflow-y-auto">
 					<v-container id="scroll-target-user" style="height: 550px;">
-						<v-list three-line v-scroll:#scroll-target-user>
-							<template v-for="(item, index) in items">
-								<v-divider v-if="item.divider" :key="index" :inset="item.inset"></v-divider>
+						<v-list two-line v-scroll:#scroll-target-user>
+							<template v-for="(item, index) in user_chat">
+								<v-divider v-if="index != 0" :key="'user_chat' + index" inset></v-divider>
 								<!--v-list-item v-else :key="item.title" @click=""-->
-								<v-list-item v-else :key="item.title">
+								<v-list-item :key="item.store_id" @click="chooseMessage(item.store_id)">
 									<v-list-item-avatar>
-										<v-img :src="item.avatar"></v-img>
+										<v-img :src="getImage(item.logo)" aspect-ratio="1"/>
 									</v-list-item-avatar>
 									<v-list-item-content>
-										<v-list-item-title v-html="item.title"></v-list-item-title>
-										<v-list-item-subtitle v-html="item.subtitle"></v-list-item-subtitle>
+										<v-list-item-title class="subtitle-1">{{item.name}}</v-list-item-title>
 									</v-list-item-content>
 								</v-list-item>
 							</template>
@@ -34,23 +33,23 @@
 				<v-divider class="mr-4 mb-2" />
 				<v-sheet id="scrolling-techniques-8" class="overflow-y-auto" max-height="475">
 					<v-container id="scroll-target-user" style="height: 550px;">
-						<v-card flat v-for="n in 10" :key="n">
-							<v-card class="d-flex flex-row mb-6" flat tile>
+						<v-card flat v-for="(item, index) in messages"  :key="'messages' + index">
+							<v-card class="d-flex flex-row mb-6" flat tile v-if="item.sender == 'Store'">
 								<v-card class="pa-2" outlined tile max-width="500" color="grey lighten-3">
 									<v-list-item>
 										<v-list-item-content>
-											<div class="overline mb-4 font-weight-black">Jannah Gate</div>
-											<v-list-item-subtitle>Greyhound divisely hello coldly fonwderfully</v-list-item-subtitle>
+											<div class="overline mb-4 font-weight-black">{{item.store_name}}</div>
+											<v-list-item-subtitle>{{item.messages}}</v-list-item-subtitle>
 										</v-list-item-content>
 									</v-list-item>
 								</v-card>
 							</v-card>
-							<v-card class="d-flex flex-row-reverse mb-6" flat tile>
+							<v-card class="d-flex flex-row-reverse mb-6" flat tile v-else>
 								<v-card class="pa-2" outlined tile max-width="500" color="green lighten-3">
 									<v-list-item>
 										<v-list-item-content>
-											<div class="overline mb-4 font-weight-black">Kiseki No Sedai</div>
-											<v-list-item-subtitle>Greyhound divisely hello coldly fonwderfully</v-list-item-subtitle>
+											<div class="overline mb-4 font-weight-black">{{item.user_name}}</div>
+											<v-list-item-subtitle>{{item.messages}}</v-list-item-subtitle>
 										</v-list-item-content>
 									</v-list-item>
 								</v-card>
@@ -65,60 +64,75 @@
 	</v-card>
 </template>
 <script>
+	import { mapActions, mapGetters } from 'vuex'
 	export default {
 		data: () => ({
 			loading: true,
-			items: [
-				{
-					avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
-					title: 'Jason Oner',
-					subtitle: "I'll be in your neighborhood doing errands this weekend. Do you want to hang out?",
-				},
-				{ divider: true, inset: true },
-				{
-					avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
-					title: 'Ranee Carlson',
-					subtitle: "Wish I could come, but I'm out of town this weekend.",
-				},
-				{ divider: true, inset: true },
-				{
-					avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
-					title: 'Cindy Baker',
-					subtitle: "Do you have Paris recommendations? Have you ever been?",
-				},
-				{ divider: true, inset: true },
-				{
-					avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
-					title: 'Ali Connors',
-					subtitle: "Have any ideas about what we should get Heidi for her birthday?",
-				},
-				{ divider: true, inset: true },
-				{
-					avatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
-					title: 'Travis Howard',
-					subtitle: "We should eat this: Grate, Squash, Corn, and tomatillo Tacos.",
-				},
-				{ divider: true, inset: true },
-				{
-					avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
-					title: 'Ba-bakaa!!',
-					subtitle: "Have any ideas about what we should get Heidi for her birthday?",
-				},
-				{ divider: true, inset: true },
-				{
-					avatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
-					title: 'Onii-chan',
-					subtitle: "We should eat this: Grate, Squash, Corn, and tomatillo Tacos.",
-				},
-			],
+			user_chat: [],
 			message: '',
+			messages: [],
 		}),
+		created() {
+			this.initialize()
+			this.axios.get('http://localhost:8000/api/message/user_to_store/' + this.userId)
+			.then((res) => {
+				this.user_chat = res.data.user_chat
+			})
+			.catch((err) => {
+				if(err.response.status == 401) {
+					localStorage.removeItem('token');
+					this.$router.push('/');
+				}
+				console.log(err.response)
+			})
+			this.loading = false
+		},
 		computed: {
+			...mapGetters({
+				userId: 'auth/getId',
+			}),
 			icon () {
 				return this.icons[this.iconIndex]
 			},
 		},
 		methods: {
+			...mapActions({
+
+			}),
+			getImage(image) {
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
+			},
+			initialize () {
+				this.axios.interceptors.request.use((config) => {
+					this.loading = true; 
+					return config;
+				}, (error) => {
+					this.loading = false;
+					return Promise.reject(error);
+				});
+
+				this.axios.interceptors.response.use((response) => {
+					this.loading = false;
+					return response;
+				}, (error) => {
+					this.loading = false;
+					return Promise.reject(error);
+				});
+			},
+			chooseMessage(id) {
+				this.axios.get('http://localhost:8000/api/message/messages/' + id + '/' + this.userId)
+				.then((res) => {
+					this.messages = res.data.message
+					console.log(res.data.message)
+				})
+				.catch((err) => {
+					if(err.response.status == 401) {
+						localStorage.removeItem('token');
+						this.$router.push('/');
+					}
+					console.log(err)
+				})
+			},
 			sendMessage () {
 				this.resetIcon()
 				this.clearMessage()

@@ -13,12 +13,12 @@
 							<template v-for="(item, index) in store_chat">
 								<v-divider v-if="index != 0" :key="'store_chat' + index" inset></v-divider>
 								<!--v-list-item v-else :key="item.title" @click=""-->
-								<v-list-item :key="item.user_id">
+								<v-list-item :key="item.user_id" @click="chooseMessage(item.user_id)">
 									<v-list-item-avatar>
-										<v-img src="https://cdn.vuetifyjs.com/images/lists/1.jpg"></v-img>
+										<v-img :src="getImage(item.avatar)" aspect-ratio="1"/>
 									</v-list-item-avatar>
 									<v-list-item-content>
-										<v-list-item-title class="subtitle-1">{{item.user_id}}</v-list-item-title>
+										<v-list-item-title class="subtitle-1">{{item.name}}</v-list-item-title>
 									</v-list-item-content>
 								</v-list-item>
 							</template>
@@ -38,7 +38,7 @@
 								<v-card class="pa-2" outlined tile max-width="500" color="grey lighten-3">
 									<v-list-item>
 										<v-list-item-content>
-											<div class="overline mb-4 font-weight-black">{{item.user_id}}</div>
+											<div class="overline mb-4 font-weight-black">{{item.user_name}}</div>
 											<v-list-item-subtitle>{{item.messages}}</v-list-item-subtitle>
 										</v-list-item-content>
 									</v-list-item>
@@ -48,7 +48,7 @@
 								<v-card class="pa-2" outlined tile max-width="500" color="green lighten-3">
 									<v-list-item>
 										<v-list-item-content>
-											<div class="overline mb-4 font-weight-black">{{item.store_id}}</div>
+											<div class="overline mb-4 font-weight-black">{{item.store_name}}</div>
 											<v-list-item-subtitle>{{item.messages}}</v-list-item-subtitle>
 										</v-list-item-content>
 									</v-list-item>
@@ -64,6 +64,7 @@
 	</v-card>
 </template>
 <script>
+	import { mapActions, mapGetters } from 'vuex'
 	export default {
 		data: () => ({
 			loading: true,
@@ -73,29 +74,13 @@
 		}),
 		created() {
 			this.initialize()
-			this.axios.get('http://localhost:8000/api/message/store_to_user/4')
+			this.axios.get('http://localhost:8000/api/message/store_to_user/' + this.store.id)
 			.then((res) => {
 				this.store_chat = res.data.store_chat
 			})
 			.catch((err) => {
 				if(err.response.status == 401) {
 					localStorage.removeItem('token');
-					localStorage.removeItem('role');
-					localStorage.removeItem('id');
-					this.$router.push('/');
-				}
-				console.log(err)
-			})
-
-			this.axios.get('http://localhost:8000/api/message/message/4/92')
-			.then((res) => {
-				this.messages = res.data.message
-			})
-			.catch((err) => {
-				if(err.response.status == 401) {
-					localStorage.removeItem('token');
-					localStorage.removeItem('role');
-					localStorage.removeItem('id');
 					this.$router.push('/');
 				}
 				console.log(err)
@@ -103,11 +88,20 @@
 			this.loading = false
 		},
 		computed: {
+			...mapGetters({
+				store: 'store/getStore',
+			}),
 			icon () {
 				return this.icons[this.iconIndex]
 			},
 		},
 		methods: {
+			...mapActions({
+
+			}),
+			getImage(image) {
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
+			},
 			initialize () {
 				this.axios.interceptors.request.use((config) => {
 					this.loading = true; 
@@ -124,6 +118,19 @@
 					this.loading = false;
 					return Promise.reject(error);
 				});
+			},
+			chooseMessage(id) {
+				this.axios.get('http://localhost:8000/api/message/messages/' + this.store.id + '/' + id)
+				.then((res) => {
+					this.messages = res.data.message
+				})
+				.catch((err) => {
+					if(err.response.status == 401) {
+						localStorage.removeItem('token');
+						this.$router.push('/');
+					}
+					console.log(err)
+				})
 			},
 			sendMessage () {
 				this.resetIcon()

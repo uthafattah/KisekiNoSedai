@@ -3,9 +3,8 @@
 		<v-list-item>
 			<v-row>
 				<v-col cols="3" class="mt-12">
-					<v-list-item-avatar tile size="250">
+					<v-list-item-avatar size="250">
 						<v-img :src="getImage(avatar)"></v-img>
-						<!--v-icon>mdi-store</v-icon-->
 					</v-list-item-avatar>
 				</v-col>
 				<v-col cols="9">
@@ -98,7 +97,7 @@
 				//setUser: 'auth/fetchUser'
 			}),
 			getImage(image) {
-				return "http://localhost:8000/storage/" + image;
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
 			submit() {
 
@@ -111,8 +110,6 @@
 				.catch((err) => {
 					if(err.response.status == 401) {
 						localStorage.removeItem('token');
-						localStorage.removeItem('role');
-						localStorage.removeItem('id');
 						this.$router.push('/');
 					}
 					console.log(err)

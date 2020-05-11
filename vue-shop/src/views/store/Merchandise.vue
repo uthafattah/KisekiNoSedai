@@ -84,6 +84,7 @@
 	</v-data-table>
 </template>
 <script>
+	import { mapGetters } from 'vuex'
 	export default {
 		data: () => ({
 			valid: true,
@@ -141,6 +142,9 @@
 			},
 		}),
 		computed: {
+			...mapGetters({
+				store: 'store/getStore',
+			}),
 			formTitle () {
 				return this.editedIndex === -1 ? 'New Merchandise' : 'Edit Merchandise'
 			},
@@ -153,10 +157,9 @@
 				handler(e) {
 					const sortBy = e.sortBy.length > 0 ? e.sortBy[0].trim() : 'id';
 					const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
-					this.axios.get(`http://localhost:8000/api/merchandise/store_merchandise/1`, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
+					this.axios.get('http://localhost:8000/api/merchandise/store_merchandise/' + this.store.id, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
 					.then(res => {
 						this.merchandise = res.data.merchandise;
-						console.log(this.merchandise)
 					})
 					.catch(err => {
 						if(err.response.status == 401) {
@@ -173,7 +176,7 @@
 		},
 		methods: {
 			getImage(image) {
-				return "http://localhost:8000/storage/" + image;
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
 			uploadPhoto(item) {
 				if (this.editedItem.photo != null) {

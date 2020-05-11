@@ -133,8 +133,6 @@
 					.catch(err => {
 						if(err.response.status == 401) {
 							localStorage.removeItem('token');
-							localStorage.removeItem('role');
-							localStorage.removeItem('id');
 							this.$router.push('/');
 						}
 					})
@@ -164,7 +162,7 @@
 				}
 			},
 			getImage(image) {
-				return "http://localhost:8000/storage/" + image;
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
 			uploadAvatar(item) {
 				if (this.editedItem.photo != null) {

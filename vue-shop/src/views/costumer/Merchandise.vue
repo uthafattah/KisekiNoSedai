@@ -4,10 +4,10 @@
 			<v-row>
 				<v-col cols="4">
 					<v-carousel cycle height="400" max-width="500" hide-delimiter-background show-arrows-on-hover>
-						<v-carousel-item v-for="(slide, i) in slides" :key="i">
-							<v-sheet :color="colors[i]" height="100%">
+						<v-carousel-item v-for="(slide, i) in [merchandise.photo]" :key="i">
+							<v-sheet color="grey lighten-3" height="100%">
 								<v-row class="fill-height" align="center" justify="center">
-									<div class="title">{{ slide }} Slide</div>
+									<v-img :src="getImage(slide)" aspect-ratio="1"/>
 								</v-row>
 							</v-sheet>
 						</v-carousel-item>
@@ -51,7 +51,7 @@
 									</v-btn>
 									<span class="caption font-weight-bold error--text" style="margin-left:1em">Tersisa {{merchandise.stock}}, beli segera!</span>
 									<v-spacer />
-									<v-btn color="primary" @click="subtractQty" style="margin-left:1em">
+									<v-btn color="primary" @click="addCart" style="margin-left:1em">
 										<v-icon left>mdi-cart</v-icon> Add to Cart
 									</v-btn>
 								</v-list-item>
@@ -99,21 +99,12 @@
 	</v-card>
 </template>
 <script>
+	import { mapActions } from 'vuex'
 	export default {
 		data: () => ({
 			loading: false,
 			tab: null,
 			qty: 1,
-			colors: [
-				'indigo',
-				'warning',
-				'pink darken-2',
-			],
-			slides: [
-				'First',
-				'Second',
-				'Third',
-			],
 			tab_header: [
 				{
 					icon: 'mdi-card-text',
@@ -132,23 +123,27 @@
 				this.merchandise = res.data.merchandise
 			})
 			.catch((err) => {
-				if(err.response.status == 401) {
-					localStorage.removeItem('token');
-					localStorage.removeItem('role');
-					localStorage.removeItem('id');
-					this.$router.push('/');
-				}
 				console.log(err)
 			})
 		},
-		computed: {
-		},
 		methods: {
+			...mapActions({
+				insertCart: 'cart/insert',
+				setAlert: 'alert/set'
+			}),
 			getImage(image) {
-				return "http://localhost:8000/storage/" + image;
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
-			submit() {
-
+			addCart() {
+				this.axios.post('http://localhost:8000/api/cart', { id: this.$route.params.id, quantity: this.qty })
+				.then((res) => {
+					this.insertCart(res.data.cart)
+					this.setAlert({status: true, color: 'success', text: 'Success Adding Item to Cart!'})
+				})
+				.catch((err) => {
+					console.log(err)
+					this.setAlert({status: true, color: 'error', text: 'Failed Add Item to Cart!'})
+				})
 			},
 			addQty() {
 				if(this.qty < this.merchandise.stock) this.qty++

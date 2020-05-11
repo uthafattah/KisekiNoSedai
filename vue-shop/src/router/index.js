@@ -51,7 +51,7 @@ Vue.use(VueRouter)
 				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Settings.vue')
 			},
 			{
-				path: 'stores',
+				path: 'stores/:id',
 				name: 'Stores Costumer',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Stores.vue')
 			},

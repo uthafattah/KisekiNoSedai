@@ -1,5 +1,5 @@
 <template>
-	<v-card :loading="loading" :to="toMerchandise(merchandise.id)">
+	<v-card :loading="loading">
 		<v-img width="300px" :src="getImage(merchandise.photo)">
 			<v-btn icon large :color="wishlist_color" @click="wishlist"><v-icon>mdi-heart</v-icon></v-btn>
 		</v-img>
@@ -14,6 +14,9 @@
 				<v-col class="text-right">xxx Terjual</v-col>
 			</v-row>
 		</v-card-text>
+		<v-card-actions class="mt-n4">
+			<v-btn block outlined large rounded color="primary" :to="toMerchandise(merchandise.id)">See Merchandise Detail</v-btn>
+		</v-card-actions>
 	</v-card>
 </template>
 
@@ -35,7 +38,7 @@
 				return "/merchandise/" + id
 			},
 			getImage(image) {
-				return "http://localhost:8000/storage/" + image;
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
 			wishlist() {
 				if(!this.status) {

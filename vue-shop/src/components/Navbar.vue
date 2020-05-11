@@ -167,6 +167,12 @@
 							</v-list-item-title>
 						</v-list-item-content>
 					</v-list-item>
+					<v-list-item link to="/admin" v-if="role == 1">
+						<v-list-item-action>
+							<v-icon>mdi-monitor-dashboard</v-icon>
+						</v-list-item-action>
+						<v-list-item-title>Admin</v-list-item-title>
+					</v-list-item>
 					<v-divider class="mx-2" />
 					<v-list-item link @click="logout">
 						<v-list-item-action>
@@ -222,7 +228,6 @@
 		created() {
 			this.loggedIn = localStorage.getItem('token') ? true : false
 			this.$vuetify.theme.dark = false
-			if(this.id == null && localStorage.getItem('token')) this.getLoggedUser()
 		},
 		watch: {
 			theme: function(old) {
@@ -242,16 +247,6 @@
 			}),
 			storePage: function() {
 				this.$router.push('/my-store')
-			},
-			getLoggedUser() {
-				this.axios.get('http://localhost:8000/api/logged_user')
-				.then((res) => {
-					this.setAuth(res.data.user)
-					this.setStore(res.data.store)
-				})
-				.catch((err) => {
-					console.log(err.response)
-				})
 			},
 			login: function() {
 				this.initialize()
@@ -331,14 +326,14 @@
 				});
 			},
 			getImage(image) {
-				return "http://localhost:8000/storage/" + image;
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
 		},
 		computed: {
 			...mapGetters({
-				id: 'auth/getId',
 				user: 'auth/getData',
 				avatar: 'auth/getAvatar',
+				role: 'auth/getRole',
 				store: 'store/getStore',
 				qty: 'cart/getQuantity',
 				store_menu: 'menu/getStoreMenu',

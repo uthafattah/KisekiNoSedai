@@ -31,6 +31,13 @@ export default {
 		SET_CART: (state, payload) => {
 			state.cart = payload
 		},
+		INSERT_CART: (state, payload) => {
+			state.cart.push(payload)
+		},
+		REMOVE_CART: (state, payload) => {
+			let idx = state.cart.indexOf(payload);
+			state.cart.splice(idx,1) 
+		},
 	},
 	actions: {
 		set: ({commit}, payload) => {
@@ -38,6 +45,14 @@ export default {
 		},
 		updateQuantity({commit}, payload) {
 			commit("UPDATE_QUANTITY", payload)
+		},
+		insert({state, commit}, payload) {
+			let cartItem = state.cart.find(item => item.id === payload.id)
+			cartItem ? commit("UPDATE_QUANTITY", payload) : commit("INSERT_CART", payload) 
+		},
+		remove({state, commit}, payload) {
+			let cartItem = state.cart.find(item => item.id === payload.id)
+			if(cartItem) commit("REMOVE_CART", payload)
 		},
 	},
 }

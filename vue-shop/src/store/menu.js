@@ -21,15 +21,12 @@ export default {
 		],
 		profile_menu: [
 			{ icon: 'mdi-account-cog', text: 'Account Settings', action: '/settings' },
-			{ icon: 'mdi-monitor-dashboard', text: 'Admin', action: '/admin' },
 			{ icon: 'mdi-heart', text: 'Wishlists', action: '/wishlists' },
 			{ icon: 'mdi-package', text: 'My Order', action: '/orders' },
 		],
 		notification: [
 			{ text: 'Checkout', action: '/checkout' },
-			{ text: 'Merchandise', action: '/merchandise' },
-			{ text: 'Seach', action: '/search' },
-			{ text: 'Stores', action: '/stores' },
+			{ text: 'Search', action: '/search' },
 			{ text: 'Promos', action: '/promos' },
 		],
 	},
@@ -46,11 +43,5 @@ export default {
 		getNotification: state => {
 			return state.notification
 		},
-	},
-	mutations: {
-
-	},
-	actions: {
-
 	},
 }

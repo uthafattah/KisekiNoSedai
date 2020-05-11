@@ -117,8 +117,6 @@
 					.catch(err => {
 						if(err.response.status == 401) {
 							localStorage.removeItem('token');
-							localStorage.removeItem('role');
-							localStorage.removeItem('id');
 							this.$router.push('/');
 						}
 					})

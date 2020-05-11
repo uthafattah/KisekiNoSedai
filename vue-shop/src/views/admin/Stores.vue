@@ -146,8 +146,6 @@
 					.catch(err => {
 						if(err.response.status == 401) {
 							localStorage.removeItem('token');
-							localStorage.removeItem('role');
-							localStorage.removeItem('id');
 							this.$router.push('/');
 						}
 					})
@@ -160,7 +158,7 @@
 		},
 		methods: {
 			getImage(image) {
-				return "http://localhost:8000/storage/" + image;
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
 			updateStatus(item) {
 				const index = this.stores.data.indexOf(item);

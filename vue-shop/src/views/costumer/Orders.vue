@@ -126,7 +126,7 @@
 		},
 		methods: {
 			getImage(image) {
-				return "http://localhost:8000/storage/" + image;
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
 			clearDate () {
 				this.dates = []

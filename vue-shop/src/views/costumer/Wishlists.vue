@@ -14,7 +14,7 @@
 		<v-col cols="9" sm="9">
 			<v-row>
 				<v-col cols="6" sm="4" v-for="(merchandise) in merchandises" :key="merchandise.id" link :to="merchandise.action">
-					<WishlistItem :merchandise="merchandise" />
+					<MerchandiseItem :merchandise="merchandise" />
 				</v-col>
 			</v-row>
 		</v-col>
@@ -27,7 +27,7 @@
 			merchandises: [],
 		}),
 		components: {
-			WishlistItem: () => import(/* webpackChunkName: "wishlist-item" */ '@/components/WishlistItem.vue')
+			MerchandiseItem: () => import(/* webpackChunkName: "merchandise-item" */ '@/components/MerchandiseItem.vue')
 		},
 		created() {
 			this.axios.get('http://localhost:8000/api/wishlist/user_wishlist/' + this.userId)
@@ -37,8 +37,6 @@
 				.catch((err) => {
 					if(err.response.status == 401) {
 						localStorage.removeItem('token');
-						localStorage.removeItem('role');
-						localStorage.removeItem('id');
 						this.$router.push('/');
 					}
 					console.log(err)

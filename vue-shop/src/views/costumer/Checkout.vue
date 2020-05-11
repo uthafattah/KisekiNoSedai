@@ -17,17 +17,16 @@
 									<div style="margin-left:0.5em" class="grey--text"><strong>Shipping Address</strong></div>
 								</v-btn> 
 							</div>
-							<v-list-item-title class="subtitle-1 mb-1"><span class="font-weight-black">Kiseki No Sedai</span> (Home)</v-list-item-title>
+							<v-list-item-title class="subtitle-1 mb-1"><span class="font-weight-black">{{user.name}}</span> (Home)</v-list-item-title>
 							<v-row class="mt-n2">
 								<v-col cols="8">
-									<v-list-item-subtitle>081234567890</v-list-item-subtitle>
+									<v-list-item-subtitle>{{user.phone}}</v-list-item-subtitle>
 									<v-list-item-subtitle>
-										Jl. H. Mahbub, Jeruk Purut No. 1234<br>
-										Pasar Minggu, Jakarta Selatan, DKI Jakarta
+										{{user.address}}
 									</v-list-item-subtitle>
 								</v-col>
 								<v-col cols="4">
-									<v-btn outlined color="grey" block>
+									<v-btn outlined color="grey" block to="/settings">
 										<v-icon dark left>mdi-square-edit-outline</v-icon>Change Address
 									</v-btn>
 								</v-col>
@@ -125,6 +124,7 @@
 	</v-row>
 </template>
 <script>
+	import { mapActions, mapGetters } from 'vuex'
 	export default {
 		data: () => ({
 			qty: 1,
@@ -139,9 +139,17 @@
 			
 		},
 		methods : {
+			...mapActions({
+
+			}),
 			getImage(image) {
-				return "http://localhost:8000/storage/" + image;
+				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
+		},
+		computed: {
+			...mapGetters({
+				user: 'auth/getData',
+			}),
 		}
 	}
 </script>
