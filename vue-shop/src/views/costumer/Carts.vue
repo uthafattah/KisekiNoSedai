@@ -52,23 +52,20 @@
 			CartItem: () => import(/* webpackChunkName: "merchandise-item" */ '@/components/CartItem.vue')
 		},
 		created() {
-			if(this.userId != undefined) {
-				this.axios.get('http://localhost:8000/api/cart/user_cart/' + this.userId)
-				.then((res) => {
-					this.setCart(res.data.cart)
-				})
-				.catch((err) => {
-					if(err.response.status == 401) {
-						localStorage.removeItem('token');
-						this.$router.push('/');
-					}
-					console.log(err.response)
-				})
-			}
+			this.axios.get('http://localhost:8000/api/cart')
+			.then((res) => {
+				this.setCart(res.data.cart)
+			})
+			.catch((err) => {
+				if(err.response.status == 401) {
+					localStorage.removeItem('token');
+					this.$router.push('/');
+				}
+				console.log(err.response)
+			})
 		},
 		computed: {
 			...mapGetters({
-				userId: 'auth/getId',
 				cart: 'cart/getCart',
 				total: 'cart/getTotal',
 				qty: 'cart/getQuantity'

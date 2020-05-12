@@ -5,6 +5,8 @@ import auth from '@/store/auth'
 import store from '@/store/store'
 import alert from '@/store/alert'
 import menu from '@/store/menu'
+import search from '@/store/search'
+import wishlist from '@/store/wishlist'
 
 Vue.use(Vuex)
 
@@ -46,5 +48,7 @@ export default new Vuex.Store({
 		store,
 		alert,
 		menu,
+		search,
+		wishlist,
 	}
 })

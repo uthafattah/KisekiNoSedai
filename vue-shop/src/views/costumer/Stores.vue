@@ -71,11 +71,13 @@
 					this.messages = 'Following'
 					this.outlined = false
 					this.unfollow = true
+					this.setAlert({status: true, color: 'success', text: 'You are Now Following this Store'})
 				} else if (this.messages === 'Unfollow') {
 					this.messages = 'Follow'
 					this.follow_color = 'success'
 					this.outlined = true
 					this.unfollow = false
+					this.setAlert({status: true, color: 'error', text: 'You are Unfollowing this Store'})
 				}
 			},
 			mouseOver: function() {

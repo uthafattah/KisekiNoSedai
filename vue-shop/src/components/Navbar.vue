@@ -64,7 +64,9 @@
 			</v-btn>
 
 			<v-spacer v-if="isAdmin || isStore" />
-			<v-text-field flat solo-inverted hide-details prepend-inner-icon="mdi-magnify" label="Search" class="pl-3 pr-3" v-if="!isAdmin && !isStore" clear-icon="mdi-close-circle" clearable/>
+
+			<v-text-field flat solo-inverted hide-details prepend-inner-icon="mdi-magnify" label="Search" class="pl-3 pr-3" v-if="!isAdmin && !isStore" clear-icon="mdi-close-circle" clearable @input="searchIt" />
+
 			<v-btn icon text to="/carts" v-if="(!isAdmin && !isStore) && loggedIn">
 				<v-badge :content="qty" :value="qty" color="green" overlap v-if="qty != 0"><v-icon>mdi-cart</v-icon></v-badge>
 				<v-badge dot color="green" overlap v-else><v-icon>mdi-cart</v-icon></v-badge>
@@ -244,10 +246,33 @@
 				setAuth: 'auth/set',
 				setStore: 'store/set',
 				setCart: 'cart/set',
-				setAlert: 'alert/set'
+				setAlert: 'alert/set',
+				searchMerchandise: 'search/searchMerchandise',
+				searchStore: 'search/searchStore',
+				search: 'search/search'
 			}),
 			storePage: function() {
 				this.$router.push('/my-store')
+			},
+			searchIt(e) {
+				if(e) {
+					if(e.length > 2) {
+						this.axios.get(`http://localhost:8000/api/merchandise/find/${e}`)
+						.then(res => this.searchMerchandise(res.data.merchandise))
+						.catch(err => console.dir(err.response))
+
+						this.axios.get(`http://localhost:8000/api/store/find/${e}`)
+						.then(res => this.searchStore(res.data.store))
+						.catch(err => console.dir(err.response))
+
+						this.search(e)
+					}
+				} else {
+					this.searchMerchandise([])
+					this.searchStore([])
+					this.search('')
+				}
+				if(this.$route.path != '/search') this.$router.push('/search')
 			},
 			login: function() {
 				this.initialize()

@@ -10,14 +10,14 @@
 		</v-card-title>
 		<v-divider class="mx-4" />
 		<v-row class="mx-1">
-			<v-col cols="12" md="6">
+			<v-col cols="12" sm="6" v-for="(promo) in promos" :key="promo.id" link :to="promo.action">
 				<v-card shaped outlined>
 					<v-img src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg" height="200px"></v-img>
 					<v-card-title>
-						Promo ABCD
+						{{promo.name}}
 					</v-card-title>
 					<v-card-subtitle>
-						Potongan harga spesial untuk anda blablabla
+						{{promo.description}}
 					</v-card-subtitle>
 
 					<v-card-actions>
@@ -37,7 +37,7 @@
 	export default {
 		data: () => ({
 			loading: false,
-			tab: null,
+			promos: []
 		}),
 		computed: {
 		},
@@ -45,11 +45,16 @@
 			getImage(image) {
 				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
-			clearSearch () {
-				this.search = ''
-			},
 		},
 		created(){
+			this.axios.get('http://localhost:8000/api/promo/all')
+			.then((res) => {
+				this.promos = res.data.promos
+				console.log(res.data.promos)
+			})
+			.catch((err) => {
+				console.log(err)
+			})
 		},
 	}
 </script>

@@ -38,6 +38,14 @@ export default {
 			let idx = state.cart.indexOf(payload);
 			state.cart.splice(idx,1) 
 		},
+		WISHLIST_CART: (state, payload) => {
+			let cartItem = state.cart.find(item => item.id === payload.id)
+			cartItem.status = !payload.status
+		},
+		STATUS: (state, payload) => {
+			let cartItem = state.cart.find(item => item.id === payload.id)
+			cartItem.status = !payload.status
+		},
 	},
 	actions: {
 		set: ({commit}, payload) => {
@@ -52,7 +60,15 @@ export default {
 		},
 		remove({state, commit}, payload) {
 			let cartItem = state.cart.find(item => item.id === payload.id)
-			if(cartItem) commit("REMOVE_CART", payload)
+			if(cartItem) commit("REMOVE_CART", cartItem)
+		},
+		wishlist({state, commit}, payload) {
+			let cartItem = state.cart.find(item => item.id === payload.id)
+			if(cartItem) commit("WISHLIST_CART", cartItem)
+		},
+		status({state, commit}, payload) {
+			let cartItem = state.cart.find(item => item.merchandise_id === payload)
+			if(cartItem) commit("STATUS", cartItem)
 		},
 	},
 }

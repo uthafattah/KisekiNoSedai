@@ -1,5 +1,5 @@
 <template>
-	<v-card :loading="loading">
+	<v-card outlined :loading="loading">
 		<v-img width="300px" :src="getImage(merchandise.photo)">
 			<v-btn icon large :color="wishlist_color" @click="wishlist"><v-icon>mdi-heart</v-icon></v-btn>
 		</v-img>
@@ -15,7 +15,7 @@
 			</v-row>
 		</v-card-text>
 		<v-card-actions class="mt-n4">
-			<v-btn block outlined large rounded color="primary" :to="toMerchandise(merchandise.id)">See Merchandise Detail</v-btn>
+			<v-btn block outlined large rounded color="primary" :to="toMerchandise()">See Merchandise Detail</v-btn>
 		</v-card-actions>
 	</v-card>
 </template>
@@ -30,27 +30,57 @@
 			wishlist_color: 'pink lighten-5',
 			status: false,
 		}),
+		created() {
+			this.status = this.merchandise.status
+			this.wishlist_color = this.stat
+		},
 		methods : {
 			...mapActions({
-				setAlert: 'alert/set'
+				setAlert: 'alert/set',
+				removeWishlist: 'wishlist/remove',
+				cartStatus: 'cart/status'
 			}),
-			toMerchandise(id) {
+			toMerchandise() {
+				var id = this.merchandise.merchandise_id ? this.merchandise.merchandise_id : this.merchandise.id
 				return "/merchandise/" + id
 			},
 			getImage(image) {
 				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
 			wishlist() {
+				var id = this.merchandise.merchandise_id ? this.merchandise.merchandise_id : this.merchandise.id
 				if(!this.status) {
-					this.wishlist_color = 'pink'
-					this.status = true
-					this.setAlert({status: true, color: 'success', text: 'Item Saved to Wishlist!'})
-				} else if (this.wishlist_color === 'pink') {
-					this.wishlist_color = 'pink lighten-5'
-					this.status = false
-					this.setAlert({status: true, color: 'error', text: 'Item Removed from Wishlist!'})
+					this.axios.post('http://localhost:8000/api/wishlist', { merchandise_id: id })
+					.then(
+						this.cartStatus(id),
+						this.setAlert({status: true, color: 'success', text: 'Item Saved to Wishslist!'}),
+						this.wishlist_color = 'pink',
+						this.status = true
+					)
+					.catch(err => {
+						console.log(err.response)
+						this.setAlert({status: true, color: 'error', text: 'Failed Saving Item to Wishslist!'})
+					})
+				} else {
+					this.axios.delete('http://localhost:8000/api/wishlist/' + id)
+					.then(res => {
+						this.removeWishlist(res.data.wishlist)
+						this.cartStatus(id)
+						this.setAlert({status: true, color: 'warning', text: 'Item Removed from Wishlist!'})
+						this.wishlist_color = 'pink lighten-5'
+						this.status = false
+					})
+					.catch(err => {
+						console.log(err.response)
+						this.setAlert({status: true, color: 'error', text: 'Error Removing Item From Wishlist!'})
+					})
 				}
 			},
-		}
+		},
+		computed: {
+			stat() {
+				return (this.merchandise.status) ? 'pink' : 'pink lighten-5'
+			},
+		},
 	}
 </script>

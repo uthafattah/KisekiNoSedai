@@ -24,7 +24,6 @@ export default {
 		],
 		notification: [
 			{ text: 'Checkout', action: '/checkout' },
-			{ text: 'Search', action: '/search' },
 			{ text: 'Promos', action: '/promos' },
 		],
 	},

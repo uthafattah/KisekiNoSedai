@@ -38,24 +38,11 @@
 				.then((res) => {
 					this.setAuth(res.data.user)
 					this.setStore(res.data.store)
-					this.getUserCart(res.data.user.id)
 				})
 				.catch((err) => {
 					console.log(err.response)
 				})
 			},
-			getUserCart(id) {
-				this.axios.get('http://localhost:8000/api/cart/user_cart/' + id)
-				.then((res) => {
-					this.setCart(res.data.cart)
-				})
-				.catch((err) => {
-					console.log(err.response)
-				})
-			},
-			getUserMessage() {
-
-			}
 		},
 		computed: {
 			...mapGetters({

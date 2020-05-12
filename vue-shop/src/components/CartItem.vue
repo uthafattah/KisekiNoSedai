@@ -41,11 +41,16 @@
 			wishlist_color: 'pink lighten-5',
 			status: false,
 		}),
+		created() {
+			this.status = this.cart.status
+			this.wishlist_color = (this.cart.status) ? 'pink' : 'pink lighten-5'
+		},
 		methods : {
 			...mapActions({
 				updateQty: 'cart/updateQuantity',
 				removeCart: 'cart/remove',
-				setAlert: 'alert/set'
+				setAlert: 'alert/set',
+				wishlistCart: 'cart/wishlist'
 			}),
 			toMerchandise(id) {
 				return "/merchandise/" + id
@@ -77,13 +82,29 @@
 			},
 			wishlist() {
 				if(!this.status) {
-					this.wishlist_color = 'pink'
-					this.status = true
-					this.setAlert({status: true, color: 'success', text: 'Item Saved to Wishlist!'})
-				} else if (this.wishlist_color === 'pink') {
-					this.wishlist_color = 'pink lighten-5'
-					this.status = false
-					this.setAlert({status: true, color: 'error', text: 'Item Removed from Wishlist!'})
+					this.axios.post('http://localhost:8000/api/wishlist', { merchandise_id: this.cart.merchandise_id })
+					.then(
+						this.wishlistCart(this.cart),
+						this.setAlert({status: true, color: 'success', text: 'Item Saved to Wishslist!'}),
+						this.wishlist_color = 'pink',
+						this.status = true
+					)
+					.catch(err => {
+						console.log(err.response)
+						this.setAlert({status: true, color: 'error', text: 'Failed Saving Item to Wishslist!'})
+					})
+				} else {
+					this.axios.delete('http://localhost:8000/api/wishlist/' + this.cart.merchandise_id)
+					.then(
+						this.wishlistCart(this.cart),
+						this.setAlert({status: true, color: 'warning', text: 'Item Removed from Wishlist!'}),
+						this.wishlist_color = 'pink lighten-5',
+						this.status = false,
+					)
+					.catch(err => {
+						console.log(err.response)
+						this.setAlert({status: true, color: 'error', text: 'Error Removing Item From Wishlist!'})
+					})
 				}
 			},
 		},

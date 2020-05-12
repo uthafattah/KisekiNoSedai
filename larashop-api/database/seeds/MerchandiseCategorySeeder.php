@@ -23,27 +23,5 @@ class MerchandiseCategorySeeder extends Seeder
                 'updated_at' => Carbon::now(),
 	        ]);
     	}
-
-    	$faker = Faker::create('id_ID');
-
-    	for ($i=0; $i < 150; $i++) { 
-	        DB::table('merchandise_categories')->insert([
-                'merchandise_id' => $faker->unique()->numberBetween(1, 150),
-	        	'category_id' => $faker->numberBetween(1, 28),
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
-    	}
-
-    	$faker = Faker::create('id_ID');
-
-    	for ($i=0; $i < 150; $i++) { 
-	        DB::table('merchandise_categories')->insert([
-                'merchandise_id' => $faker->unique()->numberBetween(1, 150),
-	        	'category_id' => $faker->numberBetween(1, 28),
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
-    	}
     }
 }
