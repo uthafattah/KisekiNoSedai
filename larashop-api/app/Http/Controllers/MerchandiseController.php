@@ -3,79 +3,89 @@
 namespace App\Http\Controllers;
 
 use App\Merchandise;
+use App\Category;
 use Illuminate\Http\Request;
 use App\Http\Resources\Merchandise as MerchandiseResource;
 use App\Http\Resources\MerchandiseCollection as MerchandiseResourceCollection;
 
 class MerchandiseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function all()
     {
         return response()->json(['merchandise' => Merchandise::all()], 200);
+        //return new MerchandiseResourceCollection(Merchandise::all());
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
         $per_page = $request->per_page ? $request->per_page : 10;
-		$sortBy = $request->sort_by ? $request->sort_by : 'id';
-		$orderBy = $request->order_by ? $request->order_by : 'asc';
-		return response()->json([
-			'roles' => Role::orderBy($sort_by,$order_by)->paginate($per_page)
-		]. 200);
+        $sortBy = $request->sort_by ? $request->sort_by : 'id';
+        $orderBy = $request->order_by  ? $request->order_by : 'asc';
+        return response()->json([
+            'merchandises' => new MerchandiseResourceCollection(Merchandise::orderBy($sortBy, $orderBy)->paginate($per_page)),
+            'categories' => Category::pluck('name')->all()
+        ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    public function top($count)
+    {
+        $merchandise = Merchandise::select('*')
+            ->orderBy('view_count', 'DESC')
+            ->limit($count)
+            ->get();        
+        return response()->json(['merchandise' => $merchandise], 200);
+    }
+
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Merchandise  $merchandise
-     * @return \Illuminate\Http\Response
-     */
-    public function show($param)
+    public function show($id)
     {
-        $merchandise = Merchandise::where('name', 'LIKE', "%$param%")->paginate(10);
+        $merchandise = Merchandise::where('id', 'LIKE', "%$id%")->paginate();
         return response()->json(['merchandise' => $merchandise], 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Merchandise  $merchandise
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Merchandise $merchandise)
+    public function find($id)
+    {
+        $merchandise = Merchandise::where('name', 'LIKE', "%$id%")->get();  
+        return response()->json(['merchandise' => $merchandise], 200);
+    }
+    
+    public function search($id)
+    {
+        $merchandise = Merchandise::where('id', '=', "$id")->first();
+        return response()->json(['merchandise' => new MerchandiseResource($merchandise)], 200);
+    }
+
+    public function userMerchandise($id)
+    {
+        $merchandise = Merchandise::where('store_id', '=', "$id")->get();
+        $merchandise_store = [];
+        foreach($merchandise as $merchandises){
+            $merchandise_store[] = new MerchandiseResource($merchandises);
+        }
+        return response()->json(['merchandise' => $merchandise_store], 200);
+    }
+
+    public function storeMerchandise(Request $request, $id)
+    {
+        $per_page = $request->per_page ? $request->per_page : 10;
+        $sortBy = $request->sort_by ? $request->sort_by : 'id';
+        $orderBy = $request->order_by  ? $request->order_by : 'asc';
+        return response()->json([
+            'merchandises' => new MerchandiseResourceCollection(Merchandise::where('store_id', '=', "$id")->orderBy($sortBy, $orderBy)->paginate($per_page)),
+            'categories' => Category::pluck('name')->all()
+        ], 200);
+    }
+
+    public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Merchandise  $merchandise
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Merchandise $merchandise)
+    public function destroy($id)
     {
         //
     }

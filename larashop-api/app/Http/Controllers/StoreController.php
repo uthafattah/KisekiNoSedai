@@ -3,95 +3,68 @@
 namespace App\Http\Controllers;
 
 use App\Store;
+Use App\StatusStore;
 use Illuminate\Http\Request;
 use App\Http\Resources\Store as StoreResource;
 use App\Http\Resources\StoreCollection as StoreResourceCollection;
 
 class StoreController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function all()
-    {
-        return response()->json(['store' => Store::all()], 200);
-    }
-	
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
         $per_page = $request->per_page ? $request->per_page : 10;
-		$sortBy = $request->sort_by ? $request->sort_by : 'id';
-		$orderBy = $request->order_by ? $request->order_by : 'asc';
-		return response()->json([
-			'roles' => Role::orderBy($sort_by,$order_by)->paginate($per_page)
-		]. 200);
+        $sortBy = $request->sort_by ? $request->sort_by : 'id';
+        $orderBy = $request->order_by  ? $request->order_by : 'asc';
+        return response()->json([
+            'stores' => new StoreResourceCollection(Store::orderBy($sortBy, $orderBy)->paginate($per_page)),
+            'status_stores' => StatusStore::pluck('name')->all()
+        ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Store  $store
-     * @return \Illuminate\Http\Response
-     */
-    public function show($param)
+    public function show($id)
     {
-        $store = Store::where('name', 'LIKE', "%$param%")->paginate(10);
-        return response()->json(['store' => $store], 200);
+        $store = Store::where('name', 'LIKE', "%$id%")->paginate(10);
+        return response()->json(['store' => new StoreResourceCollection($store)], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Store  $store
-     * @return \Illuminate\Http\Response
-     */
+    public function search($id)
+    {
+        $store = Store::where('id', '=', "$id")->first();
+        return response()->json(['store' => new StoreResource($store)], 200);
+    }
 
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Store  $store
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Store $store)
+    public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Store  $store
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Store $store)
+    public function destroy($id)
     {
         //
+    }
+
+    public function changeStatus(Request $request)
+    {
+        $status_store = StatusStore::where('name', $request->status_store)->first();
+        $store = Store::find($request->store);
+        $store->status_store()->dissociate($store->status_store);
+        $store->status_store()->associate($status_store);
+        $store->save();
+        return response()->json(['store' => new StoreResource($store)], 200);
+    }
+
+    public function status(Request $request, $id)
+    {
+        $status_store = StatusStore::where('name', $request->status_store)->first();
+        $store = Store::find($id);
+        $store->status_store()->dissociate($store->status_store);
+        $store->status_store()->associate($status_store);
+        $store->save();
+        return response()->json(['store' => new StoreResource($store)], 200);
     }
 }

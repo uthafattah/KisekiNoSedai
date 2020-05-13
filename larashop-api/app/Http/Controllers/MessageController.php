@@ -3,92 +3,89 @@
 namespace App\Http\Controllers;
 
 use App\Message;
+use App\User;
+use App\Store;
 use Illuminate\Http\Request;
 use App\Http\Resources\Message as MessageResource;
 use App\Http\Resources\MessageCollection as MessageResourceCollection;
 
 class MessageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function all()
-    {
-        return response()->json(['message' => Message::all()], 200);
-    }
-	
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        $per_page = $request->per_page ? $request->per_page : 10;
-		$sortBy = $request->sort_by ? $request->sort_by : 'id';
-		$orderBy = $request->order_by ? $request->order_by : 'asc';
-		return response()->json([
-			'roles' => Role::orderBy($sort_by,$order_by)->paginate($per_page)
-		]. 200);
+        //return response()->json(['message' => Message::all()], 200);
+        return new MessageResourceCollection(Message::paginate(5));
     }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Message  $message
-     * @return \Illuminate\Http\Response
-     */
-    public function show($param)
-    {
-        $message = Message::where('name', 'LIKE', "%$param%")->paginate(10);
-        return response()->json(['message' => $message], 200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Message  $message
-     * @return \Illuminate\Http\Response
-     */
-
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Message  $message
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Message $message)
+    public function show($id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Message  $message
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Message $message)
+    public function userToStore($id)
+    {
+        $messages = Message::select('store_id')
+            ->where('user_id', '=', $id)
+            ->orderBy('created_at', 'DESC')
+            ->distinct()
+            ->get();     
+
+        $user_chat = [];
+        foreach($messages as $message){
+            $store = Store::where('id', '=', "$message->store_id")->first();
+            $user_chat[] = [
+                'store_id' => $store->id,
+                'name' => $store->name,
+                'logo' => $store->logo,
+            ];
+        }
+        return response()->json(['user_chat' => $user_chat], 200);
+    }
+
+    public function storeToUser($id)
+    {
+        $messages = Message::select('user_id')
+            ->where('store_id', '=', $id)
+            ->orderBy('created_at', 'DESC')
+            ->distinct()
+            ->get();     
+        $store_chat = [];
+        foreach($messages as $message){
+            $user = User::where('id', '=', "$message->user_id")->first();
+            $store_chat[] = [
+                'user_id' => $user->id,
+                'name' => $user->name,
+                'avatar' => $user->avatar,
+            ];
+        }
+        return response()->json(['store_chat' => $store_chat], 200);
+    }
+
+    public function message($store_id, $user_id)
+    {
+        $messages = Message::select('*')
+            ->where('store_id', '=', $store_id)
+            ->where('user_id', '=', $user_id)
+            ->orderBy('created_at', 'ASC')
+            ->get();        
+        $message = [];
+        foreach($messages as $msg){
+            $message[] = new MessageResource($msg);
+        }
+        return response()->json(['message' => $message], 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        //
+    }
+    
+    public function destroy($id)
     {
         //
     }

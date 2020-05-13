@@ -9,74 +9,60 @@ use App\Http\Resources\CategoryCollection as CategoryResourceCollection;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function all()
     {
-        return response()->json(['category' => Category::all()], 200);
+        return response()->json(['categories' => Category::all()], 200);
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
         $per_page = $request->per_page ? $request->per_page : 10;
-		$sortBy = $request->sort_by ? $request->sort_by : 'id';
-		$orderBy = $request->order_by ? $request->order_by : 'asc';
-		return response()->json([
-			'roles' => Role::orderBy($sort_by,$order_by)->paginate($per_page)
-		]. 200);
+        $sortBy = $request->sort_by ? $request->sort_by : 'id';
+        $orderBy = $request->order_by  ? $request->order_by : 'asc';
+        return response()->json([
+            'categories' => new CategoryResourceCollection(Category::orderBy($sortBy, $orderBy)->paginate($per_page))
+        ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $photo = $request->photo ? $request->photo : 'photos/no_categories.png';
+        $category = new Category([
+            'name' => $request->name,
+            'slug' => \Str::slug($request->name, '-'),
+            'photo' => $photo,
+        ]);
+        $category->save();
+        return response()->json(['category' => new CategoryResource($category)], 200);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function show($param)
+    public function show($id)
     {
-        $category = Category::where('name', 'LIKE', "%$param%")->paginate(10);
+        $category = Category::where('name', 'LIKE', "%$id%")->paginate(10);
+        return response()->json(['category' => new CategoryResourceCollection($category)], 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $category = Category::find($id);
+        $category->name = $request->name;
+        $category->slug = \Str::slug($request->name, '-');
+        $category->save();
+        return response()->json(['category' => new CategoryResource($category)], 200);
+    }
+
+    public function destroy($id)
+    {
+        $category = Category::find($id)->delete();
         return response()->json(['category' => $category], 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Category $category)
+    public function verifyCategory(Request $request) 
     {
-        //
-    }
+        $request->validate([
+            'name' => 'required|unique:categories'
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Category $category)
-    {
-        //
+        return response()->json(['message' => 'Valid Category Name'], 200);
     }
 }

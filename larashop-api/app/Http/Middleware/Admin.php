@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+/*namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +15,7 @@ class Admin
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+/*    public function handle($request, Closure $next)
     {
         $this->auth = 
 			auth()->user() ?

@@ -9,88 +9,53 @@ use App\Http\Resources\PaymentCollection as PaymentResourceCollection;
 
 class PaymentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function all()
-    {
-        return response()->json(['payment' => Payment::all()], 200);
-    }
-	
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
         $per_page = $request->per_page ? $request->per_page : 10;
-		$sortBy = $request->sort_by ? $request->sort_by : 'id';
-		$orderBy = $request->order_by ? $request->order_by : 'asc';
-		return response()->json([
-			'roles' => Role::orderBy($sort_by,$order_by)->paginate($per_page)
-		]. 200);
+        $sortBy = $request->sort_by ? $request->sort_by : 'id';
+        $orderBy = $request->order_by  ? $request->order_by : 'asc';
+        return response()->json([
+            'payments' => new PaymentResourceCollection(Payment::orderBy($sortBy, $orderBy)->paginate($per_page))
+        ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $payment = new Payment([
+            'name' => $request->name,
+            'slug' => \Str::slug($request->name, '-'),
+        ]);
+        $payment->save();
+        return response()->json(['payment' => new PaymentResource($payment)], 200);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Payment  $payment
-     * @return \Illuminate\Http\Response
-     */
-    public function show($param)
+    public function show($id)
     {
-        $payment = Payment::where('name', 'LIKE', "%$param%")->paginate(10);
+        $payment = Payment::where('name', 'LIKE', "%$id%")->paginate(10);
+        return response()->json(['payment' => new PaymentResourceCollection($payment)], 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $payment = Payment::find($id);
+        $payment->name = $request->name;
+        $payment->slug = \Str::slug($request->name, '-');
+        $payment->save();
+        return response()->json(['payment' => new PaymentResource($payment)], 200);
+    }
+
+    public function destroy($id)
+    {
+        $payment = Payment::find($id)->delete();
         return response()->json(['payment' => $payment], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Payment  $payment
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Payment  $payment
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Payment $payment)
+    public function verifyPayment(Request $request) 
     {
-        //
-    }
+        $request->validate([
+            'name' => 'required|unique:payments'
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Payment  $payment
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Payment $payment)
-    {
-        //
+        return response()->json(['message' => 'Valid Payment Name'], 200);
     }
 }

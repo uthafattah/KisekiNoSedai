@@ -24,6 +24,8 @@ class Merchandise extends JsonResource
             'stock' => $this->stock,
             'price' => $this->price,
             'view_count' => $this->view_count,
+			'store_name' => $this->store->name,
+            'status_store' => $this->store->status_store->name,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];

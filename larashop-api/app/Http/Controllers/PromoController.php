@@ -9,89 +9,55 @@ use App\Http\Resources\PromoCollection as PromoResourceCollection;
 
 class PromoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function all()
-    {
-        return response()->json(['promo' => Promo::all()], 200);
-    }
-	
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
         $per_page = $request->per_page ? $request->per_page : 10;
-		$sortBy = $request->sort_by ? $request->sort_by : 'id';
-		$orderBy = $request->order_by ? $request->order_by : 'asc';
-		return response()->json([
-			'roles' => Role::orderBy($sort_by,$order_by)->paginate($per_page)
-		]. 200);
+        $sortBy = $request->sort_by ? $request->sort_by : 'id';
+        $orderBy = $request->order_by  ? $request->order_by : 'asc';
+        return response()->json([
+            'promos' => new PromoResourceCollection(Promo::orderBy($sortBy, $orderBy)->paginate($per_page))
+        ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $promo = new Promo([
+            'name' => $request->name,
+            'promo_code' => $request->promo_code,
+            'description' =>$request->description,
+        ]);
+        $promo->save();
+        return response()->json(['promo' => new PromoResource($promo)], 200);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Promo  $promo
-     * @return \Illuminate\Http\Response
-     */
-    public function show($param)
+    public function show($id)
     {
-        $promo = Promo::where('name', 'LIKE', "%$param%")->paginate(10);
+        $promo = Promo::where('name', 'LIKE', "%$id%")->paginate(10);
+        return response()->json(['promo' => new PromoResourceCollection($promo)], 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $promo = Promo::find($id);
+        $promo->name = $request->name;
+        $promo->promo_code = $request->promo_code;
+        $promo->description = $request->description;
+        $promo->save();
+        return response()->json(['promo' => new PromoResource($promo)], 200);
+    }
+
+    public function destroy($id)
+    {
+        $promo = Promo::find($id)->delete();
         return response()->json(['promo' => $promo], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Promo  $promo
-     * @return \Illuminate\Http\Response
-     */
-
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Promo  $promo
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Promo $promo)
+    public function verifyPromo(Request $request) 
     {
-        //
-    }
+        $request->validate([
+            'promo_code' => 'required|unique:promos'
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Promo  $promo
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Promo $promo)
-    {
-        //
+        return response()->json(['message' => 'Valid Promo Code'], 200);
     }
 }

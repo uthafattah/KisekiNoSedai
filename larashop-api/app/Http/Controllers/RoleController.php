@@ -9,89 +9,58 @@ use App\Http\Resources\RoleCollection as RoleResourceCollection;
 
 class RoleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function all()
-    {
-        return response()->json(['role' => Role::all()], 200);
-    }
-	
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
         $per_page = $request->per_page ? $request->per_page : 10;
-		$sortBy = $request->sort_by ? $request->sort_by : 'id';
-		$orderBy = $request->order_by ? $request->order_by : 'asc';
-		return response()->json([
-			'roles' => Role::orderBy($sort_by,$order_by)->paginate($per_page)
-		]. 200);
+        $sortBy = $request->sort_by ? $request->sort_by : 'id';
+        $orderBy = $request->order_by  ? $request->order_by : 'asc';
+        return response()->json([
+            'roles' => new RoleResourceCollection(Role::orderBy($sortBy, $orderBy)->paginate($per_page))
+        ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $role = new Role([
+            'name' => $request->name,
+            'slug' => \Str::slug($request->name, '-'),
+        ]);
+        $role->save();
+        return response()->json(['role' => new RoleResource($role)], 200);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Role  $role
-     * @return \Illuminate\Http\Response
-     */
-    public function show($param)
+    public function show($id)
     {
-        $role = Role::where('name', 'LIKE', "%$param%")->paginate(10);
+        $role = Role::where('name', 'LIKE', "%$id%")->paginate(10);
+        return response()->json(['role' =>  new RoleResourceCollection($role)], 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $role = Role::find($id);
+        $role->name = $request->name;
+        $role->slug = \Str::slug($request->name, '-');
+        $role->save();
+        return response()->json(['role' => new RoleResource($role)], 200);
+    }
+
+    public function destroy($id)
+    {
+        $role = Role::find($id)->delete();
         return response()->json(['role' => $role], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Role  $role
-     * @return \Illuminate\Http\Response
-     */
-
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Role  $role
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Role $role)
+    public function verify(Request $request)
     {
-        //
+        return $request->Role()->only('name');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Role  $role
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Role $role)
+    public function verifyRole(Request $request) 
     {
-        //
+        $request->validate([
+            'name' => 'required|unique:roles'
+        ]);
+
+        return response()->json(['message' => 'Valid Role Name'], 200);
     }
 }

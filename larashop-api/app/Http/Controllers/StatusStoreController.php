@@ -9,89 +9,53 @@ use App\Http\Resources\StatusStoreCollection as StatusStoreResourceCollection;
 
 class StatusStoreController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function all()
-    {
-        return response()->json(['statusStore' => StatusStore::all()], 200);
-    }
-	
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
         $per_page = $request->per_page ? $request->per_page : 10;
-		$sortBy = $request->sort_by ? $request->sort_by : 'id';
-		$orderBy = $request->order_by ? $request->order_by : 'asc';
-		return response()->json([
-			'roles' => Role::orderBy($sort_by,$order_by)->paginate($per_page)
-		]. 200);
+        $sortBy = $request->sort_by ? $request->sort_by : 'id';
+        $orderBy = $request->order_by  ? $request->order_by : 'asc';
+        return response()->json([
+            'status_stores' => new StatusStoreResourceCollection(StatusStore::orderBy($sortBy, $orderBy)->paginate($per_page))
+        ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $status_store = new StatusStore([
+            'name' => $request->name,
+            'slug' => \Str::slug($request->name, '-'),
+        ]);
+        $status_store->save();
+        return response()->json(['status_store' => new StatusStoreResource($status_store)], 200);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\StatusStore  $statusStore
-     * @return \Illuminate\Http\Response
-     */
-    public function show($param)
+    public function show($id)
     {
-        $statusStore = StatusStore::where('name', 'LIKE', "%$param%")->paginate(10);
-        return response()->json(['statusStore' => $statusStore], 200);
+        $status_store = StatusStore::where('name', 'LIKE', "%$id%")->paginate(10);
+        return response()->json(['status_store' => new StatusStoreResourceCollection($status_store)], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\StatusStore  $statusStore
-     * @return \Illuminate\Http\Response
-     */
-
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\StatusStore  $statusStore
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, StatusStore $statusStore)
+    public function update(Request $request, $id)
     {
-        //
+        $status_store = StatusStore::find($id);
+        $status_store->name = $request->name;
+        $status_store->slug = \Str::slug($request->name, '-');
+        $status_store->save();
+        return response()->json(['status_store' => new StatusStoreResource($status_store)], 200);
+    }
+    
+    public function destroy($id)
+    {
+        $status_store = StatusStore::find($id)->delete();
+        return response()->json(['status_store' => $status_store], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\StatusStore  $statusStore
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(StatusStore $statusStore)
+    public function verifyStatus(Request $request) 
     {
-        //
+        $request->validate([
+            'name' => 'required|unique:status_stores'
+        ]);
+
+        return response()->json(['message' => 'Valid Status Name'], 200);
     }
 }
