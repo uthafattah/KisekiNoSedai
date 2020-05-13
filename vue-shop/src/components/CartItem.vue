@@ -83,24 +83,26 @@
 			wishlist() {
 				if(!this.status) {
 					this.axios.post('http://localhost:8000/api/wishlist', { merchandise_id: this.cart.merchandise_id })
-					.then(
-						this.wishlistCart(this.cart),
-						this.setAlert({status: true, color: 'success', text: 'Item Saved to Wishslist!'}),
-						this.wishlist_color = 'pink',
+					.then(res => {
+						console.log(res)
+						this.wishlistCart(this.cart)
+						this.setAlert({status: true, color: 'success', text: 'Item Saved to Wishslist!'})
+						this.wishlist_color = 'pink'
 						this.status = true
-					)
+					})
 					.catch(err => {
 						console.log(err.response)
 						this.setAlert({status: true, color: 'error', text: 'Failed Saving Item to Wishslist!'})
 					})
 				} else {
 					this.axios.delete('http://localhost:8000/api/wishlist/' + this.cart.merchandise_id)
-					.then(
-						this.wishlistCart(this.cart),
-						this.setAlert({status: true, color: 'warning', text: 'Item Removed from Wishlist!'}),
-						this.wishlist_color = 'pink lighten-5',
-						this.status = false,
-					)
+					.then(res => {
+						console.log(res)
+						this.wishlistCart(this.cart)
+						this.setAlert({status: true, color: 'warning', text: 'Item Removed from Wishlist!'})
+						this.wishlist_color = 'pink lighten-5'
+						this.status = false
+					})
 					.catch(err => {
 						console.log(err.response)
 						this.setAlert({status: true, color: 'error', text: 'Error Removing Item From Wishlist!'})

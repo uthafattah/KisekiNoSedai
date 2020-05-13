@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-//import axios from "axios";
 
 Vue.use(VueRouter)
 
@@ -39,11 +38,6 @@ Vue.use(VueRouter)
 				path: 'promos',
 				name: 'Promos Costumer',
 				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Promos.vue')
-			},
-			{
-				path: 'search',
-				name: 'Search',
-				component: () => import( /*webpackChunkName: "about"*/ '../views/costumer/Search.vue')
 			},
 			{
 				path: 'settings',

@@ -12,7 +12,6 @@
 						<v-list two-line v-scroll:#scroll-target-user>
 							<template v-for="(item, index) in store_chat">
 								<v-divider v-if="index != 0" :key="'store_chat' + index" inset></v-divider>
-								<!--v-list-item v-else :key="item.title" @click=""-->
 								<v-list-item :key="item.user_id" @click="chooseMessage(item.user_id)">
 									<v-list-item-avatar>
 										<v-img :src="getImage(item.avatar)" aspect-ratio="1"/>
@@ -69,15 +68,13 @@
 		data: () => ({
 			loading: true,
 			store_chat: [],
-			message: '',
 			messages: [],
+			message: '',
 		}),
 		created() {
 			this.initialize()
 			this.axios.get('http://localhost:8000/api/message/store_to_user/' + this.store.id)
-			.then((res) => {
-				this.store_chat = res.data.store_chat
-			})
+			.then((res) => this.store_chat = res.data.store_chat)
 			.catch((err) => {
 				if(err.response.status == 401) {
 					localStorage.removeItem('token');
@@ -91,9 +88,6 @@
 			...mapGetters({
 				store: 'store/getStore',
 			}),
-			icon () {
-				return this.icons[this.iconIndex]
-			},
 		},
 		methods: {
 			...mapActions({
@@ -121,9 +115,7 @@
 			},
 			chooseMessage(id) {
 				this.axios.get('http://localhost:8000/api/message/messages/' + this.store.id + '/' + id)
-				.then((res) => {
-					this.messages = res.data.message
-				})
+				.then((res) => this.messages = res.data.message)
 				.catch((err) => {
 					if(err.response.status == 401) {
 						localStorage.removeItem('token');

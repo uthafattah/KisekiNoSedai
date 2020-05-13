@@ -69,12 +69,12 @@
 		data: () => ({
 			loading: true,
 			user_chat: [],
-			message: '',
 			messages: [],
+			message: '',
 		}),
 		created() {
 			this.initialize()
-			this.axios.get('http://localhost:8000/api/message/user_to_store/' + this.userId)
+			this.axios.get('http://localhost:8000/api/message/user_to_store')
 			.then((res) => {
 				this.user_chat = res.data.user_chat
 			})
@@ -91,9 +91,6 @@
 			...mapGetters({
 				userId: 'auth/getId',
 			}),
-			icon () {
-				return this.icons[this.iconIndex]
-			},
 		},
 		methods: {
 			...mapActions({
@@ -123,7 +120,6 @@
 				this.axios.get('http://localhost:8000/api/message/messages/' + id + '/' + this.userId)
 				.then((res) => {
 					this.messages = res.data.message
-					console.log(res.data.message)
 				})
 				.catch((err) => {
 					if(err.response.status == 401) {

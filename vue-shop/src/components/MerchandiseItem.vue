@@ -1,7 +1,7 @@
 <template>
 	<v-card outlined :loading="loading">
 		<v-img width="300px" :src="getImage(merchandise.photo)">
-			<v-btn icon large :color="wishlist_color" @click="wishlist"><v-icon>mdi-heart</v-icon></v-btn>
+			<v-btn icon large :color="wishlist_color" @click="wishlist" v-if="userId"><v-icon>mdi-heart</v-icon></v-btn>
 		</v-img>
 		<v-card-title>{{merchandise.name}}</v-card-title>
 		<v-card-text>
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex'
+	import { mapActions, mapGetters } from 'vuex'
 	export default {
 		name: 'MerchandiseItem',
 		props: ['merchandise'],
@@ -51,12 +51,13 @@
 				var id = this.merchandise.merchandise_id ? this.merchandise.merchandise_id : this.merchandise.id
 				if(!this.status) {
 					this.axios.post('http://localhost:8000/api/wishlist', { merchandise_id: id })
-					.then(
-						this.cartStatus(id),
-						this.setAlert({status: true, color: 'success', text: 'Item Saved to Wishslist!'}),
-						this.wishlist_color = 'pink',
+					.then(res => {
+						console.log(res)
+						this.cartStatus(id)
+						this.setAlert({status: true, color: 'success', text: 'Item Saved to Wishslist!'})
+						this.wishlist_color = 'pink'
 						this.status = true
-					)
+					})
 					.catch(err => {
 						console.log(err.response)
 						this.setAlert({status: true, color: 'error', text: 'Failed Saving Item to Wishslist!'})
@@ -78,6 +79,9 @@
 			},
 		},
 		computed: {
+			...mapGetters({
+				userId: 'auth/getId',
+			}),
 			stat() {
 				return (this.merchandise.status) ? 'pink' : 'pink lighten-5'
 			},

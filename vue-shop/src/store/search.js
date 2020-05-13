@@ -3,6 +3,7 @@ export default {
 	state: {
 		merchandise: [],
 		store: [],
+		category: [],
 		search: ''
 	},
 	getters: {
@@ -11,6 +12,9 @@ export default {
 		},
 		getStore: state => {
 			return state.store
+		},
+		getCategory: state => {
+			return state.category
 		},
 		getSearch: state => {
 			return state.search
@@ -23,6 +27,9 @@ export default {
 		SEARCH_STORE: (state, payload) => {
 			state.store = payload
 		},
+		SEARCH_CATEGORY: (state, payload) => {
+			state.category = payload
+		},
 		SEARCH: (state, payload) => {
 			state.search = payload
 		},
@@ -33,6 +40,9 @@ export default {
 		},
 		searchStore: ({commit}, payload) => {
 			commit("SEARCH_STORE", payload)
+		},
+		searchCategory: ({commit}, payload) => {
+			commit("SEARCH_CATEGORY", payload)
 		},
 		search: ({commit}, payload) => {
 			commit("SEARCH", payload)

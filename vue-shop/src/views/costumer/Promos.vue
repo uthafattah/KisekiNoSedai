@@ -36,7 +36,6 @@
 <script>
 	export default {
 		data: () => ({
-			loading: false,
 			promos: []
 		}),
 		computed: {
@@ -48,13 +47,8 @@
 		},
 		created(){
 			this.axios.get('http://localhost:8000/api/promo/all')
-			.then((res) => {
-				this.promos = res.data.promos
-				console.log(res.data.promos)
-			})
-			.catch((err) => {
-				console.log(err)
-			})
+			.then((res) => this.promos = res.data.promos)
+			.catch((err) =>  console.log(err))
 		},
 	}
 </script>

@@ -191,10 +191,9 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex'
-	//import Dialog from '@/components/Dialog'
 	export default {
 		components: {
-			//Dialog,
+			//Dialog: () => import(/* webpackChunkName: "dialog" */ '@/components/Dialog.vue'),
 		},
 		data: () => ({
 			drawer: true,
@@ -237,15 +236,12 @@
 				this.$vuetify.theme.dark = old;
 			}
 		},
-		mounted() {
-			localStorage.getItem('loggedIn') ? true : false;
-			localStorage.removeItem('loggedIn');
-		},
 		methods: {
 			...mapActions({
 				setAuth: 'auth/set',
 				setStore: 'store/set',
 				setCart: 'cart/set',
+				setWishlist: 'wishlist/set',
 				setAlert: 'alert/set',
 				searchMerchandise: 'search/searchMerchandise',
 				searchStore: 'search/searchStore',
@@ -256,6 +252,7 @@
 			},
 			searchIt(e) {
 				if(e) {
+					this.search(e)
 					if(e.length > 2) {
 						this.axios.get(`http://localhost:8000/api/merchandise/find/${e}`)
 						.then(res => this.searchMerchandise(res.data.merchandise))
@@ -264,15 +261,16 @@
 						this.axios.get(`http://localhost:8000/api/store/find/${e}`)
 						.then(res => this.searchStore(res.data.store))
 						.catch(err => console.dir(err.response))
-
-						this.search(e)
 					}
 				} else {
 					this.searchMerchandise([])
+					this.axios.get('http://localhost:8000/api/merchandise/top/40')
+					.then((res) => this.searchMerchandise(res.data.merchandise))
+					.catch((err) => console.log(err.response))
 					this.searchStore([])
 					this.search('')
 				}
-				if(this.$route.path != '/search') this.$router.push('/search')
+				if(this.$route.path != "/") this.$router.push('/')
 			},
 			login: function() {
 				this.initialize()
@@ -315,6 +313,7 @@
 				this.setAuth({})
 				this.setStore({})
 				this.setCart([])
+				this.setWishlist([])
 				if(this.$route.path != "/") this.$router.push('/')
 			},
 			verifyEmail() {

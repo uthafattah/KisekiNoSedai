@@ -32,7 +32,7 @@
 								<v-card-actions class="mr-2">
 									<v-spacer />
 									<v-btn outlined color="secondary" @click="clearProfile">Clear</v-btn>
-									<v-btn type="submit" :disabled="!valid_profile" @click.prevent="update_profile" outlined color="success" @click="submit">Update Profile</v-btn>
+									<v-btn type="submit" :disabled="!valid_profile" @click.prevent="update_profile" outlined color="success" @click="updateProfile">Update Profile</v-btn>
 								</v-card-actions>
 							</v-card>
 						</v-tab-item>
@@ -48,7 +48,7 @@
 								<v-card-actions class="mr-2">
 									<v-spacer />
 									<v-btn outlined color="secondary" @click="clearPassword">Clear</v-btn>
-									<v-btn type="submit" :disabled="!valid_password" @click.prevent="update_password" outlined color="success" @click="submit">Update Password</v-btn>
+									<v-btn type="submit" :disabled="!valid_password" @click.prevent="update_password" outlined color="success" @click="updatePassword">Update Password</v-btn>
 								</v-card-actions>
 							</v-card>
 						</v-tab-item>
@@ -80,9 +80,6 @@
 				new_rpassword: '',
 			},
 		}),
-		created(){
-			//this.setUser()
-		},
 		computed: {
 			...mapGetters({
 				user: 'auth/getData',
@@ -94,26 +91,19 @@
 		},
 		methods: {
 			...mapActions({
-				//setUser: 'auth/fetchUser'
+
 			}),
 			getImage(image) {
 				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
-			submit() {
+			updateProfile() {
 
 			},
 			clearProfile() {
-				this.axios.get('http://localhost:8000/api/user/' + localStorage.getItem('id'))
-				.then((res) => {
-					this.user = res.data.user[0]
-				})
-				.catch((err) => {
-					if(err.response.status == 401) {
-						localStorage.removeItem('token');
-						this.$router.push('/');
-					}
-					console.log(err)
-				})
+
+			},
+			updatePassword() {
+
 			},
 			clearPassword() {
 				this.resetPasswordField.old_password = ''

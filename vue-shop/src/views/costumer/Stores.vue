@@ -54,7 +54,6 @@
 			follow_color: 'success',
 			wishlist_color: 'pink lighten-5',
 			unfollow : false,
-			hover: '',
 			sorting: ['Highest Rating', 'Highest Price', 'Lowest Price', 'Most Reviews', 'Most Purchases', 'Most Viewed'],
 			merchandises: [],
 			store: {}
@@ -96,13 +95,6 @@
 			getImage(image) {
 				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
-			wishlist() {
-				if(this.wishlist_color === 'pink lighten-5') {
-					this.wishlist_color = 'pink'
-				} else if (this.wishlist_color === 'pink') {
-					this.wishlist_color = 'pink lighten-5'
-				}
-			},
 		},
 		computed: {
 			...mapGetters({
@@ -111,20 +103,12 @@
 		},
 		created(){
 			this.axios.get('http://localhost:8000/api/store/search/' + this.$route.params.id)
-			.then((res) => {
-				this.store = res.data.store
-			})
-			.catch((err) => {
-				console.log(err.response)
-			})
+			.then((res) => this.store = res.data.store)
+			.catch((err) => console.log(err.response))
 
 			this.axios.get('http://localhost:8000/api/merchandise/user_merchandise/' + this.$route.params.id)
-			.then((res) => {
-				this.merchandises = res.data.merchandise
-			})
-			.catch((err) => {
-				console.log(err.response)
-			})
+			.then((res) => this.merchandises = res.data.merchandise)
+			.catch((err) => console.log(err.response))
 		},
 	}
 </script>

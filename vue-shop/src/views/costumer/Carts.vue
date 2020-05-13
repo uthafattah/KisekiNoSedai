@@ -45,9 +45,6 @@
 <script>
 	import { mapGetters, mapActions } from 'vuex'
 	export default {
-		data: () => ({
-
-		}),
 		components: {
 			CartItem: () => import(/* webpackChunkName: "merchandise-item" */ '@/components/CartItem.vue')
 		},

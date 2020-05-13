@@ -16,16 +16,12 @@
 <script>
 	import { mapActions, mapGetters } from 'vuex'
 	export default {
-		name: 'App',
-		data: () => ({
-
-		}),
 		components: {
 			Navbar: () => import( /* webpackChunkName: "navbar" */ '@/components/Navbar.vue'),
 			Alert: () => import( /* webpackChunkName: "alert" */ '@/components/Alert.vue'),
 		},
 		created() {
-			if(this.id == null && localStorage.getItem('token')) this.getLoggedUser()
+			if(this.id === undefined && localStorage.getItem('token')) this.getLoggedUser()
 		},
 		methods: {
 			...mapActions({
@@ -46,7 +42,7 @@
 		},
 		computed: {
 			...mapGetters({
-
+				id: 'auth/getId',
 			}),
 		}
 	};

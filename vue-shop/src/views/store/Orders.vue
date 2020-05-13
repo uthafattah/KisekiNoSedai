@@ -1,8 +1,5 @@
 <template>
 	<v-card outlined>
-		<!--v-card-title class="text-center justify-center py-6">
-			<h1 class="font-weight-bold display-1 basil--text">BASiL</h1>
-		</v-card-title-->
 		<v-row class="mx-4 mt-4 mb-n4">
 			<v-col cols="4">
 				<v-menu v-model="datepicker" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y min-width="290px">
@@ -55,67 +52,30 @@
 			total: '1.000.000.000',
 			sorting: ['The Latest', 'Highest Price', 'Lowest Price'],
 			tab_header: [
-				{
-					icon: 'mdi-package',
-					text: 'All',
-				},
-				{
-					icon: 'mdi-note-text',
-					text: 'Requested',
-				},
-				{
-					icon: 'mdi-clock',
-					text: 'Waiting',
-				},
-				{
-					icon: 'mdi-package-variant',
-					text: 'On Process',
-				},
-				{
-					icon: 'mdi-truck-fast',
-					text: 'Shipped',
-				},
-				{
-					icon: 'mdi-truck-check',
-					text: 'Arrived',
-				},
-				{
-					icon: 'mdi-briefcase-check',
-					text: 'Success',
-				},
-				{
-					icon: 'mdi-file-cancel',
-					text: 'Canceled',
-				},
+				{ icon: 'mdi-package', text: 'All' },
+				{ icon: 'mdi-note-text', text: 'Requested' },
+				{ icon: 'mdi-clock', text: 'Waiting' },
+				{ icon: 'mdi-package-variant', text: 'On Process' },
+				{ icon: 'mdi-truck-fast', text: 'Shipped' },
+				{ icon: 'mdi-truck-check', text: 'Arrived' },
+				{ icon: 'mdi-briefcase-check', text: 'Success' },
+				{ icon: 'mdi-file-cancel', text: 'Canceled' },
 			],
 			tab_item: [
-				{
-					text: 'All',
-				},
-				{
-					text: 'Requested',
-				},
-				{
-					text: 'Waiting',
-				},
-				{
-					text: 'On Process',
-				},
-				{
-					text: 'Shipped',
-				},
-				{
-					text: 'Arrived',
-				},
-				{
-					text: 'Success',
-				},
-				{
-					text: 'Canceled',
-				},
+				{ text: 'All' },
+				{ text: 'Requested' },
+				{ text: 'Waiting' },
+				{ text: 'On Process' },
+				{ text: 'Shipped' },
+				{ text: 'Arrived' },
+				{ text: 'Success' },
+				{ text: 'Canceled' },
 			],
 			orders: ['1', '2'],
 		}),
+		created(){
+
+		},
 		components: {
 			OrderItem: () => import(/* webpackChunkName: "order-item" */ '@/components/OrderItem.vue')
 		},
@@ -131,8 +91,6 @@
 			clearDate () {
 				this.dates = []
 			},
-		},
-		created(){
 		},
 	}
 </script>

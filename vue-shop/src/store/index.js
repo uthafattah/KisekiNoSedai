@@ -7,6 +7,7 @@ import alert from '@/store/alert'
 import menu from '@/store/menu'
 import search from '@/store/search'
 import wishlist from '@/store/wishlist'
+import order from '@/store/order'
 
 Vue.use(Vuex)
 
@@ -50,5 +51,6 @@ export default new Vuex.Store({
 		menu,
 		search,
 		wishlist,
+		order,
 	}
 })
