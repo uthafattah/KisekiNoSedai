@@ -13,20 +13,35 @@ class MessageSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create('id_ID');
-        $faker2 = Faker::create('cs_CZ');
         $sender = array('User', 'Store');
 
-    	for ($i=0; $i < 1000; $i++) { 
-        	$name = $faker2->name;
-	        DB::table('messages')->insert([
-                'user_id' => $faker->numberBetween(4, 103),
-                'store_id' => $faker->numberBetween(1, 30),
-	        	'sender' => $sender[mt_rand (0, 1)],
-	        	'messages' => $faker2->text,
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
+    	for ($i=6; $i <= 25; $i++) { //User
+            $faker = Faker::create('id_ID');
+        	for ($j=0; $j < 5; $j++) { //Store
+                $store = $faker->unique()->numberBetween(1, 15);
+                for ($k=0; $k < 10; $k++) { //Message
+                    if($k == 0) {
+                        DB::table('messages')->insert([
+                            'user_id' => $i,
+                            'store_id' => $store,
+                            'sender' => $sender[0],
+                            'messages' => $faker->text,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ]);
+                    } else {
+                        DB::table('messages')->insert([
+                            'user_id' => $i,
+                            'store_id' => $store,
+                            'sender' => $sender[rand(0, 1)],
+                            'messages' => $faker->text,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ]);
+                    }
+                }
+            }
     	}
+            
     }
 }

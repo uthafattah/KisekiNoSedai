@@ -17,7 +17,7 @@ class CreateReviewsTable extends Migration
             $table->increments('id');
 			$table->integer('order_id')->unsigned();
 			$table->decimal("rating")->nullable();
-			$table->string('comment')->nullable();
+			$table->text('comment')->nullable();
 			$table->timestamps();
 			$table->softDeletes();
 			

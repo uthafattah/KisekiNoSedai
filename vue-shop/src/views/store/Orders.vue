@@ -20,28 +20,41 @@
 		<v-divider class="mx-4" />
 		<v-tabs fixed-tabs v-model="tab" background-color="white" icons-and-text>
 			<v-progress-linear :active="loading" :indeterminate="loading" absolute top color="white accent-4"></v-progress-linear>
-			<v-tabs-slider></v-tabs-slider>
-			<v-tab v-for="(item, index) in tab_header" :key="index" :href="`#tab-${index}`">
+			<v-tabs-slider :class="{'slider': theme}"></v-tabs-slider>
+			<v-tab v-for="(item, index) in tab_header" :key="index" :href="`#tab-${index}`" :class="{'tab': theme}">
 				{{item.text}}
 				<v-icon>{{item.icon}}</v-icon>
 			</v-tab>
 		</v-tabs>
 		<v-tabs-items v-model="tab">
 			<v-tab-item v-for="(item, index) in tab_item" :key="index" :value="`tab-${index}`">
-				<v-row class="mx-2">
+				<v-row class="mx-2" v-if="checkStatusOrder(index) || index == 0">
 					<v-col cols="12" v-for="(order) in orders" :key="order.id" link :to="order.action">
-						<OrderItem :order="order" />
+						<OrderItem :order="order" v-if="order.status_order_id == index" />
+						<OrderItem :order="order" v-if="index == 0" />
 					</v-col>
 				</v-row>
+				<v-row class="mx-2" v-else>
+					<v-col cols="12">
+						<v-card outlined>
+							<v-list-item>
+								<v-list-item-content>
+									ORDER NOT FOUND
+								</v-list-item-content>
+							</v-list-item>
+						</v-card>
+					</v-col>
+				</v-row>
+				<v-card-actions v-if="total(index) != 0">
+					<v-spacer />
+					<v-text-field dense outlined readonly :value="total(index)" label="Total Shopping" prefix="Rp" class="mr-3 mt-4 shrink" style="width: 250px;"/>
+				</v-card-actions>
 			</v-tab-item>
 		</v-tabs-items>
-		<v-card-actions>
-			<v-spacer />
-			<v-text-field dense outlined readonly v-model="total" label="Total Shopping" prefix="Rp" class="mr-3 mt-4 shrink" style="width: 250px;"/>
-		</v-card-actions>
 	</v-card>
 </template>
 <script>
+	import { mapGetters } from 'vuex'
 	export default {
 		data: () => ({
 			loading: false,
@@ -49,7 +62,6 @@
 			dates: [],
 			datepicker: false,
 			pickCount: 0,
-			total: '1.000.000.000',
 			sorting: ['The Latest', 'Highest Price', 'Lowest Price'],
 			tab_header: [
 				{ icon: 'mdi-package', text: 'All' },
@@ -71,18 +83,34 @@
 				{ text: 'Success' },
 				{ text: 'Canceled' },
 			],
-			orders: ['1', '2'],
+			orders: [],
 		}),
-		created(){
-
-		},
 		components: {
 			OrderItem: () => import(/* webpackChunkName: "order-item" */ '@/components/OrderItem.vue')
 		},
+		created(){
+			this.axios.get('http://localhost:8000/api/order/store_order/' + this.store.id)
+			.then((res) => {
+				this.orders = res.data.order
+			})
+			.catch((err) => {
+				if(err.response.status == 401) {
+					localStorage.removeItem('token');
+					this.$router.push('/');
+				}
+				console.log(err.response)
+			})
+		},
 		computed: {
+			...mapGetters({
+				store: 'store/getStore',
+			}),
 			dateRangeText () {
 				return this.dates.join(' ~ ')
 			},
+			theme() {
+				return (this.$vuetify.theme.dark)
+			}
 		},
 		methods: {
 			getImage(image) {
@@ -91,11 +119,34 @@
 			clearDate () {
 				this.dates = []
 			},
+			checkStatusOrder (index) {
+				for(var i = 0; i < this.orders.length; i++) {
+					if(this.orders[i].status_order_id == index) return true
+				}
+				return false
+			},
+			total(index) {
+				var total = 0;
+				if(index == 0) {
+					for(var i = 0; i < this.orders.length; i++) {
+						total += this.orders[i].total_price + 10
+					}
+				} else {
+					for(var j = 0; j < this.orders.length; j++) {
+						if(this.orders[j].status_order_id == index) total += this.orders[j].total_price + 10
+					}
+				}
+				return total
+			}
 		},
 	}
 </script>
 <style scoped>
-	.btnCustom:hover {
-		background-color: #FF5252 !important;
+	.tab {
+		color: white;
+		background-color: #212121;
+	}
+	.slider {
+		color: white;
 	}
 </style>

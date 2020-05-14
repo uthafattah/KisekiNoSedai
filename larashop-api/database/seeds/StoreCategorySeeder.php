@@ -13,15 +13,17 @@ class StoreCategorySeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create('id_ID');
-
-    	for ($i=0; $i < 30; $i++) { 
-	        DB::table('store_categories')->insert([
-                'store_id' => $faker->unique()->numberBetween(1, 30),
-	        	'category_id' => $faker->numberBetween(1, 28),
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
+    	for ($i=1; $i <= 15; $i++) { //Store
+            $faker = Faker::create('id_ID');
+            $category = rand(3,5);
+            for ($j=0; $j < $category; $j++) { //Category
+    	        DB::table('store_categories')->insert([
+                    'store_id' => $i,
+    	        	'category_id' => $faker->unique()->numberBetween(1, 28),
+    	        	'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+    	        ]);
+            }
     	}
     }
 }

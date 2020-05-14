@@ -21,7 +21,10 @@ class CreateMerchandisesTable extends Migration
             $table->string("photo")->default('photos/no_merchandise.png');;
 			$table->text("description")->nullable();
 			$table->double("stock")->nullable();
-			$table->double("price")->nullable();
+            $table->double("price")->nullable();
+            $table->double("weight")->nullable();
+            $table->enum("condition", ["New", "Secondhand"]);
+            $table->enum("insurance", ["Yes", "No"]);
 			$table->double("view_count")->nullable();
             $table->timestamps();
 			$table->softDeletes();

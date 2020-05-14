@@ -15,11 +15,11 @@ class PromoSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
 
-    	for ($i=0; $i < 20; $i++) { 
+    	for ($i=0; $i < 6; $i++) { //Promo
 	        DB::table('promos')->insert([
-	        	'name' => "Promo " . str_random(5) . " " . str_random(8) . " Terbatas",
+	        	'name' => "Promo Potongan " . (rand(1,10) * 5) . "% Special " . str_random(8) . " Terbatas!",
 	        	'description' => $faker->text,
-	        	'promo_code' => str_random(5),
+	        	'promo_code' => strtoupper(str_random(5)),
 	        	'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
 	        ]);

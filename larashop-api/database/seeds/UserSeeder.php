@@ -49,9 +49,37 @@ class UserSeeder extends Seeder
             'updated_at' => Carbon::now(),
         ]);
 
+        //-------------------------------------------------
+
+        DB::table('users')->insert([
+            'name' => "Muhammad Fuad Zikri",
+            'email' => "fuadzikri@gmail.com",
+            'email_verified_at' => Carbon::now(),
+            'password' => bcrypt('password'),
+            'address' => "Riau",
+            'phone' => "0800119922",
+            'role_id' => "2",
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('users')->insert([
+            'name' => "Ahmad Rasyid Yusdi",
+            'email' => "ahmedyusdi@gmail.com",
+            'email_verified_at' => Carbon::now(),
+            'password' => bcrypt('password'),
+            'address' => "Bogor",
+            'phone' => "080987654321",
+            'role_id' => "2",
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        //-------------------------------------------------
+
         $faker = Faker::create('id_ID');
 
-        for ($i=0; $i < 100; $i++) { 
+        for ($i=0; $i < 20; $i++) { //User
             DB::table('users')->insert([
                 'name' => $faker->name,
                 'email' => $faker->unique()->email,

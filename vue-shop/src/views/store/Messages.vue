@@ -27,7 +27,12 @@
 			</v-col>
 			<v-col cols="8" sm="8">
 				<v-toolbar flat>
-					<v-toolbar-title>Inbox</v-toolbar-title>
+					<v-avatar size="36" v-if="header.avatar" style="margin-right:1em">
+						<v-img :src="getImage(header.avatar)" aspect-ratio="1"/>
+					</v-avatar>
+					<span class="title font-weight-bold">{{header.name}}</span>
+					<v-spacer/>
+					<v-btn icon large @click="clearInbox" v-if="header.avatar"><v-icon large>mdi-close-circle-outline</v-icon></v-btn>
 				</v-toolbar>
 				<v-divider class="mr-4 mb-2" />
 				<v-sheet id="scrolling-techniques-8" class="overflow-y-auto" max-height="475">
@@ -70,6 +75,10 @@
 			store_chat: [],
 			messages: [],
 			message: '',
+			header: {
+				name: '',
+				avatar: '',
+			}
 		}),
 		created() {
 			this.initialize()
@@ -115,7 +124,11 @@
 			},
 			chooseMessage(id) {
 				this.axios.get('http://localhost:8000/api/message/messages/' + this.store.id + '/' + id)
-				.then((res) => this.messages = res.data.message)
+				.then((res) => {
+					this.messages = res.data.message
+					this.header.name = res.data.message[0].user_name
+					this.header.avatar = res.data.message[0].avatar
+				})
 				.catch((err) => {
 					if(err.response.status == 401) {
 						localStorage.removeItem('token');
@@ -127,6 +140,11 @@
 			sendMessage () {
 				this.resetIcon()
 				this.clearMessage()
+			},
+			clearInbox () {
+				this.messages = []
+				this.header.name = ''
+				this.header.avatar = ''
 			},
 			clearMessage () {
 				this.message = ''

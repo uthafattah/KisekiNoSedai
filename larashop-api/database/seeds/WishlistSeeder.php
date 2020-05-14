@@ -13,37 +13,17 @@ class WishlistSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create('id_ID');
-
-    	for ($i=0; $i < 100; $i++) { 
-	        DB::table('wishlists')->insert([
-	        	'user_id' => $faker->unique()->numberBetween(4, 103),
-                'merchandise_id' => $faker->numberBetween(1, 150),
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
-    	}
-
-    	$faker = Faker::create('id_ID');
-
-    	for ($i=0; $i < 100; $i++) { 
-	        DB::table('wishlists')->insert([
-	        	'user_id' => $faker->unique()->numberBetween(4, 103),
-                'merchandise_id' => $faker->numberBetween(1, 150),
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
-    	}
-
-    	$faker = Faker::create('id_ID');
-
-    	for ($i=0; $i < 100; $i++) { 
-	        DB::table('wishlists')->insert([
-	        	'user_id' => $faker->unique()->numberBetween(4, 103),
-                'merchandise_id' => $faker->numberBetween(1, 150),
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
+    	for ($i=6; $i <= 25; $i++) { //User
+            $faker = Faker::create('id_ID');
+            $wishlist = rand(5,10);
+            for ($j=0; $j < $wishlist; $j++) { //Wishlsit
+    	        DB::table('wishlists')->insert([
+    	        	'user_id' => $i,
+                    'merchandise_id' => $faker->unique()->numberBetween(1, 150),
+    	        	'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+    	        ]);
+            }
     	}
     }
 }

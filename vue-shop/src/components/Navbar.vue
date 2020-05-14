@@ -33,14 +33,6 @@
 					</v-list-item-action>
 					<v-list-item-title>Dashboard</v-list-item-title>
 				</v-list-item>
-				<v-list-item link v-if="isAdmin || isStore">
-					<v-list-item-action>
-						<v-switch v-model="theme"></v-switch>
-					</v-list-item-action>
-					<v-list-item-title>
-						Switch Theme
-					</v-list-item-title>
-				</v-list-item>
 			</v-list>
 		</v-navigation-drawer>
 		<v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app color="light-blue darken-1" dark class="pr-3">
@@ -169,6 +161,14 @@
 								{{ item.text }}
 							</v-list-item-title>
 						</v-list-item-content>
+					</v-list-item>
+					<v-list-item>
+						<v-list-item-action>
+							<v-switch dense v-model="theme"></v-switch>
+						</v-list-item-action>
+						<v-list-item-title class="ml-n2">
+							Switch Theme
+						</v-list-item-title>
 					</v-list-item>
 					<v-list-item link to="/admin" v-if="roleAdmin">
 						<v-list-item-action>

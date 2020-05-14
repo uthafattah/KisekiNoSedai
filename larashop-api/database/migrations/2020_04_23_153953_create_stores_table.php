@@ -20,7 +20,7 @@ class CreateStoresTable extends Migration
             $table->string("slug")->unique();
             $table->string("logo")->default('logos/no_logo.png');
 			$table->text("address")->nullable();
-			$table->string("description")->nullable();
+			$table->text("description")->nullable();
 			$table->double("followers")->nullable();
 			$table->decimal("ratings")->nullable();
             $table->integer('status_store_id')->unsigned();

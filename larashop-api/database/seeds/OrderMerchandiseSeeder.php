@@ -13,43 +13,19 @@ class OrderMerchandiseSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create('id_ID');
-
-    	for ($i=0; $i < 300; $i++) { 
-	        DB::table('order_merchandises')->insert([
-	        	'order_id' => $faker->unique()->numberBetween(1, 300),
-                'merchandise_id' => $faker->numberBetween(1, 150),
-                'quantity' => $faker->numberBetween(1, 100),
-	        	'note' => $faker->text,
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
-    	}
-
-    	$faker = Faker::create('id_ID');
-
-    	for ($i=0; $i < 300; $i++) { 
-	        DB::table('order_merchandises')->insert([
-	        	'order_id' => $faker->unique()->numberBetween(1, 300),
-                'merchandise_id' => $faker->numberBetween(1, 150),
-                'quantity' => $faker->numberBetween(1, 100),
-	        	'note' => $faker->text,
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
-    	}
-
-    	$faker = Faker::create('id_ID');
-
-    	for ($i=0; $i < 300; $i++) { 
-	        DB::table('order_merchandises')->insert([
-	        	'order_id' => $faker->unique()->numberBetween(1, 300),
-                'merchandise_id' => $faker->numberBetween(1, 150),
-                'quantity' => $faker->numberBetween(1, 100),
-	        	'note' => $faker->text,
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
+    	for ($i=1; $i <= 200; $i++) { //Order
+            $faker = Faker::create('id_ID');
+            $count = rand(1,3);
+            for ($j=0; $j < $count; $j++) { //Merchandise
+    	        DB::table('order_merchandises')->insert([
+    	        	'order_id' => $i,
+                    'merchandise_id' => $faker->unique()->numberBetween(1, 150),
+                    'quantity' => rand(1,10),
+    	        	'note' => $faker->text,
+    	        	'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+    	        ]);
+            }
     	}
     }
 }

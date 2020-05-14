@@ -13,46 +13,18 @@ class OrderSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create('id_ID');
-
-    	for ($i=0; $i < 100; $i++) { 
-	        DB::table('orders')->insert([
-	        	'user_id' => $faker->unique()->numberBetween(4, 103),
-                'total_price' => '0',
-                'invoice_number' => "INV-" . str_random(20),
-                'status_order_id' => $faker->numberBetween(1, 7),
-                'payment_id' => $faker->numberBetween(1, 8),
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
-    	}
-
-    	$faker = Faker::create('id_ID');
-
-    	for ($i=0; $i < 100; $i++) { 
-	        DB::table('orders')->insert([
-	        	'user_id' => $faker->unique()->numberBetween(4, 103),
-                'total_price' => '0',
-                'invoice_number' => "INV-" . str_random(20),
-                'status_order_id' => $faker->numberBetween(1, 7),
-                'payment_id' => $faker->numberBetween(1, 8),
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
-    	}
-
-    	$faker = Faker::create('id_ID');
-
-    	for ($i=0; $i < 100; $i++) { 
-	        DB::table('orders')->insert([
-	        	'user_id' => $faker->unique()->numberBetween(4, 103),
-                'total_price' => '0',
-                'invoice_number' => "INV-" . str_random(20),
-                'status_order_id' => $faker->numberBetween(1, 7),
-                'payment_id' => $faker->numberBetween(1, 8),
-	        	'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-	        ]);
+    	for ($i=6; $i <= 25; $i++) { //User
+            for ($j=0; $j < 10; $j++) { //Order
+    	        DB::table('orders')->insert([
+    	        	'user_id' => $i,
+                    'total_price' => '0',
+                    'invoice_number' => "INV/" . strtoupper(str_random(2)) . "/" . strtoupper(str_random(3)) . "/" . rand(100000, 999999),
+                    'status_order_id' => rand(1,7),
+                    'payment_id' => rand(1,8),
+    	        	'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+    	        ]);
+            }
     	}
     }
 }

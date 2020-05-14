@@ -16,17 +16,17 @@ class StoreSeeder extends Seeder
         $faker = Faker::create('id_ID');
         $faker2 = Faker::create('fr_CH');
 
-    	for ($i=0; $i < 30; $i++) { 
+    	for ($i=0; $i < 15; $i++) { //Store
         	$name = $faker2->name;
 	        DB::table('stores')->insert([
-                'user_id' => $faker->unique()->numberBetween(4, 103),
+                'user_id' => $faker->unique()->numberBetween(6, 25),
 	        	'name' => $name,
 	        	'slug' => str_slug($name),
-	        	'address' => $faker2->address,
+	        	'address' => $faker->address,
 	        	'description' => $faker->text,
-	        	'followers' => $faker->numberBetween(0, 100),
-	        	'ratings' => mt_rand (0, 50) / 10,
-	        	'status_store_id' => $faker->numberBetween(1, 4),
+	        	'followers' => rand(0,25),
+	        	'ratings' => rand(0,500) / 100,
+	        	'status_store_id' => rand(1,4),
 	        	'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
 	        ]);

@@ -36,7 +36,7 @@
 								</v-list-item-subtitle>
 								<v-divider class="my-4" />
 								<v-list-item class="ml-n4">
-									<span class="title mb-1 font-weight-black grey--text">Harga</span>
+									<span class="title mb-1 font-weight-black grey--text">Price</span>
 									<span class="headline font-weight-bold warning--text" style="margin-left:1em">{{merchandise.price | currency}}</span>
 								</v-list-item>
 								<v-divider class="my-4" />
@@ -49,7 +49,7 @@
 									<v-btn icon color="green" @click="addQty">
 										<v-icon>mdi-plus-circle</v-icon>
 									</v-btn>
-									<span class="caption font-weight-bold error--text" style="margin-left:1em">Tersisa {{merchandise.stock}}, beli segera!</span>
+									<span class="caption font-weight-bold error--text" style="margin-left:1em">{{merchandise.stock}} items left, buy this item immediately!</span>
 									<v-spacer />
 									<v-btn color="primary" @click="addCart" style="margin-left:1em">
 										<v-icon left>mdi-cart</v-icon> Add to Cart
@@ -57,15 +57,15 @@
 								</v-list-item>
 								<v-divider class="my-4" />
 								<v-list-item class="ml-n4">
-									<span class="title mb-1 font-weight-black grey--text" style="margin-right:1em">Info produk</span>
-									<span class="subtitle">Berat</span>
-									<span class="subtitle font-weight-bold primary--text" style="margin-left:0.3em">1200 gr</span>
+									<span class="title mb-1 font-weight-black grey--text" style="margin-right:1em">Product Info</span>
+									<span class="subtitle">Weight</span>
+									<span class="subtitle font-weight-bold primary--text" style="margin-left:0.3em">{{merchandise.weight}} gr</span>
 									<v-divider class="mx-4 my-2" inset vertical />
-									<span class="subtitle">Kondisi</span>
-									<span class="subtitle font-weight-bold primary--text" style="margin-left:0.3em">Baru</span>
+									<span class="subtitle">Condition</span>
+									<span class="subtitle font-weight-bold primary--text" style="margin-left:0.3em">New</span>
 									<v-divider class="mx-4 my-2" inset vertical />
-									<span class="subtitle">Ansuransi</span>
-									<span class="subtitle font-weight-bold primary--text" style="margin-left:0.3em">Ya</span>
+									<span class="subtitle">Insurance</span>
+									<span class="subtitle font-weight-bold primary--text" style="margin-left:0.3em">Yes</span>
 								</v-list-item>
 							</v-list-item-content>
 						</v-list-item>

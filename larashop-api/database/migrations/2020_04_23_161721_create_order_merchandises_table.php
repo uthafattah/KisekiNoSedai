@@ -18,7 +18,7 @@ class CreateOrderMerchandisesTable extends Migration
 			$table->integer('order_id')->unsigned();
 			$table->integer('merchandise_id')->unsigned();
 			$table->double("quantity")->default('1');
-			$table->string("note")->nullable();
+			$table->text("note")->nullable();
 			$table->timestamps();
 			$table->softDeletes();
 			
