@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\MerchandiseCategory;
 use App\Merchandise;
+use App\Wishlist;
+use Auth;
 use Illuminate\Http\Request;
 use App\Http\Resources\Merchandise as MerchandiseResource;
 use App\Http\Resources\MerchandiseCategory as MerchandiseCategoryResource;
@@ -13,8 +15,7 @@ class MerchandiseCategoryController extends Controller
 {
     public function index()
     {
-        //return response()->json(['merchandise_category' => MerchandiseCategory::all()], 200);
-        return new MerchandiseCategoryCollection(MerchandiseCategory::paginate(5));
+        return new MerchandiseCategoryCollection(MerchandiseCategory::paginate(10));
     }
 
     public function store(Request $request)
@@ -34,8 +35,15 @@ class MerchandiseCategoryController extends Controller
             ->get();   
 
         $merchandise = [];
-        foreach($merchandises as $merch){
-            $merchandise[] = Merchandise::where('id', '=', $merch->merchandise_id)->first();
+        foreach($merchandises as $temp){
+            $temp2 = Merchandise::where('id', '=', $temp->merchandise_id)->first();
+            if(Auth::user()) {
+                $wishlist = Wishlist::where('user_id', '=', Auth::user()->id)->where('merchandise_id', '=', $temp2->id)->first();
+                $temp2->status = $wishlist ? true : false;
+            } else {
+                $temp2->status = false;
+            }
+            $merchandise[] = new MerchandiseResource($temp2);
         }
         return response()->json(['merchandise' => $merchandise], 200);
     }

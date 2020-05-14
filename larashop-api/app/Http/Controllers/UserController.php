@@ -71,13 +71,6 @@ class UserController extends Controller
         return response()->json(['user' => $user], 200);
     }
 
-    public function deleteAll(Request $request)
-    {
-        User::whereIn('id', $request->users)->delete();
-        $selected = [];
-        return response()->json(['message', 'Records Deleted Successfully'], 200);
-    }
-
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');

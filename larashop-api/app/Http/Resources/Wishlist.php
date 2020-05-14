@@ -21,6 +21,7 @@ class Wishlist extends JsonResource
             'name' => $this->merchandise->name,
             'price' => $this->merchandise->price,
             'photo' => $this->merchandise->photo,
+            'status' => $this->status,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];

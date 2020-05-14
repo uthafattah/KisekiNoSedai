@@ -126,7 +126,7 @@
 				});
 			},
 			chooseMessage(id) {
-				this.axios.get('http://localhost:8000/api/message/messages/' + id + '/' + this.userId)
+				this.axios.get('http://localhost:8000/api/message/user_messages/' + id)
 				.then((res) => {
 					this.messages = res.data.message
 					this.header.name = res.data.message[0].store_name

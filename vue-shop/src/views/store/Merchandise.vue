@@ -143,7 +143,7 @@
 				handler(e) {
 					const sortBy = e.sortBy.length > 0 ? e.sortBy[0].trim() : 'id';
 					const orderBy = e.sortDesc[0] ? 'desc' : 'asc';
-					this.axios.get('http://localhost:8000/api/merchandise/store_merchandise/' + this.store.id, {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
+					this.axios.get('http://localhost:8000/api/merchandise', {params: {'page': e.page,'per_page': e.itemsPerPage, 'sort_by': sortBy, 'order_by': orderBy}})
 					.then(res => {
 						this.merchandises = res.data.merchandises
 						this.categories = res.data.categories
@@ -174,7 +174,7 @@
 					let formData = new FormData();
 					formData.append( "photo", this.editedItem.photo, this.editedItem.photo.name );
 					formData.append("merchandise", item.id);
-					this.axios.post("http://localhost:8000/api/merchandise/searchStoreId/" + this.store.id + "/photo", formData)
+					this.axios.post("http://localhost:8000/api/merchandise/photo", formData)
 					.then(res => {
 						this.merchandises.data[index].photo = res.data.merchandise.photo;
 						this.editedItem.photo = null;
@@ -184,7 +184,7 @@
 			},
 			updateCategory(item) {
 				const index = this.merchandises.data.indexOf(item);
-				this.axios.post("http://localhost:8000/api/merchandise/searchStoreId/" + this.store.id + "/category", { category: item.category, merchandise: item.id })
+				this.axios.post("http://localhost:8000/api/merchandise/category", { category: item.category, merchandise: item.id })
 				.then(res => {
 					this.text = res.data.merchandise.name + "'s Category Updated to " + res.data.merchandise.category;
 					this.snackbar = true;
@@ -198,12 +198,12 @@
 			searchIt(e) {
 				if(e) {
 					if(e.length > 2) {
-						this.axios.get("http://localhost:8000/api/merchandise/searchStoreId/" + this.store.id + "/${e}")
+						this.axios.get(`http://localhost:8000/api/merchandise/${e}`)
 						.then(res => this.merchandises = res.data.merchandise)
 						.catch(err => console.dir(err.response))
 					}
 				} else {
-					this.axios.get('http://localhost:8000/api/merchandise/searchStoreId/1' + this.store.id)
+					this.axios.get('http://localhost:8000/api/merchandise')
 					.then(res => this.merchandises = res.data.merchandises)
 					.catch(err => console.dir(err.response))
 				}
@@ -227,7 +227,7 @@
 			},
 			refresh() {
 				this.initialize()
-				this.axios.get('http://localhost:8000/api/merchandise/store_merchandise/' + this.store.id)
+				this.axios.get('http://localhost:8000/api/merchandise')
 				.then(res => {
 					this.merchandises = res.data.merchandises
 					this.categories = res.data.categories
@@ -248,7 +248,7 @@
 				const index = this.merchandises.data.indexOf(item)
 				let decide = confirm('Are you sure you want to delete this item?')
 				if(decide) {
-					this.axios.delete("http://localhost:8000/api/merchandise/searchStoreId/" + this.store.id + "/" + item.id)
+					this.axios.delete("http://localhost:8000/api/merchandise/" + item.id)
 					.then(res => {
 						this.setAlert({status: true, color: 'success', text: 'Record Deleted Successfully!'})
 						this.merchandises.data.splice(index, 1)
@@ -269,7 +269,7 @@
 			save () {
 				if (this.editedIndex > -1) {
 					const index = this.editedIndex
-					this.axios.put("http://localhost:8000/api/merchandise/searchStoreId/" + this.store.id + "/" + this.editedItem.id, this.editedItem)
+					this.axios.put("http://localhost:8000/api/merchandise/" + this.editedItem.id, this.editedItem)
 					.then(res => {
 						this.setAlert({status: true, color: 'success', text: 'Record Updated Successfully!'})
 						Object.assign(this.merchandises.data[index], res.data.merchandise)
@@ -279,7 +279,7 @@
 						this.setAlert({status: true, color: 'error', text: 'Error Updating Record!'})
 					})
 				} else {
-					this.axios.post('http://localhost:8000/api/merchandise/searchStoreId/' + this.store.id, this.editedItem)
+					this.axios.post('http://localhost:8000/api/merchandise', this.editedItem)
 					.then(res => {
 						this.setAlert({status: true, color: 'success', text: 'Record Added Successfully!'})
 						this.merchandises.data.push(res.data.merchandise)

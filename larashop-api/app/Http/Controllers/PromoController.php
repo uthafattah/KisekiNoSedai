@@ -9,6 +9,11 @@ use App\Http\Resources\PromoCollection as PromoResourceCollection;
 
 class PromoController extends Controller
 {
+    public function all()
+    {
+        return response()->json(['promos' => Promo::all()], 200);
+    }
+
     public function index(Request $request)
     {
         $per_page = $request->per_page ? $request->per_page : 10;

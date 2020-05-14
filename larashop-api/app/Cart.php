@@ -8,11 +8,6 @@ use App\Merchandise;
 
 class Cart extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'user_id', 'merchandise_id', 'quantity'
     ];

@@ -106,7 +106,7 @@
 			.then((res) => this.store = res.data.store)
 			.catch((err) => console.log(err.response))
 
-			this.axios.get('http://localhost:8000/api/merchandise/user_merchandise/' + this.$route.params.id)
+			this.axios.get('http://localhost:8000/api/merchandise/store_merchandise/' + this.$route.params.id)
 			.then((res) => this.merchandises = res.data.merchandise)
 			.catch((err) => console.log(err.response))
 		},

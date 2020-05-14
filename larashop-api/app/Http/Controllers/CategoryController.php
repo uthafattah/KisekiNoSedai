@@ -13,6 +13,11 @@ class CategoryController extends Controller
     {
         return response()->json(['categories' => Category::all()], 200);
     }
+    
+    public function pluck()
+    {
+        return response()->json(['categories' => Category::pluck('name')->all()], 200);
+    }
 
     public function index(Request $request)
     {

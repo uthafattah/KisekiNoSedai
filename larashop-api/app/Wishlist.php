@@ -8,6 +8,10 @@ use App\Merchandise;
 
 class Wishlist extends Model
 {
+	protected $fillable = [
+        'user_id', 'merchandise_id',
+    ];
+    
     public function user() {
         return $this->belongsTo(User::class);
     } 

@@ -19,38 +19,48 @@ use Illuminate\Http\Request;
 });*/
 
 Route::get('category/all', 'CategoryController@all');
+//-------------------------------------------------------------------------------------------------
 Route::get('merchandise/all', 'MerchandiseController@all');
 Route::get('merchandise/top/{count}', 'MerchandiseController@top');
+Route::get('merchandise/search/{id}', 'MerchandiseController@search');
 Route::get('merchandise/find/{id}', 'MerchandiseController@find');
 //-------------------------------------------------------------------------------------------------
-Route::get('merchandise_category/find/{id}', 'MerchandiseCategoryController@find');
-Route::get('merchandise/user_merchandise/{id}', 'MerchandiseController@userMerchandise');
+Route::get('merchandise/store_merchandise/{id}', 'MerchandiseController@storeMerchandise');
 //-------------------------------------------------------------------------------------------------
-Route::get('merchandise/search/{id}', 'MerchandiseController@search');
+Route::get('merchandise_category/find/{id}', 'MerchandiseCategoryController@find');
+Route::get('store_category/find/{id}', 'StoreCategoryController@find');
 //-------------------------------------------------------------------------------------------------
 Route::get('store/search/{id}', 'StoreController@search');
+Route::get('store/find/{id}', 'StoreController@find');
+//-------------------------------------------------------------------------------------------------
+Route::get('promo/all', 'PromoController@all');
 
 
 Route::group(['middleware'=> ['auth:api']], function() {
-	Route::get('cart/user_cart/{id}', 'CartController@userCart');
 	Route::get('cart/add_quantity/{id}', 'CartController@addQuantity');
 	Route::get('cart/subtract_quantity/{id}', 'CartController@subtractQuantity');
 	Route::resource("cart", "CartController");
 	//---------------------------------------------------------------------------------------------
 	Route::post('category/verify', 'CategoryController@verifyCategory');
+	Route::get('category/pluck', 'CategoryController@pluck');
 	Route::resource("category", "CategoryController");
 	//---------------------------------------------------------------------------------------------
+	//Route::get('merchandise/top/{count}', 'MerchandiseController@top');
+	Route::get('merchandise/find/{id}', 'MerchandiseController@find');
 	Route::resource("merchandise", "MerchandiseController");
-	Route::get('merchandise/store_merchandise/{id}', 'MerchandiseController@storeMerchandise');
 	//---------------------------------------------------------------------------------------------
+	Route::get('message/user_to_store', 'MessageController@userToStore');
+	Route::get('message/store_to_user', 'MessageController@storeToUser');
+	Route::get('message/user_messages/{id}', 'MessageController@userMessages');
+	Route::get('message/store_messages/{id}', 'MessageController@storeMessages');
 	Route::resource("message", "MessageController");
-	Route::get('message/user_to_store/{id}', 'MessageController@userToStore');
-	Route::get('message/store_to_user/{id}', 'MessageController@storeToUser');
-	Route::get('message/messages/{store_id}/{user_id}', 'MessageController@message');
 	//---------------------------------------------------------------------------------------------
-	Route::resource("order", "OrderController");
+	Route::get('order/user_order', 'OrderController@userOrder');
 	Route::get('order/store_order/{id}', 'OrderController@storeOrder');
+	Route::resource("order", "OrderController");
 	//---------------------------------------------------------------------------------------------
+	Route::get("order_merchandise/user_order_merchandise/{id}", "OrderMerchandiseController@userOrderMerchandise");
+	Route::get("order_merchandise/store_order_merchandise/{id}", "OrderMerchandiseController@storeOrderMerchandise");
 	Route::resource("order_merchandise", "OrderMerchandiseController");
 	//---------------------------------------------------------------------------------------------
 	Route::post('payment/verify', 'PaymentController@verifyPayment');
@@ -79,15 +89,14 @@ Route::group(['middleware'=> ['auth:api']], function() {
 	//---------------------------------------------------------------------------------------------
     Route::post('user/role', 'UserController@changeRole');
     Route::post('user/photo', 'UserController@changePhoto');
-	Route::post('users/delete', 'UserController@deleteAll');
 	Route::get('user/search/{id}', 'UserController@search');
 	Route::get('logged_user', 'UserController@loggedUser')->name('loggedUser');
 	Route::resource("user", "UserController");
 	//---------------------------------------------------------------------------------------------
 	Route::resource("wishlist", "WishlistController");
-	Route::get('wishlist/user_wishlist/{id}', 'WishlistController@userWishlist');
 });
 
+Route::get('wishlist/status/{user_id}/{merchandise_id}', 'WishlistController@status');
 Route::post('login', 'UserController@login')->name('login');
 Route::post('register', 'UserController@register')->name('register');
 Route::get('/verify', 'UserController@verify');

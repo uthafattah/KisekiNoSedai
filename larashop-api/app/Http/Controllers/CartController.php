@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Cart;
 use App\Merchandise;
+use App\Wishlist;
 use Auth;
 use Illuminate\Http\Request;
 use App\Http\Resources\Cart as CartResource;
@@ -13,27 +14,34 @@ class CartController extends Controller
 {
     public function index()
     {
-        //return response()->json(['cart' => Cart::all()], 200);
-        return new CartResourceCollection(Cart::paginate(5));
+        $carts = Cart::where('user_id', '=', Auth::user()->id)->get();
+        $cart = [];
+        foreach($carts as $temp){
+            $wishlist = Wishlist::where('user_id', '=', Auth::user()->id)->where('merchandise_id', '=', $temp->merchandise_id)->first();
+            $temp->status = $wishlist ? true : false;
+            $cart[] = new CartResource($temp);
+        }
+        return response()->json(['cart' => $cart], 200);
     }
 
     public function store(Request $request)
     {
-        $user_id = Auth::user()->id;
         $merchandise = Merchandise::where('id', $request->id)->first();
 
         $user_cart = Cart::select('*')
-            ->where('user_id', '=', $user_id)
+            ->where('user_id', '=', Auth::user()->id)
             ->where('merchandise_id', '=', $merchandise->id)
             ->first();
 
         if(!$user_cart) {
             $cart = new Cart([
-                'user_id' => $user_id,
+                'user_id' => Auth::user()->id,
                 'merchandise_id' => $merchandise->id,
                 'quantity' => $request->quantity
             ]);
             $cart->save();
+            $wishlist = Wishlist::where('user_id', '=', Auth::user()->id)->where('merchandise_id', '=', $cart->merchandise_id)->first();
+            $cart->status = $wishlist ? true : false;
             return response()->json(['cart' => new CartResource($cart)], 200);
         } else {
             $user_cart->quantity += $request->quantity;
@@ -46,16 +54,6 @@ class CartController extends Controller
     {
         $cart = Cart::where('id', '=', "$id")->first();
         return response()->json(['cart' => $cart], 200);
-    }
-
-    public function userCart($id)
-    {
-        $cart = Cart::where('user_id', '=', "$id")->get();
-        $merchandise_cart = [];
-        foreach($cart as $carts){
-            $merchandise_cart[] = new CartResource($carts);
-        }
-        return response()->json(['cart' => $merchandise_cart], 200);
     }
 
     public function update(Request $request, $id)

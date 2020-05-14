@@ -23,6 +23,7 @@ class Cart extends JsonResource
             'price' => $this->merchandise->price,
             'photo' => $this->merchandise->photo,
 			'quantity' => $this->quantity,
+            'status' => $this->status,
 			'created_at' => $this->created_at->format('Y-m-d H:i:s'),
 			'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
 		];

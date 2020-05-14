@@ -60,14 +60,14 @@
 			},
 		},
 		created(){
-			/*this.axios.get('http://localhost:8000/api/category/all')
+			this.axios.get('http://localhost:8000/api/category/pluck')
 			.then((res) => {
 				this.categories = res.data.categories
 				console.log(res.data.categories)
 			})
 			.catch((err) => {
 				console.log(err)
-			})*/
+			})
 		},
 	}
 </script>

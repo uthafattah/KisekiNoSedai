@@ -82,7 +82,7 @@
 		}),
 		created() {
 			this.initialize()
-			this.axios.get('http://localhost:8000/api/message/store_to_user/' + this.store.id)
+			this.axios.get('http://localhost:8000/api/message/store_to_user')
 			.then((res) => this.store_chat = res.data.store_chat)
 			.catch((err) => {
 				if(err.response.status == 401) {
@@ -123,7 +123,7 @@
 				});
 			},
 			chooseMessage(id) {
-				this.axios.get('http://localhost:8000/api/message/messages/' + this.store.id + '/' + id)
+				this.axios.get('http://localhost:8000/api/message/store_messages/' + id)
 				.then((res) => {
 					this.messages = res.data.message
 					this.header.name = res.data.message[0].user_name

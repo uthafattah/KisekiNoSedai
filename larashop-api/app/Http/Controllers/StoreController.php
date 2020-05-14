@@ -32,6 +32,16 @@ class StoreController extends Controller
         return response()->json(['store' => new StoreResourceCollection($store)], 200);
     }
 
+    public function find($id)
+    {
+        $stores = Store::where('name', 'LIKE', "%$id%")->get();  
+        $store = [];
+        foreach($stores as $temp){
+            $store[] = new StoreResource($temp);
+        }
+        return response()->json(['store' => $store], 200);
+    }
+
     public function search($id)
     {
         $store = Store::where('id', '=', "$id")->first();

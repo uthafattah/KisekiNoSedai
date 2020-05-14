@@ -11,8 +11,7 @@ class ReviewController extends Controller
 {
     public function index()
     {
-        //return response()->json(['review' => Review::all()], 200);
-        return new ReviewResourceCollection(Review::paginate(5));
+        return new ReviewResourceCollection(Review::paginate(10));
     }
 
     public function store(Request $request)

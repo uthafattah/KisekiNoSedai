@@ -48,7 +48,7 @@
 			MerchandiseItem: () => import(/* webpackChunkName: "merchandise-item" */ '@/components/MerchandiseItem.vue')
 		},
 		created() {
-			this.axios.get('http://localhost:8000/api/wishlist/user_wishlist')
+			this.axios.get('http://localhost:8000/api/wishlist')
 			.then((res) => {
 				this.setWishlist(res.data.wishlist)
 			})
