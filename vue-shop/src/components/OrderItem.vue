@@ -24,6 +24,7 @@
 											<v-list-item-title class="title font-weight-bold">{{item.merchandise_name}}</v-list-item-title>
 											<v-list-item-subtitle>
 												<span class="warning--text mr-4">{{item.price | currency}}</span> <span class="grey--text">{{item.quantity}} Produk</span>
+												<v-btn small outlined color="secondary" style="margin-left:5em" :to="toMerchandise(item.merchandise_id)">Merchandise Details</v-btn>
 											</v-list-item-subtitle>
 										</v-list-item-content>
 									</v-col>
@@ -109,7 +110,10 @@
 			moveOrder(status) {
 				this.setAlert({status: true, color: 'success', text: 'Order Status Change to ' + status + '!'})
 				this.status = ''
-			}
+			},
+			toMerchandise(id) {
+				return "/merchandise/" + id
+			},
 		},
 		computed: {
 			totalPrice() {

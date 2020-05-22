@@ -32,7 +32,7 @@
 					</v-avatar>
 					<span class="title font-weight-bold">{{header.name}}</span>
 					<v-spacer/>
-					<v-btn icon large @click="clearInbox" v-if="header.avatar"><v-icon large>mdi-close-circle-outline</v-icon></v-btn>
+					<v-btn icon large @click="clearInbox" v-if="header.avatar" class="mr-1"><v-icon large>mdi-close-circle-outline</v-icon></v-btn>
 				</v-toolbar>
 				<v-divider class="mr-4 mb-2" />
 				<v-sheet id="scrolling-techniques-8" class="overflow-y-auto" max-height="475">

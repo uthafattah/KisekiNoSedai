@@ -15,8 +15,7 @@ class OrderMerchandiseSeeder extends Seeder
     {
     	for ($i=1; $i <= 200; $i++) { //Order
             $faker = Faker::create('id_ID');
-            $count = rand(1,3);
-            for ($j=0; $j < $count; $j++) { //Merchandise
+            for ($j=0; $j < 2; $j++) { //Merchandise
     	        DB::table('order_merchandises')->insert([
     	        	'order_id' => $i,
                     'merchandise_id' => $faker->unique()->numberBetween(1, 150),

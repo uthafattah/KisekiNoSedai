@@ -22,7 +22,7 @@
 
 					<v-card-actions>
 						<v-spacer />
-						<v-btn text rounded small color="light-blue darken-1">
+						<v-btn text rounded small color="light-blue darken-1" @click="copy(promo.promo_code)">
 							<v-icon small left>mdi-content-copy</v-icon> Copy Code
 						</v-btn>
 					</v-card-actions>
@@ -44,6 +44,10 @@
 			getImage(image) {
 				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
+			copy(code) {
+				code.select()
+				document.execCommand('copy')
+			}
 		},
 		created(){
 			this.axios.get('http://localhost:8000/api/promo/all')

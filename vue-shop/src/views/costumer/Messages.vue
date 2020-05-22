@@ -28,12 +28,17 @@
 			</v-col>
 			<v-col cols="8" sm="8">
 				<v-toolbar flat>
-					<v-avatar size="36" v-if="header.logo" style="margin-right:1em">
+					<v-avatar size="42" v-if="header.logo" style="margin-right:0.5em">
 						<v-img :src="getImage(header.logo)" aspect-ratio="1"/>
 					</v-avatar>
-					<span class="title font-weight-bold">{{header.name}}</span>
+					<v-list-item class="mt-n1" v-if="header.logo">
+						<v-list-item-content>
+							<v-list-item-title class="title mb-n1 font-weight-black">{{header.name}}</v-list-item-title>
+							<v-list-item-subtitle>{{header.status_store}}</v-list-item-subtitle>
+						</v-list-item-content>
+					</v-list-item>
 					<v-spacer/>
-					<v-btn icon large @click="clearInbox" v-if="header.logo"><v-icon large>mdi-close-circle-outline</v-icon></v-btn>
+					<v-btn icon large @click="clearInbox" v-if="header.logo" class="mr-1"><v-icon large>mdi-close-circle-outline</v-icon></v-btn>
 				</v-toolbar>
 				<v-divider class="mr-4 mb-2" />
 				<v-sheet id="scrolling-techniques-8" class="overflow-y-auto" max-height="475">
@@ -79,6 +84,7 @@
 			header: {
 				name: '',
 				logo: '',
+				status_store: '',
 			}
 		}),
 		created() {
@@ -131,6 +137,7 @@
 					this.messages = res.data.message
 					this.header.name = res.data.message[0].store_name
 					this.header.logo = res.data.message[0].logo
+					this.header.status_store = res.data.message[0].status_store
 				})
 				.catch((err) => {
 					if(err.response.status == 401) {
@@ -148,6 +155,7 @@
 				this.messages = []
 				this.header.name = ''
 				this.header.logo = ''
+				this.header.status_store = ''
 			},
 			clearMessage () {
 				this.message = ''

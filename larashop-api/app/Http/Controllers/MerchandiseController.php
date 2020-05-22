@@ -86,6 +86,12 @@ class MerchandiseController extends Controller
     public function search($id)
     {
         $merchandise = Merchandise::where('id', '=', "$id")->first();
+        if(Auth::user()) {
+            $wishlist = Wishlist::where('user_id', '=', Auth::user()->id)->where('merchandise_id', '=', $temp->id)->first();
+            $merchandise->status = $wishlist ? true : false;
+        } else {
+            $merchandise->status = false;
+        }
         return response()->json(['merchandise' => new MerchandiseResource($merchandise)], 200);
     }
 

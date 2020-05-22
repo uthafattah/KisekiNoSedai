@@ -9,6 +9,11 @@ use App\Http\Resources\ReviewCollection as ReviewResourceCollection;
 
 class ReviewController extends Controller
 {
+    public function all()
+    {
+        return new ReviewResourceCollection(Review::paginate(10));
+    }
+
     public function index()
     {
         return new ReviewResourceCollection(Review::paginate(10));
@@ -22,6 +27,16 @@ class ReviewController extends Controller
     public function show($id)
     {
         //
+    }
+
+    public function merchandiseReview($id)
+    {
+        $reviews = Review::where('order_merchandise_id', '=', "$id")->get();
+        $review = [];
+        foreach($reviews as $temp){
+            $review[] = new ReviewResource($temp);
+        }
+        return response()->json(['review' => $review], 200);
     }
 
     public function update(Request $request, $id)

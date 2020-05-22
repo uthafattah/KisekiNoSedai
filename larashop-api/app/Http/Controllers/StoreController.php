@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Store;
 Use App\StatusStore;
+use App\Category;
+use App\Follow;
+use Auth;
 use Illuminate\Http\Request;
 use App\Http\Resources\Store as StoreResource;
 use App\Http\Resources\StoreCollection as StoreResourceCollection;
@@ -37,6 +40,12 @@ class StoreController extends Controller
         $stores = Store::where('name', 'LIKE', "%$id%")->get();  
         $store = [];
         foreach($stores as $temp){
+            if(Auth::user()) {
+                $follow = Follow::where('user_id', '=', Auth::user()->id)->where('store_id', '=', $temp->id)->first();
+                $temp->status = $follow ? true : false;
+            } else {
+                $temp->status = false;
+            }
             $store[] = new StoreResource($temp);
         }
         return response()->json(['store' => $store], 200);
@@ -45,6 +54,12 @@ class StoreController extends Controller
     public function search($id)
     {
         $store = Store::where('id', '=', "$id")->first();
+        if(Auth::user()) {
+            $follow = Follow::where('user_id', '=', Auth::user()->id)->where('store_id', '=', $store->id)->first();
+            $store->status = $follow ? true : false;
+        } else {
+            $store->status = false;
+        }
         return response()->json(['store' => new StoreResource($store)], 200);
     }
 

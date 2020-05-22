@@ -62,10 +62,10 @@
 									<span class="subtitle font-weight-bold primary--text" style="margin-left:0.3em">{{merchandise.weight}} gr</span>
 									<v-divider class="mx-4 my-2" inset vertical />
 									<span class="subtitle">Condition</span>
-									<span class="subtitle font-weight-bold primary--text" style="margin-left:0.3em">New</span>
+									<span class="subtitle font-weight-bold primary--text" style="margin-left:0.3em">{{merchandise.condition}}</span>
 									<v-divider class="mx-4 my-2" inset vertical />
 									<span class="subtitle">Insurance</span>
-									<span class="subtitle font-weight-bold primary--text" style="margin-left:0.3em">Yes</span>
+									<span class="subtitle font-weight-bold primary--text" style="margin-left:0.3em">{{merchandise.insurance}}</span>
 								</v-list-item>
 							</v-list-item-content>
 						</v-list-item>
@@ -87,11 +87,32 @@
 			<v-tab-item v-for="(item, index) in tab_header" :key="index" :value="`tab-${index}`">
 				<v-row class="mx-2">
 					<v-col cols="12">
-						<v-card flat>
+						<v-card flat v-if="index == 0">
 							<v-card-text>
 								{{merchandise.description}}
 							</v-card-text>
 						</v-card>
+						<v-row v-else>
+							<v-col cols="12">
+								<v-card outlined class="mx-4">
+									<v-list-item two-line class="mt-n4">
+										<v-list-item-avatar tile size="36">
+											<v-img src="http://localhost:8000/storage/avatars/no_avatar.png"></v-img>
+										</v-list-item-avatar>
+										<v-list-item-content class="mt-7">
+											<v-list-item>
+												<span class="ml-n4 title">Ahmad</span>
+												<v-rating :value="4.5" color="amber" dense half-increments readonly size="20" style="margin-left:1em"/>
+												<span class="mt-1 ml-2 caption">(4.5)</span>
+											</v-list-item>
+											<v-list-item-subtitle class="subtitle-1 grey--text">
+												Packing aman,Barang ori,penjual responnya cepat..mantap gan.semoga tambah sukses Packing aman,Barang ori,penjual responnya cepat..mantap gan.semoga tambah sukses Packing aman,Barang ori,penjual responnya cepat.
+											</v-list-item-subtitle>
+										</v-list-item-content>
+									</v-list-item>
+								</v-card>
+							</v-col>
+						</v-row>
 					</v-col>
 				</v-row>
 			</v-tab-item>
@@ -99,7 +120,7 @@
 	</v-card>
 </template>
 <script>
-	import { mapActions } from 'vuex'
+	import { mapActions, mapGetters } from 'vuex'
 	export default {
 		data: () => ({
 			loading: false,
@@ -135,15 +156,19 @@
 				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
 			},
 			addCart() {
-				this.axios.post('http://localhost:8000/api/cart', { id: this.$route.params.id, quantity: this.qty })
-				.then((res) => {
-					this.insertCart(res.data.cart)
-					this.setAlert({status: true, color: 'success', text: 'Success Adding Item to Cart!'})
-				})
-				.catch((err) => {
-					console.log(err)
-					this.setAlert({status: true, color: 'error', text: 'Failed Add Item to Cart!'})
-				})
+				if(this.userId) {
+					this.axios.post('http://localhost:8000/api/cart', { id: this.$route.params.id, quantity: this.qty })
+					.then((res) => {
+						this.insertCart(res.data.cart)
+						this.setAlert({status: true, color: 'success', text: 'Success Adding Item to Cart!'})
+					})
+					.catch((err) => {
+						console.log(err)
+						this.setAlert({status: true, color: 'error', text: 'Failed Add Item to Cart!'})
+					})
+				} else {
+					this.setAlert({status: true, color: 'warning', text: 'You Must Login to Adding Item!'})
+				}
 			},
 			addQty() {
 				if(this.qty < this.merchandise.stock) this.qty++
@@ -152,6 +177,11 @@
 				if(this.qty > 1) this.qty--
 			},
 		},
+		computed: {
+			...mapGetters({
+				userId: 'auth/getId',
+			}),
+		}
 	}
 </script>
 <style scoped>

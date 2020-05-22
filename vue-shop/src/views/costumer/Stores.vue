@@ -6,10 +6,7 @@
 					<div class="mb-4 ml-n4 spacer" no-gutters>
 						<v-btn text dark>
 							<v-avatar tile size="24">
-								<v-icon color="grey" v-if="store.status_store == 'Official Store'">mdi-sticker-check</v-icon>
-								<v-icon color="grey" v-else-if="store.status_store == 'Starred Store'">mdi-star-circle</v-icon>
-								<v-icon color="grey" v-else-if="store.status_store == 'Verified Store'">mdi-shield-check</v-icon>
-								<v-icon color="grey" v-else>mdi-storefront</v-icon>
+								<v-icon color="grey">{{iconStatusStore}}</v-icon>
 							</v-avatar>
 							<div style="margin-left:0.5em" class="grey--text"><strong>{{store.status_store}}</strong></div>
 						</v-btn> 
@@ -25,8 +22,8 @@
 
 			<v-card-actions>
 				<v-spacer />
-				<v-btn :outlined="outlined" :color="follow_color" @click="follow" @mouseover="mouseOver" @mouseleave="mouseLeave">{{messages}}</v-btn>
-				<v-btn outlined color="secondary" to="/messages">Message Store</v-btn>
+				<v-btn :outlined="outlined" :color="follow_color" @click="follow" @mouseover="mouseOver" @mouseleave="mouseLeave" v-if="userId">{{message}}</v-btn>
+				<v-btn outlined color="secondary" to="/message" v-if="userId">Message Store</v-btn>
 			</v-card-actions>
 			<v-divider class="mt-4 mx-4" />
 			<v-row class="mx-4 mb-n6">
@@ -50,9 +47,9 @@
 	export default {
 		data: () => ({
 			outlined: true,
-			messages: 'Follow',
+			message: '',
 			follow_color: 'success',
-			wishlist_color: 'pink lighten-5',
+			status: false,
 			unfollow : false,
 			sorting: ['Highest Rating', 'Highest Price', 'Lowest Price', 'Most Reviews', 'Most Purchases', 'Most Viewed'],
 			merchandises: [],
@@ -66,28 +63,46 @@
 				setAlert: 'alert/set'
 			}),
 			follow() {
-				if(this.messages === 'Follow') {
-					this.messages = 'Following'
-					this.outlined = false
-					this.unfollow = true
-					this.setAlert({status: true, color: 'success', text: 'You are Now Following this Store'})
-				} else if (this.messages === 'Unfollow') {
-					this.messages = 'Follow'
-					this.follow_color = 'success'
-					this.outlined = true
-					this.unfollow = false
-					this.setAlert({status: true, color: 'error', text: 'You are Unfollowing this Store'})
+				if(!this.status) {
+					this.axios.post('http://localhost:8000/api/follow', { store_id: this.$route.params.id })
+					.then(res => {
+						console.log(res)
+						this.message = 'Following'
+						this.outlined = !this.outlined
+						this.status = !this.status
+						this.unfollow = true
+						this.setAlert({status: true, color: 'success', text: 'You are Now Following this Store'})
+					})
+					.catch(err => {
+						console.log(err.response)
+						this.setAlert({status: true, color: 'error', text: 'Failed Following this Store!'})
+					})
+				} else {
+					this.axios.delete('http://localhost:8000/api/follow/' + this.$route.params.id)
+					.then(res => {
+						this.removeFollow(res.data.follow)
+						this.message = 'Follow'
+						this.outlined = !this.outlined
+						this.status = !this.status
+						this.follow_color = 'success'
+						this.unfollow = false
+						this.setAlert({status: true, color: 'error', text: 'You are Unfollowing this Store'})
+					})
+					.catch(err => {
+						console.log(err.response)
+						this.setAlert({status: true, color: 'error', text: 'Error Unfollowing this Store!'})
+					})
 				}
 			},
 			mouseOver: function() {
 				if(this.unfollow) {
-					this.messages = 'Unfollow'
+					this.message = 'Unfollow'
 					this.follow_color = 'error'
 				}
 			},
 			mouseLeave: function() {
 				if(this.unfollow) {
-					this.messages = 'Following'
+					this.message = 'Following'
 					this.follow_color = 'success'
 					this.outlined = false
 				}
@@ -98,12 +113,27 @@
 		},
 		computed: {
 			...mapGetters({
-
+				userId: 'auth/getId',
 			}),
+			iconStatusStore() {
+				if(this.store.status_store == 'Official Store') return 'mdi-sticker-check'
+				else if(this.store.status_store == 'Starred Store') return 'mdi-star-circle'
+				else if(this.store.status_store == 'Verified Store') return 'mdi-shield-check'
+				else if(this.store.status_store == 'Default') return 'mdi-storefront'
+				else return null
+			},
+			msg() {
+				return (this.store.status) ? 'Following' : 'Follow'
+			},
 		},
 		created(){
 			this.axios.get('http://localhost:8000/api/store/search/' + this.$route.params.id)
-			.then((res) => this.store = res.data.store)
+			.then((res) => {
+				this.store = res.data.store
+				this.status = this.store.status
+					this.outlined = !this.status
+					this.message = this.msg
+			})
 			.catch((err) => console.log(err.response))
 
 			this.axios.get('http://localhost:8000/api/merchandise/store_merchandise/' + this.$route.params.id)

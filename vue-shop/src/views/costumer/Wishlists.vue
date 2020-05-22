@@ -41,10 +41,8 @@
 <script>
 	import { mapGetters, mapActions } from 'vuex'
 	export default {
-		data: () => ({
-			stores: []
-		}),
 		components: {
+			StoreItem: () => import(/* webpackChunkName: "store-item" */ '@/components/StoreItem.vue'),
 			MerchandiseItem: () => import(/* webpackChunkName: "merchandise-item" */ '@/components/MerchandiseItem.vue')
 		},
 		created() {
@@ -59,15 +57,29 @@
 				}
 				console.log(err)
 			})
+
+			this.axios.get('http://localhost:8000/api/follow')
+			.then((res) => {
+				this.setFollow(res.data.follow)
+			})
+			.catch((err) => {
+				if(err.response.status == 401) {
+					localStorage.removeItem('token');
+					this.$router.push('/');
+				}
+				console.log(err)
+			})
 		},
 		computed: {
 			...mapGetters({
 				merchandises: 'wishlist/getWishlist',
+				stores: 'follow/getFollow',
 			}),
 		},
 		methods: {
 			...mapActions({
-				setWishlist: 'wishlist/set'
+				setWishlist: 'wishlist/set',
+				setFollow: 'follow/set'
 			}),
 		},
 	}

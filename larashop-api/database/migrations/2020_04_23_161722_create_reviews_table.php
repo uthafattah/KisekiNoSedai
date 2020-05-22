@@ -15,13 +15,13 @@ class CreateReviewsTable extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->increments('id');
-			$table->integer('order_id')->unsigned();
+			$table->integer('order_merchandise_id')->unsigned();
 			$table->decimal("rating")->nullable();
 			$table->text('comment')->nullable();
 			$table->timestamps();
 			$table->softDeletes();
 			
-			$table->foreign('order_id')->references('id')->on('orders');
+			$table->foreign('order_merchandise_id')->references('id')->on('order_merchandises');
         });
     }
 
@@ -33,7 +33,7 @@ class CreateReviewsTable extends Migration
     public function down()
     {
 		Schema::table('reviews', function(Blueprint $table){
-            $table->dropForeign('review_order_id_foreign');
+            $table->dropForeign('review_order_merchandise_id_foreign');
         });
 		
         Schema::dropIfExists('reviews');

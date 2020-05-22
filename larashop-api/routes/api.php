@@ -46,7 +46,8 @@ Route::group(['middleware'=> ['auth:api']], function() {
 	Route::resource("category", "CategoryController");
 	//---------------------------------------------------------------------------------------------
 	//Route::get('merchandise/top/{count}', 'MerchandiseController@top');
-	Route::get('merchandise/find/{id}', 'MerchandiseController@find');
+	//Route::get('merchandise/find/{id}', 'MerchandiseController@find');
+	//Route::get('merchandise/search/{id}', 'MerchandiseController@search');
 	Route::resource("merchandise", "MerchandiseController");
 	//---------------------------------------------------------------------------------------------
 	Route::get('message/user_to_store', 'MessageController@userToStore');
@@ -81,6 +82,7 @@ Route::group(['middleware'=> ['auth:api']], function() {
 	Route::post('status_store/verify', 'StatusStoreController@verifyStatus');
 	Route::resource("status_store", "StatusStoreController");
 	//---------------------------------------------------------------------------------------------
+	//Route::get('store/search/{id}', 'StoreController@search');
     Route::post('store/status_store', 'StoreController@changeStatus');
     Route::put('store/status/{id}', 'StoreController@status');
 	Route::resource("store", "StoreController");
@@ -94,8 +96,11 @@ Route::group(['middleware'=> ['auth:api']], function() {
 	Route::resource("user", "UserController");
 	//---------------------------------------------------------------------------------------------
 	Route::resource("wishlist", "WishlistController");
+	//---------------------------------------------------------------------------------------------
+	Route::resource("follow", "FollowController");
 });
 
+Route::get('review/merchandise/{id}', 'ReviewController@merchandiseReview');
 Route::get('wishlist/status/{user_id}/{merchandise_id}', 'WishlistController@status');
 Route::post('login', 'UserController@login')->name('login');
 Route::post('register', 'UserController@register')->name('register');
