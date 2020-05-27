@@ -23,6 +23,7 @@ class CreateMerchandisesTable extends Migration
 			$table->double("stock")->nullable();
             $table->double("price")->nullable();
             $table->double("weight")->nullable();
+            $table->decimal("rating")->nullable();
             $table->enum("condition", ["New", "Secondhand"]);
             $table->enum("insurance", ["Yes", "No"]);
 			$table->double("view_count")->nullable();

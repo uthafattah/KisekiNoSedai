@@ -28,23 +28,26 @@
 		</v-tabs>
 		<v-tabs-items v-model="tab">
 			<v-tab-item v-for="(item, index) in tab_item" :key="index" :value="`tab-${index}`">
-				<v-row class="mx-2" v-if="checkStatusOrder(index) || index == 0">
-					<v-col cols="12" v-for="(order) in orders" :key="order.id" link :to="order.action">
-						<OrderItem :order="order" v-if="index == 0" />
-						<OrderItem :order="order" v-if="order.status_order_id == index" />
-					</v-col>
-				</v-row>
-				<v-row class="mx-2" v-else>
-					<v-col cols="12">
-						<v-card outlined>
-							<v-list-item>
-								<v-list-item-content>
-									ORDER NOT FOUND
-								</v-list-item-content>
-							</v-list-item>
-						</v-card>
-					</v-col>
-				</v-row>
+				<div v-if="checkStatusOrder(index) || index == 0">
+					<v-row class="mx-2" v-for="(order) in orders" :key="order.id" link :to="order.action">
+						<v-col cols="12" v-if="index == 0 || order.status_order_id == index">
+							<OrderItem :order="order" />
+						</v-col>
+					</v-row>
+				</div>
+				<div v-else>
+					<v-row class="mx-2">
+						<v-col cols="12">
+							<v-card outlined>
+								<v-list-item>
+									<v-list-item-content>
+										ORDER NOT FOUND
+									</v-list-item-content>
+								</v-list-item>
+							</v-card>
+						</v-col>
+					</v-row>
+				</div>
 				<v-card-actions v-if="total(index) != 0">
 					<v-spacer />
 					<v-text-field dense outlined readonly :value="total(index)" label="Total Shopping" prefix="Rp" class="mr-3 mt-4 shrink" style="width: 250px;"/>

@@ -22,7 +22,7 @@ class CreateStoresTable extends Migration
 			$table->text("address")->nullable();
 			$table->text("description")->nullable();
 			$table->double("followers")->nullable();
-			$table->decimal("ratings")->nullable();
+			$table->decimal("rating")->nullable();
             $table->integer('status_store_id')->unsigned();
             $table->timestamps();
 			$table->softDeletes();

@@ -30,16 +30,4 @@ class User extends Authenticatable
 	public function role() {
 		return $this->belongsTo(Role::class);
 	}
-	
-	public function isAdmin() {
-        return strtolower($this->role->name) === 'administrator';
-    }
-
-    public function isStaff() {
-        return strtolower($this->role->name) === 'staff';
-    }
-
-    public function isCostumer() {
-        return strtolower($this->role->name) === 'costumer';
-    }
 }

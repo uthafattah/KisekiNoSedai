@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\User;
 use App\StatusOrder;
-use App\OrderMerchandise;
+use App\Payment;
 
 class Order extends Model
 {
@@ -17,7 +17,7 @@ class Order extends Model
         return $this->belongsTo(StatusOrder::class);
     }
 
-    public function order_merchandise() {
-        return $this->belongsToMany(OrderMerchandise::class);
-    } 
+    public function payment() {
+        return $this->belongsTo(Payment::class);
+    }
 }

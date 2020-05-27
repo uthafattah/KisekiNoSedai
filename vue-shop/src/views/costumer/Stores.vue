@@ -13,6 +13,14 @@
 					</div>
 					<v-list-item-title class="display-1 mb-1 font-weight-black">{{store.name}}</v-list-item-title>
 					<v-list-item-subtitle>{{store.description}}</v-list-item-subtitle>
+					<v-list-item class="ml-n4">
+						<span class="subtitle-2 grey--text">Followers</span>
+						<span class="subtitle-2 font-weight-bold warning--text" style="margin-left:0.5em">{{store.followers}}</span>
+						<v-divider class="mx-4 my-3" inset vertical />
+						<span class="subtitle-2 grey--text">Rating</span>
+						<v-rating :value="rating(store.rating)" color="amber" dense half-increments readonly size="20" style="margin-left:1em"/>
+						<span class=" ml-2 subtitle-2">({{store.rating}})</span>
+					</v-list-item>
 				</v-list-item-content>
 
 				<v-list-item-avatar size="100">
@@ -109,6 +117,9 @@
 			},
 			getImage(image) {
 				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
+			},
+			rating(rating) {
+				return Number(rating)
 			},
 		},
 		computed: {

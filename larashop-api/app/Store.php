@@ -16,13 +16,5 @@ class Store extends Model
 
     public function status_store() {
         return $this->belongsTo(StatusStore::class);
-    } 
-
-    public function category() {
-        return $this->belongsTo(Category::class);
-    } 
-
-    public function store_category() {
-        return $this->belongsToMany(StoreCategory::class);
-    } 
+    }
 }

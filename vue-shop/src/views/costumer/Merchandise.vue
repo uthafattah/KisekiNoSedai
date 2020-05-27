@@ -26,14 +26,21 @@
 											<v-icon color="grey" v-else>mdi-storefront</v-icon>
 										</v-avatar>
 										<div style="margin-left:0.5em" class="grey--text"><strong>{{merchandise.status_store}}</strong></div>
-									</v-btn> 
+									</v-btn>
 								</div>
 								<v-list-item-title class="title mb-1 font-weight-black">{{merchandise.name}}</v-list-item-title>
-								<v-list-item-subtitle>
-									<strong>Sold 1 Product</strong> (100%)
-									<v-divider class="mx-4" inset vertical />
-									<strong>{{merchandise.view_count}}x</strong> Viewed
-								</v-list-item-subtitle>
+								<v-list-item class="ml-n4">
+									<span class="grey--text">Rating</span>
+									<v-rating :value="rating(merchandise.rating)" color="amber" dense half-increments readonly size="20" style="margin-left:1em"/>
+									<span class="ml-2">({{merchandise.rating}})</span>
+									<v-divider class="mx-4 my-3" inset vertical />
+									<span class="grey--text">Sold</span>
+									<span class="font-weight-bold primary--text" style="margin-left:0.5em">1</span>
+									<span class="grey--text" style="margin-left:0.5em">Product</span>
+									<v-divider class="mx-4 my-3" inset vertical />
+									<span class="grey--text">Viewed</span>
+									<span class="font-weight-bold primary--text" style="margin-left:0.5em">{{merchandise.view_count}} x</span>
+								</v-list-item>
 								<v-divider class="my-4" />
 								<v-list-item class="ml-n4">
 									<span class="title mb-1 font-weight-black grey--text">Price</span>
@@ -73,8 +80,45 @@
 				</v-col>
 			</v-row>
 		</v-list-item>
+		<v-divider/>
+		<v-list-item three-line>
+			<v-row>
+				<v-col cols="2" class="mr-n6">
+					<v-list-item-avatar size="100">
+						<v-img src="http://localhost:8000/storage/logos/no_logo.png" aspect-ratio="1" rounded />
+					</v-list-item-avatar>
+				</v-col>
+				<v-col cols="6" class="ml-n12">
+					<v-list-item-content>
+						<div class="ml-n4 spacer" no-gutters>
+							<v-btn text dark>
+								<v-avatar tile size="24">
+									<v-icon color="grey">{{iconStatusStore}}</v-icon>
+								</v-avatar>
+								<div style="margin-left:0.5em" class="grey--text"><strong>{{merchandise.status_store}}</strong></div>
+							</v-btn> 
+						</div>
+						<v-list-item-title class="title font-weight-black">{{merchandise.store_name}}</v-list-item-title>
+						<v-list-item class="ml-n4 mt-n2">
+							<span class="subtitle-2 grey--text">Followers</span>
+							<span class="subtitle-2 font-weight-bold warning--text" style="margin-left:0.5em">{{merchandise.store_followers}}</span>
+							<v-divider class="mx-4 my-3" inset vertical />
+							<span class="subtitle-2 grey--text">Rating</span>
+							<v-rating :value="rating(merchandise.store_rating)" color="amber" dense half-increments readonly size="20" style="margin-left:1em"/>
+							<span class=" ml-2 subtitle-2">{{merchandise.store_rating}}</span>
+						</v-list-item>
+					</v-list-item-content>
+				</v-col>
+				<v-col cols="2">
+					<v-btn large outlined color="success" to="/messages" class="mt-10" v-if="userId">Message Store</v-btn>
+				</v-col>
+				<v-col cols="2">
+					<v-btn large outlined color="secondary" :to="toStore()" class="mt-10 ml-6" v-if="userId">Store Details</v-btn>
+				</v-col>
+			</v-row>
+		</v-list-item>
 
-		<v-divider class="mx-4" />
+		<v-divider/>
 		<v-tabs grow v-model="tab" background-color="white" icons-and-text>
 			<v-progress-linear :active="loading" :indeterminate="loading" absolute top color="white accent-4"></v-progress-linear>
 			<v-tabs-slider></v-tabs-slider>
@@ -93,20 +137,20 @@
 							</v-card-text>
 						</v-card>
 						<v-row v-else>
-							<v-col cols="12">
+							<v-col cols="12" v-for="(review) in reviews" :key="review.id">
 								<v-card outlined class="mx-4">
 									<v-list-item two-line class="mt-n4">
 										<v-list-item-avatar tile size="36">
-											<v-img src="http://localhost:8000/storage/avatars/no_avatar.png"></v-img>
+											<v-img :src="getImage(review.user_avatar)"></v-img>
 										</v-list-item-avatar>
 										<v-list-item-content class="mt-7">
 											<v-list-item>
-												<span class="ml-n4 title">Ahmad</span>
-												<v-rating :value="4.5" color="amber" dense half-increments readonly size="20" style="margin-left:1em"/>
-												<span class="mt-1 ml-2 caption">(4.5)</span>
+												<span class="ml-n4 title">{{review.user_name}}</span>
+												<v-rating :value="rating(review.rating)" color="amber" dense half-increments readonly size="20" style="margin-left:1em"/>
+												<span class="mt-1 ml-2 caption">({{review.rating}})</span>
 											</v-list-item>
 											<v-list-item-subtitle class="subtitle-1 grey--text">
-												Packing aman,Barang ori,penjual responnya cepat..mantap gan.semoga tambah sukses Packing aman,Barang ori,penjual responnya cepat..mantap gan.semoga tambah sukses Packing aman,Barang ori,penjual responnya cepat.
+												{{review.comment}}
 											</v-list-item-subtitle>
 										</v-list-item-content>
 									</v-list-item>
@@ -136,12 +180,21 @@
 					text: 'Review',
 				},
 			],
-			merchandise: {}
+			merchandise: {},
+			reviews: []
 		}),
 		created(){
 			this.axios.get('http://localhost:8000/api/merchandise/search/' + this.$route.params.id)
 			.then((res) => {
 				this.merchandise = res.data.merchandise
+			})
+			.catch((err) => {
+				console.log(err)
+			})
+
+			this.axios.get('http://localhost:8000/api/review/merchandise/' + this.$route.params.id)
+			.then((res) => {
+				this.reviews = res.data.review
 			})
 			.catch((err) => {
 				console.log(err)
@@ -154,6 +207,9 @@
 			}),
 			getImage(image) {
 				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
+			},
+			rating(rating) {
+				return Number(rating)
 			},
 			addCart() {
 				if(this.userId) {
@@ -176,11 +232,21 @@
 			subtractQty() {
 				if(this.qty > 1) this.qty--
 			},
+			toStore() {
+				return "/stores/" + this.merchandise.store_id
+			},
 		},
 		computed: {
 			...mapGetters({
 				userId: 'auth/getId',
 			}),
+			iconStatusStore() {
+				if(this.merchandise.status_store == 'Official Store') return 'mdi-sticker-check'
+				else if(this.merchandise.status_store == 'Starred Store') return 'mdi-star-circle'
+				else if(this.merchandise.status_store == 'Verified Store') return 'mdi-shield-check'
+				else if(this.merchandise.status_store == 'Default') return 'mdi-storefront'
+				else return null
+			},
 		}
 	}
 </script>

@@ -31,7 +31,7 @@
 					</v-row>
 				</v-card-text>
 				<v-card-actions class="mt-n4 mx-1">
-					<v-btn color="light-blue darken-1" block class="title white--text" to="/checkout">Order ({{qty}})</v-btn>
+					<v-btn color="light-blue darken-1" block class="title white--text" @click="order">Order ({{qty}})</v-btn>
 				</v-card-actions>
 				<v-card-actions class="mx-1">
 					<v-btn outlined color="light-blue darken-1" block class="title white--text" to="/promos">
@@ -64,14 +64,20 @@
 		computed: {
 			...mapGetters({
 				cart: 'cart/getCart',
-				total: 'cart/getTotal',
-				qty: 'cart/getQuantity'
+				total: 'cart/getCheckedTotal',
+				qty: 'cart/getCheckedQuantity',
+				checked: 'cart/getChecked'
 			}),
 		},
 		methods: {
 			...mapActions({
-				setCart: 'cart/set'
+				setCart: 'cart/set',
+				setAlert: 'alert/set',
 			}),
+			order() {
+				if(this.qty > 0) this.$router.push('/checkout');
+				else this.setAlert({status: true, color: 'error', text: 'Cart Checked is invalid!'})
+			}
 		}
 	}
 </script>

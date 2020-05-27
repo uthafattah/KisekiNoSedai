@@ -18,7 +18,7 @@ class OrderMerchandise extends JsonResource
             'id' => $this->id,
 			'order_id' => $this->order_id,
 			'merchandise_id' => $this->merchandise_id,
-            'store_name' => $this->store_name,
+            'store_name' => $this->merchandise->store->name,
             'merchandise_name' => $this->merchandise->name,
             'photo' => $this->merchandise->photo,
             'price' => $this->merchandise->price,

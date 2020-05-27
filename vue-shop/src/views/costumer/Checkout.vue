@@ -45,31 +45,34 @@
 									<div style="margin-left:0.5em" class="grey--text"><strong>Shipping Courier</strong></div>
 								</v-btn> 
 							</div>
-							<v-list-item-title class="subtitle-1 mb-1">Penjual <span class="font-weight-black">Jannah Gate</span></v-list-item-title>
-							<v-row class="mt-n2">
-								<v-col cols="2">
-									<v-list-item-avatar tile size="100">
-										<v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg"></v-img>
+							<v-row class="mt-n2" v-for="(order, index) in checked" :key="index" link>
+								<v-col cols="2" class="mt-n2">
+									<v-list-item-avatar tile size="80">
+										<v-img :src="getImage(order.photo)"></v-img>
 									</v-list-item-avatar>
 								</v-col>
-								<v-col cols="6">
-									<v-list-item>
-										<v-list-item-content>
-											<v-list-item-title class="mb-1 font-weight-black">Bundle Package WD Green SSD 240GB + WD Blue PC 1TB HDD/ Hardisk/ Hard</v-list-item-title>
-											<v-list-item-subtitle class="title font-weight-bold warning--text">Rp. 1.600.000</v-list-item-subtitle>
-										</v-list-item-content>
-									</v-list-item>
-									<v-list-item>
-										<span class="caption grey--text">Berat</span>
-										<span class="caption font-weight-bold primary--text" style="margin-left:0.3em">1200 gr</span>
-										<v-divider class="mx-4 my-2" inset vertical />
-										<span class="caption grey--text">Jumlah</span>
-										<span class="caption font-weight-bold primary--text" style="margin-left:0.3em">2</span>
-									</v-list-item>
+								<v-col cols="7" class="ml-n4">
+									<v-list-item-content>
+										<v-list-item-subtitle>
+											<span class="success--text font-weight-bold mr-2">{{order.store_name}}</span>
+										</v-list-item-subtitle>
+											<v-list-item-title class="title font-weight-bold">{{order.merchandise_name}}</v-list-item-title>
+										<v-list-item class="ml-n4">
+											<span class="caption grey--text">Harga</span>
+											<span class="caption font-weight-bold warning--text" style="margin-left:0.5em">{{order.price | currency}}</span>
+											<v-divider class="mx-4 my-3" inset vertical />
+											<span class="caption grey--text">Berat</span>
+											<span class="caption font-weight-bold primary--text" style="margin-left:0.5em">1200 gr</span>
+											<v-divider class="mx-4 my-3" inset vertical />
+											<span class="caption grey--text">Jumlah</span>
+											<span class="caption font-weight-bold primary--text" style="margin-left:0.5em">{{order.quantity}}</span>
+										</v-list-item>
+									</v-list-item-content>
 								</v-col>
-								<v-col cols="4">
+								<v-col cols="3">
 									<v-select outlined dense :items="sorting" label="Courier"></v-select>
 								</v-col>
+								<v-divider class="mb-2 mt-n2 mx-4" v-if="index != checked.length-1"/>
 							</v-row>
 						</v-list-item-content>
 					</v-list-item>
@@ -95,7 +98,7 @@
 							Total Ongkos Kirim
 						</v-col>
 						<v-col cols="6" sm="6" class="text-right font-weight-black">
-							{{total | currency}}
+							{{ongkir | currency}}
 						</v-col>
 					</v-row>
 					<div class="caption grey--text">Dengan ini, saya menyetujui <span class="font-weight-black">syarat dan ketentuan yang berlaku</span></div>
@@ -107,18 +110,47 @@
 							Total Harga
 						</v-col>
 						<v-col cols="6" sm="6" class="text-right font-weight-black">
-							{{total | currency}}
+							{{payment | currency}}
 						</v-col>
 					</v-row>
 				</v-card-text>
 				<v-card-actions class="mt-n4 mx-1">
 					<v-btn color="light-blue darken-1" block class="title white--text">Pay</v-btn>
 				</v-card-actions>
+				<v-divider class="mx-4 my-4" />
+				<v-text-field type="text" class="shrink justify-center mx-4" v-model="code" label="Promo Code"/>
 				<v-card-actions class="mx-1">
-					<v-btn outlined color="light-blue darken-1" block class="title white--text" to="/promos">
+					<v-btn outlined color="light-blue darken-1" block class="title white--text" @click="checkCode">
 						<v-icon dark left>mdi-ticket-percent</v-icon>Use Promo
 					</v-btn>
 				</v-card-actions>
+			</v-card>
+			<v-card class="mt-3" outlined v-if="promo.promo_code">
+				<v-card-text class="font-weight-black">
+					<v-row class="my-n2">
+						<v-col cols="10">
+							<span>Promo Digunakan</span>
+						</v-col>
+						<v-col cols="2">
+							<v-btn icon small @click="clearPromo" class="mr-1 text-right"><v-icon large>mdi-close-circle-outline</v-icon></v-btn>
+						</v-col>
+					</v-row>
+				</v-card-text>
+				<v-divider class="mx-4" />
+				<v-card-text>
+					<v-row>
+						<v-col cols="6" sm="6">
+							Total Potensi Promo
+						</v-col>
+						<v-col cols="6" sm="6" class="text-right font-weight-black">
+							{{ongkir | currency}}
+						</v-col>
+						<v-col cols="12" sm="12">
+							<b>{{promo.name}}</b>
+							{{promo.description}}
+						</v-col>
+					</v-row>
+				</v-card-text>
 			</v-card>
 		</v-col>
 	</v-row>
@@ -127,29 +159,54 @@
 	import { mapActions, mapGetters } from 'vuex'
 	export default {
 		data: () => ({
-			qty: 1,
-			total: 0,
+			ongkir: 10000,
 			cart: [],
+			code: '',
+			promo: {},
 			sorting: ['Larashop Courier', 'JNE', 'Tiki', 'Si Cepat', 'GoJek', 'Grab'],
 		}),
 		components: {
 
 		},
 		created() {
-			
+			//console.log(this.checked)
 		},
 		methods : {
 			...mapActions({
-
+				setAlert: 'alert/set',
 			}),
 			getImage(image) {
 				if(image != null && image.length > 0 && image != undefined) return "http://localhost:8000/storage/" + image;
+			},
+			checkCode() {
+				if(this.code) {
+					this.axios.get('http://localhost:8000/api/promo/check_promo/' + this.code)
+					.then((res) => {
+						this.promo = res.data.promo
+						this.setAlert({status: true, color: 'success', text: 'Promo Code is valid!'})
+					})
+					.catch((err) => {
+						console.log(err)
+						this.setAlert({status: true, color: 'error', text: 'Promo Code is invalid!'})
+						this.promo = {}
+					})
+				}
+				else this.$router.push('/promos');
+			},
+			clearPromo () {
+				this.promo = {}
+				this.code = ''
 			},
 		},
 		computed: {
 			...mapGetters({
 				user: 'auth/getData',
+				checked: 'cart/getChecked',
+				total: 'cart/getCheckedTotal',
 			}),
+			payment() {
+				return this.total + this.ongkir
+			}
 		}
 	}
 </script>

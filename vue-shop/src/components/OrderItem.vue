@@ -70,7 +70,6 @@
 						<v-select dense outlined :items="status_order" label="Change Order Status to" color="primary" append-icon="mdi-content-save-move" @click:append="moveOrder(status)" v-model='status'/>
 					</v-col>
 				</v-row>
-				
 			</v-card-actions>
 		</v-card>
 	</v-card>
@@ -88,17 +87,31 @@
 			status_order: ['Requested', 'Waiting', 'On Process', 'Shipped', 'Arrived', 'Success', 'Canceled'],
 		}),
 		created(){
-			this.axios.get('http://localhost:8000/api/order_merchandise/user_order_merchandise/' + this.order.id)
-			.then((res) => {
-				this.order_merchandise = res.data.order_merchandise
-			})
-			.catch((err) => {
-				if(err.response.status == 401) {
-					localStorage.removeItem('token');
-					this.$router.push('/');
-				}
-				console.log(err.response)
-			})
+			if(this.$route.path === '/orders') {
+				this.axios.get('http://localhost:8000/api/order_merchandise/user_order_merchandise/' + this.order.id)
+				.then((res) => {
+					this.order_merchandise = res.data.order_merchandise
+				})
+				.catch((err) => {
+					if(err.response.status == 401) {
+						localStorage.removeItem('token');
+						this.$router.push('/');
+					}
+					console.log(err.response)
+				})
+			} else if (this.$route.path === '/my-store/orders') {
+				this.axios.get('http://localhost:8000/api/order_merchandise/user_order_merchandise/' + this.order.id)
+				.then((res) => {
+					this.order_merchandise = res.data.order_merchandise
+				})
+				.catch((err) => {
+					if(err.response.status == 401) {
+						localStorage.removeItem('token');
+						this.$router.push('/');
+					}
+					console.log(err.response)
+				})
+			}
 		},
 		methods : {
 			...mapActions({

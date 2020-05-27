@@ -1,13 +1,25 @@
 <template>
 	<v-card outlined class="mx-4">
 		<v-list-item three-line>
-			<v-list-item-avatar tile size="80">
-				<v-img :src="getImage(cart.photo)"></v-img>
-			</v-list-item-avatar>
-			<v-list-item-content>
-				<v-list-item-title class="title font-weight-bold">{{cart.name}}</v-list-item-title>
-				<v-list-item-subtitle class="subtitle-1 font-weight-black warning--text">{{cart.price | currency}}</v-list-item-subtitle>
-			</v-list-item-content>
+			<v-checkbox v-model="checked" class="mt-8" @change="check(cart)"></v-checkbox>
+			<v-row>
+				<v-col cols="2" class="mt-n2">
+					<v-list-item-avatar tile size="80">
+						<v-img :src="getImage(cart.photo)"></v-img>
+					</v-list-item-avatar>
+				</v-col>
+				<v-col cols="10" class="ml-n4">
+					<v-list-item-content>
+						<v-list-item-subtitle>
+							<span class="success--text font-weight-bold mr-2">{{cart.store_name}}</span>
+						</v-list-item-subtitle>
+							<v-list-item-title class="title font-weight-bold">{{cart.merchandise_name}}</v-list-item-title>
+						<v-list-item-subtitle>
+							<span class="warning--text mr-4">{{cart.price | currency}}</span> <span class="grey--text">Stock {{cart.stock}} Produk</span>
+						</v-list-item-subtitle>
+					</v-list-item-content>
+				</v-col>
+			</v-row>
 		</v-list-item>
 
 		<v-card-actions class="mt-n12">
@@ -40,9 +52,11 @@
 		data: () => ({
 			wishlist_color: 'pink lighten-5',
 			status: false,
+			checked: true,
 		}),
 		created() {
 			this.status = this.cart.status
+			console.log(this.status)
 			this.wishlist_color = (this.cart.status) ? 'pink' : 'pink lighten-5'
 		},
 		methods : {
@@ -50,8 +64,14 @@
 				updateQty: 'cart/updateQuantity',
 				removeCart: 'cart/remove',
 				setAlert: 'alert/set',
-				wishlistCart: 'cart/wishlist'
+				wishlistCart: 'cart/wishlist',
+				checkCart: 'cart/checkCart',
+				uncheckCart: 'cart/uncheckCart',
 			}),
+			check(cart) {
+				if(this.checked) this.checkCart(cart)
+				else this.uncheckCart(cart)
+			},
 			toMerchandise(id) {
 				return "/merchandise/" + id
 			},

@@ -28,8 +28,6 @@ class OrderMerchandiseController extends Controller
 
         $order_merchandise = [];
         foreach($orders as $temp){
-            $store_id = Merchandise::where('id', '=', $temp->merchandise_id)->first()->store_id;
-            $temp->store_name = Merchandise::where('id', '=', $store_id)->first()->name;
             $order_merchandise[] = new OrderMerchandiseResource($temp);
         }
         return response()->json(['order_merchandise' => $order_merchandise], 200);
@@ -41,8 +39,6 @@ class OrderMerchandiseController extends Controller
 
         $order_merchandise = [];
         foreach($orders as $temp){
-            $store_id = Merchandise::where('id', '=', $temp->merchandise_id)->first()->store_id;
-            $temp->store_name = Merchandise::where('id', '=', $store_id)->first()->name;
             $order_merchandise[] = new OrderMerchandiseResource($temp);
         }
         return response()->json(['order_merchandise' => $order_merchandise], 200);

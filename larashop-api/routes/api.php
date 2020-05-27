@@ -67,6 +67,7 @@ Route::group(['middleware'=> ['auth:api']], function() {
 	Route::post('payment/verify', 'PaymentController@verifyPayment');
 	Route::resource("payment", "PaymentController");
 	//---------------------------------------------------------------------------------------------
+	Route::get('promo/check_promo/{code}', 'PromoController@checkPromo');
 	Route::post('promo/verify', 'PromoController@verifyPromo');
 	Route::resource("promo", "PromoController");
 	//---------------------------------------------------------------------------------------------

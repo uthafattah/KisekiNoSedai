@@ -18,7 +18,7 @@ class ReviewSeeder extends Seeder
     	for ($i=0; $i < 400; $i++) { //Review
 	        DB::table('reviews')->insert([
 	        	'order_merchandise_id' => $faker->unique()->numberBetween(1, 400),
-	        	'rating' => rand(0,500) / 100,
+	        	'rating' => rand(1,5),
 	        	'comment' => $faker->text,
 	        	'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),

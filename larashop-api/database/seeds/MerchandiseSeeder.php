@@ -29,6 +29,7 @@ class MerchandiseSeeder extends Seeder
 		        	'stock' => rand(10,100),
 		        	'price' => rand(10,10000) * 1000,
 		        	'weight' => rand(1,100) * 100,
+	        		'rating' => rand(10,50) / 10,
 		        	'condition' => $condition[rand(0, 1)],
 		        	'insurance' => $insurance[rand(0, 1)],
 		        	'view_count' => rand(0,250),

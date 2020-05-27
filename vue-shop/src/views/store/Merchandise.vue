@@ -50,6 +50,14 @@
 			</v-toolbar>
 			<v-text-field @input="searchIt" append-icon="mdi-magnify" class="mx-4" label="Search..." single-line hide-details clear-icon="mdi-close-circle" clearable/>
 		</template>
+		<template v-slot:item.category="{ item }">
+			<v-edit-dialog large block persistent :return-value.sync="item.category">
+				Category	
+				<template v-slot:input>
+					<v-select :items="categories" :rules="[rules.category]" v-model="item.category" label="Category" class="mt-6" multiple/>
+				</template>
+			</v-edit-dialog>
+		</template>
 		<template v-slot:item.photo="{ item }">
 			<v-edit-dialog>
 				<v-list-item-avatar tile>

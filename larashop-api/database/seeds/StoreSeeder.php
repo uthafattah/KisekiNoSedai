@@ -25,7 +25,7 @@ class StoreSeeder extends Seeder
 	        	'address' => $faker->address,
 	        	'description' => $faker->text,
 	        	'followers' => rand(0,25),
-	        	'ratings' => rand(0,500) / 100,
+	        	'rating' => rand(10,50) / 10,
 	        	'status_store_id' => rand(1,4),
 	        	'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),

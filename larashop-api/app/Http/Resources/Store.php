@@ -23,7 +23,7 @@ class Store extends JsonResource
             'address' => $this->address,
             'description' => $this->description,
             'followers' => $this->followers,
-            'ratings' => $this->ratings,
+            'rating' => number_format($this->rating, 1),
             'status_store' => $this->status_store->name,
             'status' => $this->status,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),

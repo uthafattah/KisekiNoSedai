@@ -65,4 +65,10 @@ class PromoController extends Controller
 
         return response()->json(['message' => 'Valid Promo Code'], 200);
     }
+
+    public function checkPromo($code) 
+    {
+        $promo = Promo::where('promo_code', '=', "$code")->first();
+        return response()->json(['promo' => new PromoResource($promo)], 200);
+    }
 }
