@@ -28,10 +28,10 @@
 				</v-list-item-avatar>
 			</v-list-item>
 
-			<v-card-actions>
+			<v-card-actions class="mr-2">
 				<v-spacer />
 				<v-btn :outlined="outlined" :color="follow_color" @click="follow" @mouseover="mouseOver" @mouseleave="mouseLeave" v-if="userId">{{message}}</v-btn>
-				<v-btn outlined color="secondary" to="/message" v-if="userId">Message Store</v-btn>
+				<v-btn outlined :color="theme ? 'white' : 'secondary'" to="/message" v-if="userId">Message Store</v-btn>
 			</v-card-actions>
 			<v-divider class="mt-4 mx-4" />
 			<v-row class="mx-4 mb-n6">
@@ -136,6 +136,9 @@
 			msg() {
 				return (this.store.status) ? 'Following' : 'Follow'
 			},
+			theme() {
+				return (this.$vuetify.theme.dark)
+			}
 		},
 		created(){
 			this.axios.get('http://localhost:8000/api/store/search/' + this.$route.params.id)

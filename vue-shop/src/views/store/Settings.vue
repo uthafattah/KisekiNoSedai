@@ -19,7 +19,7 @@
 						</v-card-text>
 						<v-card-actions class="mr-2">
 							<v-spacer />
-							<v-btn outlined color="secondary" @click="clear">Clear</v-btn>
+							<v-btn outlined :color="theme ? 'white' : 'secondary'" @click="clear">Clear</v-btn>
 							<v-btn type="submit" :disabled="!valid" @click.prevent="updateStore" outlined color="success" @click="submit">Update Store</v-btn>
 						</v-card-actions>
 					</v-card>
@@ -58,6 +58,9 @@
 			clear() {
 
 			},
+			theme() {
+				return (this.$vuetify.theme.dark)
+			}
 		},
 		created(){
 			this.axios.get('http://localhost:8000/api/category/pluck')

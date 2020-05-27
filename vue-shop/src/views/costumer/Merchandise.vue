@@ -5,7 +5,7 @@
 				<v-col cols="4">
 					<v-carousel cycle height="400" max-width="500" hide-delimiter-background show-arrows-on-hover>
 						<v-carousel-item v-for="(slide, i) in [merchandise.photo]" :key="i">
-							<v-sheet color="grey lighten-3" height="100%">
+							<v-sheet :color="theme? 'transparant' : 'white'" height="100%">
 								<v-row class="fill-height" align="center" justify="center">
 									<v-img :src="getImage(slide)" aspect-ratio="1"/>
 								</v-row>
@@ -110,10 +110,10 @@
 					</v-list-item-content>
 				</v-col>
 				<v-col cols="2">
-					<v-btn large outlined color="success" to="/messages" class="mt-10" v-if="userId">Message Store</v-btn>
+					<v-btn large outlined :color="theme ? 'white' : 'secondary'" to="/messages" class="mt-10" v-if="userId">Message Store</v-btn>
 				</v-col>
 				<v-col cols="2">
-					<v-btn large outlined color="secondary" :to="toStore()" class="mt-10 ml-6" v-if="userId">Store Details</v-btn>
+					<v-btn large outlined color="success" :to="toStore()" class="mt-10 ml-6" v-if="userId">Store Details</v-btn>
 				</v-col>
 			</v-row>
 		</v-list-item>
@@ -121,8 +121,8 @@
 		<v-divider/>
 		<v-tabs grow v-model="tab" background-color="white" icons-and-text>
 			<v-progress-linear :active="loading" :indeterminate="loading" absolute top color="white accent-4"></v-progress-linear>
-			<v-tabs-slider></v-tabs-slider>
-			<v-tab v-for="(item, index) in tab_header" :key="index" :href="`#tab-${index}`">
+			<v-tabs-slider :class="{'slider': theme}"></v-tabs-slider>
+			<v-tab v-for="(item, index) in tab_header" :key="index" :href="`#tab-${index}`" :class="{'tab': theme}">
 				{{item.text}}
 				<v-icon>{{item.icon}}</v-icon>
 			</v-tab>
@@ -247,8 +247,18 @@
 				else if(this.merchandise.status_store == 'Default') return 'mdi-storefront'
 				else return null
 			},
+			theme() {
+				return (this.$vuetify.theme.dark)
+			}
 		}
 	}
 </script>
 <style scoped>
+	.tab {
+		color: white;
+		background-color: #212121;
+	}
+	.slider {
+		color: white;
+	}
 </style>

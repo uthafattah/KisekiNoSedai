@@ -24,7 +24,7 @@
 											<v-list-item-title class="title font-weight-bold">{{item.merchandise_name}}</v-list-item-title>
 											<v-list-item-subtitle>
 												<span class="warning--text mr-4">{{item.price | currency}}</span> <span class="grey--text">{{item.quantity}} Produk</span>
-												<v-btn small outlined color="secondary" style="margin-left:5em" :to="toMerchandise(item.merchandise_id)">Merchandise Details</v-btn>
+												<v-btn small outlined :color="theme ? 'white' : 'secondary'" style="margin-left:5em" :to="toMerchandise(item.merchandise_id)">Merchandise Details</v-btn>
 											</v-list-item-subtitle>
 										</v-list-item-content>
 									</v-col>
@@ -52,10 +52,10 @@
 
 			<v-card-actions v-if="isCostumer">
 				<v-spacer />
-				<v-btn small outlined color="secondary" to="/checkout">
+				<v-btn small outlined :color="theme ? 'white' : 'secondary'" to="/checkout">
 					<v-icon small left>mdi-eye</v-icon>See Order Details
 				</v-btn>
-				<v-btn small outlined color="secondary" to="/messages">
+				<v-btn small outlined :color="theme ? 'white' : 'secondary'" to="/messages">
 					<v-icon small left>mdi-email</v-icon>Message Store
 				</v-btn>
 				<v-btn small color="light-blue darken-1" class="white--text" to="/carts">
@@ -142,6 +142,9 @@
 			isStore () {
 				return (this.$route.path === '/my-store/orders')
 			},
+			theme() {
+				return (this.$vuetify.theme.dark)
+			}
 		}
 	}
 </script>

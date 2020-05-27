@@ -1,7 +1,7 @@
 <template>
 	<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="users.total" :items="users.data" :footer-props="footerProps">
 		<template v-slot:top>
-			<v-toolbar flat>
+			<v-toolbar flat color="transparent">
 				<v-toolbar-title>User Management System</v-toolbar-title>
 				<v-divider class="mx-4" inset vertical></v-divider>
 				<v-spacer></v-spacer>

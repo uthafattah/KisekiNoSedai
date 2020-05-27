@@ -3,9 +3,9 @@
 		<v-card-title>
 			<v-btn text dark large>
 				<v-avatar tile size="36">
-					<v-icon large class="black--text">mdi-ticket-percent</v-icon>
+					<v-icon large :class="theme ? 'white--text' : 'black--text'">mdi-ticket-percent</v-icon>
 				</v-avatar>
-				<div style="margin-left:0.5em" class="black--text headline"><strong>PROMO LARASHOP</strong></div>
+				<div style="margin-left:0.5em" :class="theme ? 'white--text headline' : 'black--text headline'"><strong>PROMO LARASHOP</strong></div>
 			</v-btn>
 		</v-card-title>
 		<v-divider class="mx-4" />
@@ -39,6 +39,9 @@
 			promos: []
 		}),
 		computed: {
+			theme() {
+				return (this.$vuetify.theme.dark)
+			}
 		},
 		methods: {
 			getImage(image) {

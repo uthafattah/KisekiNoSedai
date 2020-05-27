@@ -18,9 +18,9 @@
 								<v-col cols="12" sm="12" md="12">
 									<v-btn text dark>
 										<v-avatar tile size="36">
-											<v-icon class="black--text">mdi-apps</v-icon>
+											<v-icon :class="theme ? 'white--text' : 'black--text'">mdi-apps</v-icon>
 										</v-avatar>
-										<div style="margin-left:0.5em" class="black--text"><strong>Categories</strong></div>
+										<div style="margin-left:0.5em" :class="theme ? 'white--text' : 'black--text'"><strong>Categories</strong></div>
 									</v-btn>
 								</v-col>
 							</v-row>
@@ -32,7 +32,7 @@
 										<v-avatar tile size="36">
 											<v-img :src="getImage(category.photo)" aspect-ratio="1"></v-img>
 										</v-avatar>
-										<div style="margin-left:0.5em" class="black--text">{{ category.name }}</div>
+										<div style="margin-left:0.5em" :class="theme ? 'white--text' : 'black--text'">{{ category.name }}</div>
 									</v-btn>
 								</v-col>
 							</v-row>
@@ -133,6 +133,9 @@
 			},
 			isSearch () {
 				return (this.search === '')
+			},
+			theme() {
+				return (this.$vuetify.theme.dark)
 			}
 		},
 		methods : {

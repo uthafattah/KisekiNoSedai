@@ -3,8 +3,8 @@
 		<v-progress-linear :active="loading" :indeterminate="loading" absolute top color="light-blue darken-1"></v-progress-linear>
 		<v-row>
 			<v-col cols="4" sm="4">
-				<v-toolbar flat>
-					<v-toolbar-title>Messages</v-toolbar-title>
+				<v-toolbar flat color="transparent">
+					<v-toolbar-title class="ml-6 headline mb-n1 font-weight-bold">Messages</v-toolbar-title>
 				</v-toolbar>
 				<v-divider class="ml-4 mb-2" />
 				<v-sheet id="scrolling-techniques-7" class="overflow-y-auto">
@@ -26,7 +26,7 @@
 				</v-sheet>
 			</v-col>
 			<v-col cols="8" sm="8">
-				<v-toolbar flat>
+				<v-toolbar flat color="transparent">
 					<v-avatar size="36" v-if="header.avatar" style="margin-right:1em">
 						<v-img :src="getImage(header.avatar)" aspect-ratio="1"/>
 					</v-avatar>
@@ -39,7 +39,7 @@
 					<v-container id="scroll-target-user" style="height: 550px;">
 						<v-card flat v-for="(item, index) in messages"  :key="'messages' + index">
 							<v-card class="d-flex flex-row mb-6" flat tile v-if="item.sender == 'User'">
-								<v-card class="pa-2" outlined tile max-width="500" color="grey lighten-3">
+								<v-card class="pa-2" outlined tile max-width="500" :color="theme ? 'grey darken-3' : 'grey lighten-3'">
 									<v-list-item>
 										<v-list-item-content>
 											<div class="overline mb-4 font-weight-black">{{item.user_name}}</div>
@@ -49,7 +49,7 @@
 								</v-card>
 							</v-card>
 							<v-card class="d-flex flex-row-reverse mb-6" flat tile v-else>
-								<v-card class="pa-2" outlined tile max-width="500" color="green lighten-3">
+								<v-card class="pa-2" outlined tile max-width="500" :color="theme ? 'green' : 'green lighten-3'">
 									<v-list-item>
 										<v-list-item-content>
 											<div class="overline mb-4 font-weight-black">{{item.store_name}}</div>
@@ -97,6 +97,9 @@
 			...mapGetters({
 				store: 'store/getStore',
 			}),
+			theme() {
+				return (this.$vuetify.theme.dark)
+			}
 		},
 		methods: {
 			...mapActions({

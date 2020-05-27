@@ -10,11 +10,11 @@
 				<v-col cols="9">
 					<v-tabs grow v-model="tab" background-color="white" centered>
 						<v-progress-linear :active="loading" :indeterminate="loading" absolute top color="white accent-4"></v-progress-linear>
-						<v-tabs-slider></v-tabs-slider>
-						<v-tab href="#tab-profile">
+						<v-tabs-slider :class="{'slider': theme}"></v-tabs-slider>
+						<v-tab href="#tab-profile" :class="{'tab': theme}">
 							Profile
 						</v-tab>
-						<v-tab href="#tab-password">
+						<v-tab href="#tab-password" :class="{'tab': theme}">
 							Change Password
 						</v-tab>
 					</v-tabs>
@@ -31,7 +31,7 @@
 								</v-card-text>
 								<v-card-actions class="mr-2">
 									<v-spacer />
-									<v-btn outlined color="secondary" @click="clearProfile">Clear</v-btn>
+									<v-btn outlined :color="theme ? 'white' : 'secondary'" @click="clearProfile">Clear</v-btn>
 									<v-btn type="submit" :disabled="!valid_profile" @click.prevent="update_profile" outlined color="success" @click="updateProfile">Update Profile</v-btn>
 								</v-card-actions>
 							</v-card>
@@ -47,7 +47,7 @@
 								</v-card-text>
 								<v-card-actions class="mr-2">
 									<v-spacer />
-									<v-btn outlined color="secondary" @click="clearPassword">Clear</v-btn>
+									<v-btn outlined :color="theme ? 'white' : 'secondary'" @click="clearPassword">Clear</v-btn>
 									<v-btn type="submit" :disabled="!valid_password" @click.prevent="update_password" outlined color="success" @click="updatePassword">Update Password</v-btn>
 								</v-card-actions>
 							</v-card>
@@ -88,6 +88,9 @@
 			passwordMatch() {
 				return this.resetPasswordField.new_password != this.resetPasswordField.new_rpassword ? "Password Does Not Match" : true;
 			},
+			theme() {
+				return (this.$vuetify.theme.dark)
+			}
 		},
 		methods: {
 			...mapActions({
@@ -116,5 +119,12 @@
 <style scoped>
 	.btnCustom:hover {
 		background-color: #FF5252 !important;
+	}
+	.tab {
+		color: white;
+		background-color: #212121;
+	}
+	.slider {
+		color: white;
 	}
 </style>

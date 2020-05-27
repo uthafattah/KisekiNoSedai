@@ -73,11 +73,11 @@
 				<v-card>
 					<v-tabs fixed-tabs v-model="tab" background-color="light-blue darken-1" centered dark icons-and-text>
 						<v-progress-linear :active="loading" :indeterminate="loading" absolute top color="white accent-4"></v-progress-linear>
-						<v-tabs-slider></v-tabs-slider>
-						<v-tab href="#tab-login">
+						<v-tabs-slider :class="{'slider': theme}"></v-tabs-slider>
+						<v-tab href="#tab-login" :class="{'tab': theme}">
 							Login
 						</v-tab>
-						<v-tab href="#tab-register">
+						<v-tab href="#tab-register" :class="{'tab': theme}">
 							Register
 						</v-tab>
 					</v-tabs>
@@ -383,6 +383,9 @@
 			},
 			roleAdmin() {
 				return this.role === 1 ? true : false
+			},
+			theme() {
+				return (this.$vuetify.theme.dark)
 			}
 		},
 	}
@@ -396,5 +399,12 @@
 		box-shadow: none;
 		border: none;
 		background: transparent;
+	}
+	.tab {
+		color: white;
+		/*background-color: #212121;*/
+	}
+	.slider {
+		color: white;
 	}
 </style>
