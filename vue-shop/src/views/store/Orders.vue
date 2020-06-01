@@ -1,22 +1,5 @@
 <template>
 	<v-card outlined>
-		<v-row class="mx-4 mt-4 mb-n4">
-			<v-col cols="4">
-				<v-menu v-model="datepicker" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y min-width="290px">
-					<template v-slot:activator="{ on }">
-						<v-text-field dense outlined :value="dateRangeText" label="Lihat Transaksi" prepend-icon="mdi-calendar-blank" readonly v-on="on" @click:clear="clearDate" clear-icon="mdi-close-circle" clearable/>
-						<!--v-text-field v-model="dateRangeText" label="Date range" prepend-icon="mdi-calendar-blank" readonly v-on="on"></v-text-field-->
-					</template>
-					<v-date-picker v-model="dates" @input="pickCount++, pickCount == 2 ? (datepicker = false, pickCount = 0) : datepicker " range></v-date-picker>
-				</v-menu>
-			</v-col>
-			<v-col cols="6">
-				<v-text-field dense outlined append-icon="mdi-magnify" label="Search..." hide-details clear-icon="mdi-close-circle" clearable/>
-			</v-col>
-			<v-col cols="2">
-				<v-select dense outlined :items="sorting" label="Sort By"></v-select>
-			</v-col>
-		</v-row>
 		<v-divider class="mx-4" />
 		<v-tabs fixed-tabs v-model="tab" background-color="white" icons-and-text>
 			<v-progress-linear :active="loading" :indeterminate="loading" absolute top color="white accent-4"></v-progress-linear>
@@ -28,27 +11,48 @@
 		</v-tabs>
 		<v-tabs-items v-model="tab">
 			<v-tab-item v-for="(item, index) in tab_item" :key="index" :value="`tab-${index}`">
-				<v-row class="mx-2" v-if="checkStatusOrder(index) || index == 0">
-					<v-col cols="12" v-for="(order) in orders" :key="order.id" link :to="order.action">
-						<OrderItem :order="order" v-if="order.status_order_id == index" />
-						<OrderItem :order="order" v-if="index == 0" />
-					</v-col>
-				</v-row>
-				<v-row class="mx-2" v-else>
-					<v-col cols="12">
-						<v-card outlined>
-							<v-list-item>
-								<v-list-item-content>
-									ORDER NOT FOUND
-								</v-list-item-content>
-							</v-list-item>
-						</v-card>
-					</v-col>
-				</v-row>
-				<v-card-actions v-if="total(index) != 0">
-					<v-spacer />
-					<v-text-field dense outlined readonly :value="total(index)" label="Total Shopping" prefix="Rp" class="mr-3 mt-4 shrink" style="width: 250px;"/>
-				</v-card-actions>
+				<v-data-table item-key="name" class="elevation-1" :loading="loading" loading-text="Loading... Please wait" :headers="headers" :options.sync="options" :server-items-length="orders.total" :items="orders.data" :footer-props="footerProps">
+					<template v-slot:top>
+						<v-toolbar flat color="transparent">
+							<v-toolbar-title>{{item.text}} Orders</v-toolbar-title>
+						</v-toolbar>
+						<v-row class="mx-1 mt-n6 mb-2">
+							<v-col cols="4">
+								<v-menu v-model="datepicker" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y min-width="290px">
+									<template v-slot:activator="{ on }">
+										<v-text-field single-line hide-details :value="dateRangeText" label="Lihat Transaksi" prepend-icon="mdi-calendar-blank" readonly v-on="on" @click:clear="clearDate" clear-icon="mdi-close-circle" clearable/>
+										<!--v-text-field v-model="dateRangeText" label="Date range" prepend-icon="mdi-calendar-blank" readonly v-on="on"></v-text-field-->
+									</template>
+									<v-date-picker v-model="dates" @input="pickCount++, pickCount == 2 ? (datepicker = false, pickCount = 0) : datepicker " range></v-date-picker>
+								</v-menu>
+							</v-col>
+							<v-col cols="6">
+								<v-text-field single-line hide-details append-icon="mdi-magnify" label="Search..." clear-icon="mdi-close-circle" clearable/>
+							</v-col>
+							<v-col cols="2">
+								<v-select single-line hide-details :items="sorting" label="Sort By"></v-select>
+							</v-col>
+						</v-row>
+					</template>
+					<template v-slot:item.status_order="{ item }">
+						<v-edit-dialog large block persistent :return-value.sync="item.status_order" @save="updateStatus(item)">
+								{{item.status_order}}
+								
+							<template v-slot:input>
+								<h4>Change Role</h4>
+								<v-select :rules="[rules.required]" :items="status_order" v-model="item.status_order" color="error" label="Select Status"></v-select>
+							</template>
+						</v-edit-dialog>
+					</template>
+					<!--template v-slot:item.photo="{ item }">
+						<v-list-item-avatar>
+							<v-img :src="getImage(item.photo)" aspect-ratio="1" class="grey lighten-2"></v-img>
+						</v-list-item-avatar>
+					</template-->
+					<template v-slot:no-data>
+						<v-btn color="primary" @click="refresh">Reset</v-btn>
+					</template>
+				</v-data-table>
 			</v-tab-item>
 		</v-tabs-items>
 	</v-card>
@@ -57,7 +61,6 @@
 	import { mapGetters } from 'vuex'
 	export default {
 		data: () => ({
-			loading: false,
 			tab: null,
 			dates: [],
 			datepicker: false,
@@ -84,14 +87,37 @@
 				{ text: 'Canceled' },
 			],
 			orders: [],
+			status_order: [],
+			loading: false,
+			options: {
+				itemsPerPage: 10,
+				sortBy: ['role_id'],
+				sortDesc: [false]
+			},
+			rules: {
+				required: v => !!v || "This Field Required",
+			},
+			footerProps: {
+				itemsPerPageOptions: [10, 20, 30],
+				itemsPerPageText: 'Users Per Page',
+				'show-current-page': true,
+				'show-first-last-page': true
+			},
+			headers: [
+				{ text: 'Invoice', align: 'left', sortable: false, value: 'invoice_number' },
+				//{ text: 'Costumer', value: 'user_name' },
+				//{ text: 'Name Merchandise', value: 'merchandise_name' },
+				//{ text: 'Quantity', value: 'quantity' },
+				{ text: 'Total Price', value: 'total_price' },
+				//{ text: 'Photo', sortable: false, value: 'photo' },
+				{ text: 'Status', value: 'status_order' },
+			],
 		}),
-		components: {
-			OrderItem: () => import(/* webpackChunkName: "order-item" */ '@/components/OrderItem.vue')
-		},
 		created(){
-			this.axios.get('http://localhost:8000/api/order/store_order/' + this.store.id)
+			this.axios.get('http://localhost:8000/api/order/store_order')
 			.then((res) => {
 				this.orders = res.data.order
+				this.status_order = res.data.status_order
 			})
 			.catch((err) => {
 				if(err.response.status == 401) {
@@ -137,7 +163,32 @@
 					}
 				}
 				return total
-			}
+			},
+			updateStatus(item) {
+				const index = this.users.data.indexOf(item);
+				this.axios.post("http://localhost:8000/api/user/role", { role: item.role, user: item.id })
+				.then(res => {
+					this.setAlert({status: true, color: 'success', text: res.data.user.name + "'s Role Updated to " + res.data.user.role})
+				})
+				.catch(err => {
+					this.users.data[index].role = err.response.data.user.role;
+					this.setAlert({status: true, color: 'error', text: err.response.data.user.name + "'s Role Cannot Be Updated to " + err.response.data.user.role})
+				});
+			},
+			refresh() {
+				//this.initialize()
+				this.axios.get('http://localhost:8000/api/order/user_order')
+				.then((res) => {
+					this.orders = res.data.order
+				})
+				.catch((err) => {
+					if(err.response.status == 401) {
+						localStorage.removeItem('token');
+						this.$router.push('/');
+					}
+					console.log(err.response)
+				})
+			},
 		},
 	}
 </script>

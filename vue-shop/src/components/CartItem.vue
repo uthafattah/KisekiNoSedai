@@ -56,7 +56,6 @@
 		}),
 		created() {
 			this.status = this.cart.status
-			console.log(this.status)
 			this.wishlist_color = (this.cart.status) ? 'pink' : 'pink lighten-5'
 		},
 		methods : {

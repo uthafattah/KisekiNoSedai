@@ -9,6 +9,10 @@ use App\Order;
 
 class OrderMerchandise extends Model
 {
+	protected $fillable = [
+        'order_id', 'merchandise_id', 'quantity', 'note',
+    ];
+
     public function merchandise() {
         return $this->belongsTo(Merchandise::class);
     }

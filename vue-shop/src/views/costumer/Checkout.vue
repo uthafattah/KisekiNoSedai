@@ -51,7 +51,7 @@
 										<v-img :src="getImage(order.photo)"></v-img>
 									</v-list-item-avatar>
 								</v-col>
-								<v-col cols="7" class="ml-n4">
+								<v-col cols="10" class="ml-n4">
 									<v-list-item-content>
 										<v-list-item-subtitle>
 											<span class="success--text font-weight-bold mr-2">{{order.store_name}}</span>
@@ -69,9 +69,9 @@
 										</v-list-item>
 									</v-list-item-content>
 								</v-col>
-								<v-col cols="3">
+								<!--v-col cols="3">
 									<v-select outlined dense :items="sorting" label="Courier"></v-select>
-								</v-col>
+								</v-col-->
 								<v-divider class="mb-2 mt-n2 mx-4" v-if="index != checked.length-1"/>
 							</v-row>
 						</v-list-item-content>
@@ -94,16 +94,16 @@
 						<v-col cols="6" sm="6" class="text-right font-weight-black">
 							{{total | currency}}
 						</v-col>
-						<v-col cols="6" sm="6">
+						<!--v-col cols="6" sm="6">
 							Total Ongkos Kirim
 						</v-col>
 						<v-col cols="6" sm="6" class="text-right font-weight-black">
 							{{ongkir | currency}}
-						</v-col>
+						</v-col-->
 					</v-row>
 					<div class="caption grey--text">Dengan ini, saya menyetujui <span class="font-weight-black">syarat dan ketentuan yang berlaku</span></div>
 				</v-card-text>
-				<v-divider class="mx-4" />
+				<!--v-divider class="mx-4" />
 				<v-card-text>
 					<v-row>
 						<v-col cols="6" sm="6">
@@ -113,9 +113,9 @@
 							{{payment | currency}}
 						</v-col>
 					</v-row>
-				</v-card-text>
+				</v-card-text-->
 				<v-card-actions class="mt-n4 mx-1">
-					<v-btn color="light-blue darken-1" block class="title white--text">Pay</v-btn>
+					<v-btn color="light-blue darken-1" block class="title white--text" @click="process" >Pay</v-btn>
 				</v-card-actions>
 				<v-divider class="mx-4 my-4" />
 				<v-text-field type="text" class="shrink justify-center mx-4" v-model="code" label="Promo Code"/>
@@ -159,17 +159,17 @@
 	import { mapActions, mapGetters } from 'vuex'
 	export default {
 		data: () => ({
-			ongkir: 10000,
 			cart: [],
 			code: '',
 			promo: {},
-			sorting: ['Larashop Courier', 'JNE', 'Tiki', 'Si Cepat', 'GoJek', 'Grab'],
+			//ongkir: 10000
+			//sorting: ['Larashop Courier', 'JNE', 'Tiki', 'Si Cepat', 'GoJek', 'Grab'],
 		}),
 		components: {
 
 		},
 		created() {
-			//console.log(this.checked)
+			console.log(this.checked)
 		},
 		methods : {
 			...mapActions({
@@ -197,6 +197,19 @@
 				this.promo = {}
 				this.code = ''
 			},
+			process() {
+				this.axios.post('http://localhost:8000/api/order', { total_price: this.total, checked: this.checked })
+				.then((res) => {
+					console.log(res.data.order)
+					console.log(res.data.order_merchandise)
+					this.setAlert({status: true, color: 'success', text: 'Success Ordering Item!'})
+					this.$router.push('/orders');
+				})
+				.catch((err) => {
+					console.log(err)
+					this.setAlert({status: true, color: 'error', text: 'Failed Processing Order!'})
+				})
+			}
 		},
 		computed: {
 			...mapGetters({
@@ -204,9 +217,9 @@
 				checked: 'cart/getChecked',
 				total: 'cart/getCheckedTotal',
 			}),
-			payment() {
+			/*payment() {
 				return this.total + this.ongkir
-			}
+			}*/
 		}
 	}
 </script>

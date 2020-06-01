@@ -9,6 +9,10 @@ use App\Payment;
 
 class Order extends Model
 {
+	protected $fillable = [
+        'user_id', 'total_price', 'invoice_number', 'status_order_id', 'payment_id'
+    ];
+
     public function user() {
         return $this->belongsTo(User::class);
     }

@@ -57,7 +57,7 @@ Route::group(['middleware'=> ['auth:api']], function() {
 	Route::resource("message", "MessageController");
 	//---------------------------------------------------------------------------------------------
 	Route::get('order/user_order', 'OrderController@userOrder');
-	Route::get('order/store_order/{id}', 'OrderController@storeOrder');
+	Route::get('order/store_order', 'OrderController@storeOrder');
 	Route::resource("order", "OrderController");
 	//---------------------------------------------------------------------------------------------
 	Route::get("order_merchandise/user_order_merchandise/{id}", "OrderMerchandiseController@userOrderMerchandise");

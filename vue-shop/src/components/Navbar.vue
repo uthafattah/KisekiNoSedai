@@ -384,9 +384,6 @@
 			roleAdmin() {
 				return this.role === 1 ? true : false
 			},
-			theme() {
-				return (this.$vuetify.theme.dark)
-			}
 		},
 	}
 </script>
